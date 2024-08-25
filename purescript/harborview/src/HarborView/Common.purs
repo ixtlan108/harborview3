@@ -3,13 +3,10 @@ module HarborView.Common where
 import Prelude
 
 import Data.Either (Either(..))
-import Effect (Effect)
-import Effect.Class (liftEffect)
-import Effect.Aff (Aff)
-import Web.Event.Event as Event
--- import Effect.Console (logShow)
-
 import Data.Number.Format as Format
+import Effect (Effect)
+import Effect.Console (logShow)
+import Web.Event.Event as Event
 
 foreign import alert :: String -> Effect Unit
 
@@ -29,11 +26,11 @@ data HarborViewError
   = AffjaxError String
   | JsonError String
 
-handleErrorAff :: HarborViewError -> Aff Unit
-handleErrorAff (AffjaxError err) =
-  liftEffect $ alert $ "AffjaxError: " <> err
-handleErrorAff (JsonError err) =
-  liftEffect $ alert $ "JsonError: " <> err
+handleError :: HarborViewError -> Effect Unit
+handleError (AffjaxError err) =
+  logShow $ "AffjaxError: " <> err
+handleError (JsonError err) =
+  logShow $ "JsonError: " <> err
 
 errToString :: HarborViewError -> String
 errToString (AffjaxError err) =
@@ -44,6 +41,13 @@ errToString (JsonError err) =
 numToString :: Number -> String
 numToString num =
   Format.toStringWith (Format.fixed 2) num
+
+fromInt :: Int -> String
+fromInt i =
+  if i < 0 then
+    ""
+  else
+    show i
 
 type JsonResult =
   { oid :: Int

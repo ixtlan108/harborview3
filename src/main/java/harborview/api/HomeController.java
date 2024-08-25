@@ -16,4 +16,8 @@ public class HomeController {
         return "maunaloa/charts";
     }
 
+    @RequestMapping(method =  RequestMethod.GET, path = "rapanui")
+    public String rapanui(Locale locale, Model model) {
+        return "rapanui/rapanui";
+    }
 }

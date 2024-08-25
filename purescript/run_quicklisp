@@ -1,0 +1,28 @@
+#!/bin/bash
+
+QL_IMG="rcs/quicklisp:2.0"
+
+QL="/root/.quicklisp"
+
+SW="dists/quicklisp/software"
+
+PKG="$QL/$SW"
+
+HOME="/home/rcs/opt/java/harborview3"
+
+LOC_PROJ="$HOME/cl"
+
+PS_HOME="$HOME/purescript"
+
+docker run -it --rm -v "$HOME:$HOME"  -v "$LOC_PROJ:$QL/local-projects" -v "/home/rcs/opt/lisp/$SW/:$PKG/" -w $PS_HOME $QL_IMG
+
+# docker run -it --rm $QL_IMG
+
+# /root/.quicklisp/dists/quicklisp/software/
+
+# /root/.quicklisp/local-projects
+
+# /home/rcs/opt/java/harborview3/cl
+
+exit 0 
+

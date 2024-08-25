@@ -23,7 +23,7 @@ public class MaunaloaAPI {
 
     @GetMapping(value = "/stockoption/purchases")
     public String optionPurchases() {
-        return "maunaloa/optionpurchases";
+        return "optionpurchase/optionpurchases";
     }
     /*
     @ResponseBody

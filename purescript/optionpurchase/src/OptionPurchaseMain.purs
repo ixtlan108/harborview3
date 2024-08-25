@@ -33,7 +33,7 @@ main :: Effect Unit
 main = HA.runHalogenAff $
     HA.awaitLoad *> 
     let 
-      qs1 = QuerySelector "#ps-main"
+      qs1 = QuerySelector "#ps-optionpurchase"
     in
     HA.selectElement qs1 >>= \node ->
       run node qs1

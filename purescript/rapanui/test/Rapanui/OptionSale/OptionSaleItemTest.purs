@@ -1,0 +1,33 @@
+module Test.Rapanui.OptionSale.OptionSaleItemTest
+  ( testOptionSaleSuite
+  ) where
+
+import Prelude
+
+import Test.Unit (suite, test, TestSuite)
+import Test.Unit.Assert as Assert
+--import Data.Maybe (Maybe(..))
+--import Rapanui.OptionSale.OptionSaleItem (OptionSale(..), findOptionSale)
+import Rapanui.StockMarket.OptionSaleItem (OptionSale(..), validOptionSales)
+import Rapanui.Common (Bid(..), Cid(..))
+
+
+testSale1 :: OptionSale
+testSale1  =
+  Sale { critterId: Cid 1, price: Bid 10.0 }
+
+testOptionSaleSuite :: TestSuite
+testOptionSaleSuite =
+  suite "OptionSaleItemTest" do
+    test "Result Empty" do
+      let curAx = [ NoSale, NotActive, NoSale ]
+      let actual = validOptionSales curAx
+      Assert.equal actual []
+    test "Result Sale" do
+      let curAx = [ NoSale, testSale1, NotActive, NoSale ]
+      let actual = validOptionSales curAx
+      Assert.equal actual [ testSale1 ]
+    test "Result Sale + SaleError" do
+      let curAx = [ NoSale, SaleError "Error 1", NotActive, testSale1, NoSale ]
+      let actual = validOptionSales curAx
+      Assert.equal actual [ testSale1, SaleError "Error 1" ]

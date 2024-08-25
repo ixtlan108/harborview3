@@ -23,7 +23,7 @@ import Halogen as H
 import Halogen.HTML (HTML, ClassName(..))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
-import HarborView.Common (HarborViewError, Oid(..), Amount(..), Price(..), Url(..), JsonResult)
+import HarborView.Common (HarborViewError, Oid(..), Amount(..), Price(..), JsonResult)
 import HarborView.Common as Common
 import HarborView.ModalDialog (DialogState(..))
 import HarborView.ModalDialog as DLG
@@ -120,7 +120,7 @@ fetchPurchases isPaper =
       else
         "/maunaloa/stockoption/purchases/11"
   in
-    HttpUtil.getAff (Url url) purchasesFromJson
+    HttpUtil.get url purchasesFromJson
 
 sell :: forall m. MonadAff m => Oid -> Price -> Amount -> m (Either HarborViewError JsonResult)
 sell (Oid oid) (Price price) (Amount amt) =
@@ -138,7 +138,7 @@ sell (Oid oid) (Price price) (Amount amt) =
             ]
         )
   in
-    HttpUtil.postAff (Url url) payload resultFromJson
+    HttpUtil.post url payload resultFromJson
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
 component =

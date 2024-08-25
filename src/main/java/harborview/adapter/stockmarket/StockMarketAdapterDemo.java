@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.function.Consumer;
 
 @Component()
-@Profile({"demo","test"})
+@Profile({"demo","cmdline","test"})
 public class StockMarketAdapterDemo extends StockMarketAdapter {
 
     public StockMarketAdapterDemo(MyBatisUtil myBatisUtil,

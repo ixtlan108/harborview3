@@ -1,0 +1,24 @@
+/* optionpurchases/_grid_main.scss */
+
+.op {
+
+  &-grid-main {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 1fr 8fr 1fr;
+    grid-template-rows: 20px 100px 800px;
+  }
+
+  &-grid-menu-bar {
+    display: flex;
+    //margin-top: 1rem;
+    //margin-right: 3rem;
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  &-grid-table {
+    grid-column: 2;
+    grid-row: 3;
+  }
+}

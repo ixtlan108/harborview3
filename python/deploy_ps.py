@@ -94,6 +94,15 @@ APPS = { 1: {   PKG: "maunaloa",
                 JS_STEM: "ps-charts",
                 JS_TARGET: "maunaloa",
                 SASS: "maunaloa" },
+        3: {    PKG: "rapanui", 
+                TPL: "rapanui/rapanui.html.tpl", 
+                HTML: "rapanui/rapanui.html", 
+                MAIN: "RapanuiMain",
+                CSS_STEM: "rapanui",
+                CSS_TARGET: "rapanui",
+                JS_STEM: "rapanui",
+                JS_TARGET: "rapanui",
+                SASS: "rapanui" },
 }
 
 def md5_sum(src_file):
@@ -259,7 +268,7 @@ if __name__ == "__main__":
     parser.add_option("--min", action="store_true", default=False,
                       help="Minify js file. Default: False")
     parser.add_option("--app", dest="app", action="store", type="int",
-                      metavar="APP", help="App name: 1 -> Maunaloa, 2 -> Optionpurchase")
+                      metavar="APP", help="App name: 1-> Maunaloa, 2-> Optionpurchase, 3-> Rapanui")
     parser.add_option("--param", action="store_true", default=False,
                       help="Show Application parameters. Default: False")
     parser.add_option("--studiop", action="store_true", default=False,

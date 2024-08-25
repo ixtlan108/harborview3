@@ -52,4 +52,6 @@ purescript/deploy_ps.py
 purescript/dist/
 harborview.code-workspace
 purescript/tmp/
+purescript/**/dist/
+
 

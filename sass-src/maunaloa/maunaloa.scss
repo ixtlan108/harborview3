@@ -5,16 +5,6 @@ body {
   font-size: 1.0em;
 }
 
-.logo {
-  background: url("/img/02.png") center no-repeat;
-  position: absolute;
-  top: 0px;
-  left: 90%;
-  width: 163px;
-  height: 159px;
-  z-index: 9999;
-}
-
 .draggable {
   cursor: move;
 }
@@ -41,6 +31,8 @@ a.href-td {
 
 @import "../components/checkbox";
 @import "../components/modal_dialog";
+
+@import "../globals/logo";
 
 @import "grid_main";
 @import "grid_scrapbook";
