@@ -16,4 +16,6 @@ public interface StockMarketRepository {
     void insertStockOption(StockOption option, Consumer<Exception> errorHandler);
 
     List<StockOptionPurchase> stockOptionPurchases(int purchaseType, int status, String opType);
+
+    StockPrice getSpot(StockTicker ticker);
 }

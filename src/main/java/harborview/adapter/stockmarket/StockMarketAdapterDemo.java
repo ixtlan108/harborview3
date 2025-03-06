@@ -1,5 +1,6 @@
 package harborview.adapter.stockmarket;
 
+import harborview.adapter.RedisAdapter;
 import harborview.domain.stockmarket.*;
 import harborview.mybatis.MyBatisUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +14,9 @@ import java.util.function.Consumer;
 public class StockMarketAdapterDemo extends StockMarketAdapter {
 
     public StockMarketAdapterDemo(MyBatisUtil myBatisUtil,
+                                  RedisAdapter redisAdapter,
                                   @Value("${adapter.stockmarket.from-date}") String fromDate) {
-        super(myBatisUtil, fromDate);
+        super(myBatisUtil, redisAdapter, fromDate);
     }
     /*
     @Override

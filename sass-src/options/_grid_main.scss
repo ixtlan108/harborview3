@@ -10,13 +10,34 @@
   }
 
   &-grid-menu-bar {
-    display: flex;
-    //margin-top: 1rem;
-    //margin-right: 3rem;
+    display: grid;
     grid-column: 2;
     grid-row: 2;
+    gap: 10px;
+    grid-template-columns: repeat(5, 1fr) 7fr;
+    grid-template-areas:
+      "a a a a a a"
+      "b1 b2 b3 b4 b5 .";
   }
 
+  &-a {
+    grid-area: a;
+  }
+  &-b1 {
+    grid-area: b1;
+  }
+  &-b2 {
+    grid-area: b2;
+  }
+  &-b3 {
+    grid-area: b3;
+  }
+  &-b4 {
+    grid-area: b4;
+  }
+  &-b5 {
+    grid-area: b5;
+  }
   &-grid-table {
     grid-column: 2;
     grid-row: 3;

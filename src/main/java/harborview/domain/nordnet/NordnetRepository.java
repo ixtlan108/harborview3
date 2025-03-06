@@ -1,5 +1,6 @@
 package harborview.domain.nordnet;
 
+import harborview.api.nordnet.response.FindOptionResponse;
 import harborview.domain.stockmarket.StockOptionTicker;
 import harborview.domain.stockmarket.StockTicker;
 

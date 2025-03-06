@@ -1,5 +1,6 @@
 package harborview.adapter.stockmarket;
 
+import harborview.adapter.RedisAdapter;
 import harborview.domain.stockmarket.StockMarketRepository;
 import harborview.domain.stockmarket.*;
 import harborview.mybatis.CritterMapper;
@@ -25,12 +26,15 @@ public class StockMarketAdapter implements StockMarketRepository {
 
     private final MyBatisUtil myBatisUtil;
     private final Date fromDate;
+    private final RedisAdapter redisAdapter;
 
     private List<Stock> stocks;
 
     public StockMarketAdapter(MyBatisUtil myBatisUtil,
+                              RedisAdapter redisAdapter,
                               @Value("${adapter.stockmarket.from-date}") String fromDate) {
         this.myBatisUtil = myBatisUtil;
+        this.redisAdapter = redisAdapter;
         this.fromDate =  java.sql.Date.valueOf(fromDate);
         logger.info(String.format("From date: %s", this.fromDate.toString()));
     }
@@ -134,5 +138,10 @@ public class StockMarketAdapter implements StockMarketRepository {
             var mapper = session.getMapper(StockOptionMapper.class);
             return mapper.purchasesWithSalesAll(purchaseType, status, opType);
         }));
+    }
+
+    @Override
+    public StockPrice getSpot(StockTicker ticker) {
+        return redisAdapter.getSpot(ticker);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 		, "harborview.adapter"
 		, "harborview.mybatis"
 		, "harborview.transform"
+		, "harborview.config"
 		, "vega.financial.calculator"
 })
 public class App {

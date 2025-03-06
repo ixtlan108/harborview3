@@ -1,5 +1,6 @@
 (import jpm)
-(import spork) 
+(import spork/argparse :as ap)
+#(import spork/argparse :refer '[argparse])
 
 (defn calc-md5-sum [f-name]
   (let [tmp-file (file/temp)
@@ -8,12 +9,26 @@
     (os/proc-wait p)
     (file/seek tmp-file :set 0)
     (let [buffer (file/read tmp-file :all)
-          result (string/slice buffer 0 9)]
+          result (string/slice buffer)]
         (file/close tmp-file)
         result)))
 
+(defn md5-linux [f-name]
+  (with-dyns [:x-md5 "md5sum"]
+    (let [ms (calc-md5-sum f-name)]
+      (string/slice ms 0 8))))
+
+# (def m5s "MD5 (/Users/zeus/Projects/PhotoAppMVC/cl/deploy-ps/t/resources/rigaphoto-482af713.css) = 482af7137144614ed3535474843429f3")
+
+(defn md5-macos [f-name]
+  (with-dyns [:x-md5 "md5"]
+    (let [ms (calc-md5-sum f-name)
+          sx (string/split " = " ms)
+          sx1 (get sx 1)]
+      (string/slice sx1 0 8))))
+
 (defn optionpurchase []
-  (let [spago 
+  (let [spago
         {
           :pkg "optionpurchase"
           :module "OptionPurchaseMain"
@@ -22,10 +37,10 @@
           :js-map-file "../src/main/resources/static/js/optionpurchase/optionpurchase.js.map"
           :js-target "../src/main/resources/static/js/optionpurchase/optionpurchase-%s.js"
         }
-        sass 
+        sass
         {
-          :src "../sass-src" 
-          :pkg "optionpurchase" 
+          :src "../sass-src"
+          :pkg "optionpurchase"
           :scss-file "optionpurchase.scss"
           :css-file "optionpurchase.css"
           :css-file-2 "optionpurchase/dist/optionpurchase.css"
@@ -33,13 +48,13 @@
           :css-map-target"../src/main/resources/static/css/optionpurchase/optionpurchase.css.map"
           :css-target "../src/main/resources/static/css/optionpurchase/optionpurchase-%s.css"
         }]
-    { :spago spago 
-      :sass sass 
+    { :spago spago
+      :sass sass
       :tpl "optionpurchase/tpl/optionpurchase.html.tpl"
       :tpl-target "../src/main/resources/templates/optionpurchase/optionpurchases.html"}))
 
 (defn maunaloa []
-  (let [spago 
+  (let [spago
         {
           :pkg "maunaloa"
           :module "Main"
@@ -48,10 +63,10 @@
           :js-map-file "../src/main/resources/static/js/maunaloa/maunaloa.js.map"
           :js-target "../src/main/resources/static/js/maunaloa/ps-charts-%s.js"
         }
-        sass 
+        sass
         {
-          :src "../sass-src" 
-          :pkg "maunaloa" 
+          :src "../sass-src"
+          :pkg "maunaloa"
           :scss-file "maunaloa.scss"
           :css-file "maunaloa.css"
           :css-file-2 "maunaloa/dist/maunaloa.css"
@@ -59,13 +74,13 @@
           :css-map-target"../src/main/resources/static/css/maunaloa/maunaloa.css.map"
           :css-target "../src/main/resources/static/css/maunaloa/maunaloa-%s.css"
         }]
-    { :spago spago 
-      :sass sass 
+    { :spago spago
+      :sass sass
       :tpl "maunaloa/tpl/charts.html.tpl"
       :tpl-target "../src/main/resources/templates/maunaloa/charts.html"}))
 
 (defn rapanui []
-  (let [spago 
+  (let [spago
           { :pkg "rapanui"
             :module "RapanuiMain"
             :target "dist/rapanui.js"
@@ -75,7 +90,7 @@
             }
         sass
           { :src "../sass-src"
-            :pkg "rapanui" 
+            :pkg "rapanui"
             :scss-file "rapanui.scss"
             :css-file "rapanui.css"
             :css-file-2 "rapanui/dist/rapanui.css"
@@ -83,26 +98,61 @@
             :css-map-target"../src/main/resources/static/css/rapanui/rapanui.css.map"
             :css-target "../src/main/resources/static/css/rapanui/rapanui-%s.css"
           }]
-    { :spago spago 
-      :sass sass 
+    { :spago spago
+      :sass sass
       :tpl "rapanui/tpl/rapanui.html.tpl"
       :tpl-target "../src/main/resources/templates/rapanui/rapanui.html"}))
 
-(def spago-cmd "/home/rcs/.nvm/versions/node/v20.9.0/bin/spago")
-(def sass-cmd "/home/rcs/.nvm/versions/node/v20.9.0/bin/sass")
+(defn options []
+  (let [spago
+          {
+            :js-file "/home/rcs/opt/java/harborview3/elm/elm-options.js"
+            :js-target "../src/main/resources/static/js/maunaloa/elm-options-%s.js"
+            }
+        sass
+          { :src "../sass-src"
+            :pkg "options"
+            :scss-file "options.scss"
+            :css-file "options.css"
+            :css-file-2 "options/dist/options.css"
+            :css-map-file "options/dist/options.css.map"
+            :css-map-target"../src/main/resources/static/css/maunaloa/options.css.map"
+            :css-target "../src/main/resources/static/css/maunaloa/options-%s.css"
+          }]
+    { :spago spago
+      :sass sass
+      :tpl "options/tpl/options.html.tpl"
+      :tpl-target "../src/main/resources/templates/maunaloa/options.html"}))
+
+
+# (def spago-cmd "/home/rcs/.nvm/versions/node/v20.9.0/bin/spago")
+# (def spago-cmd "/usr/local/bin/spago")
+# (def sass-cmd "/home/rcs/.nvm/versions/node/v20.9.0/bin/sass")
+# (def sass-cmd "/usr/bin/sass")
+(def elm-cmd "/usr/local/bin/elm")
+
+(def home-dir "/home/rcs/opt/java/harborview3")
+(def ps-dir (string/format "%s/purescript" home-dir))
+(def elm-dir (string/format "%s/elm" home-dir))
+
 #(def *exec-spago* @{})
+
+# (defn create-dirs [cfg]
+#   (let [spago-cfg (cfg :spago)
+#         sass-cfg (cfg :sass)]
+#     (print (spago-cfg ))
 
 (defn run-spago [cfg]
   (print "Enter run-spago..")
   (let [spago-cfg (cfg :spago)
-        pkg (spago-cfg :pkg)
-        main-module (spago-cfg :module)
-        target (spago-cfg :target)
         md5-file (spago-cfg :js-file)]
     (when (dyn :x-spago)
-      (print "EXECUTING SPAGO..")
-      (os/execute [spago-cmd "bundle" "--package" pkg "--source-maps" "--module" main-module "--outfile" target]))
-    (calc-md5-sum md5-file)))
+      (let [pkg (spago-cfg :pkg)
+            main-module (spago-cfg :module)
+            target (spago-cfg :target)]
+        (print "EXECUTING SPAGO..")
+        (os/execute [(dyn :x-spago-cmd) "bundle" "--package" pkg "--source-maps" "--module" main-module "--outfile" target])))
+    ((dyn :x-md5-cmd) md5-file)))
 
 (defn sass-out-file [cfg]
   (let [sass-cfg (cfg :sass)
@@ -120,13 +170,19 @@
         #out-file (string/slice (buffer/push-string @"" pkg "/dist/" css))
         out-file (sass-out-file cfg)
         sass-cmd-input (string/slice (buffer/push-string @"" src "/" pkg "/" scss))]
-    (when (dyn :x-sass) 
+    (when (dyn :x-sass)
       (print "EXECUTING SASS..")
-      (os/execute [sass-cmd sass-cmd-input out-file]))
-    (calc-md5-sum out-file)))
+      (os/execute [(dyn :x-sass-cmd) sass-cmd-input out-file]))
+    ((dyn :x-md5-cmd) out-file)))
+
+(defn run-elm []
+  (os/cd elm-dir)
+  (os/execute [elm-cmd "make" "src/Maunaloa/Options/Main.elm" "--output=elm-options.js"])
+  (os/cd ps-dir))
 
 (defn render [cfg spago-md5 sass-md5]
   (print "Enter render..")
+  (print (cfg :tpl))
   (let [tpl (cfg :tpl)
         f (file/open tpl :r)
         content (string/slice (file/read f :all))]
@@ -162,6 +218,19 @@
     (copy-spago-files cfg spago-md5)
     (copy-sass-files cfg sass-md5)))
 
+  # (let [cfg (options)
+  #       spago-md5 (run-spago cfg)
+  #       sass-md5 (run-sass cfg)]
+  #   (render cfg spago-md5 sass-md5)
+  #   (copy-spago-files cfg spago-md5)
+  #   (copy-sass-files cfg sass-md5)))
+
+(defn run-options []
+  (print "Enter run-options..")
+  (when (dyn :x-elm)
+    (run-elm))
+  (run (options)))
+
 (defn run-optionpurchase []
   (print "Enter run-maunaoa..")
   (run (optionpurchase)))
@@ -174,37 +243,35 @@
   (print "Enter run-rapanui..")
   (run (rapanui)))
 
-(def *x-sass* :x-sass)
-(def *x-spago* :x-spago)
-(def *x-md5* :x-md5)
+(def PROJ {"1" run-rapanui "2" run-maunaloa "3" run-optionpurchase "4" run-options})
 
-(def PROJ {"1" run-rapanui "2" run-maunaloa "3" run-optionpurchase})
+(defn run [argx]
+  (let [os-linux (= (argx "os") "linux")
+        md5-cmd (if os-linux md5-linux md5-macos)
+        sass-cmd (if os-linux "/usr/bin/sass" "/opt/homebrew/bin/sass")
+        spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
+    (with-dyns [:x-sass (argx "sass")
+                :x-spago (argx "spago")
+                :x-elm (argx "elm")
+                :x-md5-cmd md5-cmd
+                :x-sass-cmd sass-cmd
+                :x-spago-cmd spago-cmd]
+      (let [cmd (PROJ (argx "proj"))]
+        (cmd)))))
 
-(defn main [&] 
-  (let 
-    [ argx (spork/argparse/argparse "Deploy" 
-            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase" :required true} 
-            "md5"   {:kind :option  :short "m" :help "md5 sum function. Linux: md5sum, MacOs: md5. Default: md5sum" :default "md5sum"} 
-            "sass"  {:kind :flag    :short "s" :default false :help "Default: false"} 
+(defn main [&]
+  (let
+    [ argx (ap/argparse "Deploy"
+            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: options" :required true}
+            "os"    {:kind :option  :short "o" :help "Os: linux, macos. Default: linux" :default "linux"}
+            "log"   {:kind :flag    :short "l" :help "If set, will write to log. Default: false" :default false}
+            "elm"   {:kind :flag    :short "e" :default false :help "Default: false"}
+            "sass"  {:kind :flag    :short "s" :default false :help "Default: false"}
             "spago" {:kind :flag    :short "g" :default false :help "Default: false"})]
-      (if (not= argx nil)
+    (if (not= argx nil)
+      (if (= (argx "log") true)
         (let [log (file/open "log" :w)]
-          (with-dyns [*out* log
-                      *x-sass* (argx "sass")
-                      *x-spago* (argx "spago")
-                      *x-md5* (argx "md5")]
-              (pp argx)
-              (let [cmd (PROJ (argx "proj"))]
-                (cmd)))
-          (file/close log)))))
-
-# (defn xmain [& args] 
-#   (if (<= (length args) 1) 
-#     (print "args: project (1: rapanui, 2: maunaloa) x-spago (0|1) x-sass (0|1)")
-#     (let [log (file/open "log" :w)
-#           cmd (PROJ (args 1))]
-#       (with-dyns [*out* log
-#                   *x-sass* (= (args 3) "1")
-#                   *x-spago* (= (args 2) "1")]
-#         (cmd))
-#       (file/close log))))
+          (with-dyns [*out* log]
+            (run argx))
+          (file/close log))
+        (run argx)))))

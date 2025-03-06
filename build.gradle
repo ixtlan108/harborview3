@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'hamilton108'
-version = '0.9.1'
+version = '0.9.2'
 sourceCompatibility = '21'
 
 repositories {
@@ -16,7 +16,7 @@ dependencies {
 	implementation project(':oahu')
 	implementation project(':vega')
 
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	//implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	// implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	//implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	//implementation 'org.springframework.boot:spring-boot-starter-cache'
@@ -29,12 +29,17 @@ dependencies {
 	implementation 'com.google.guava:guava:31.1-jre'
 	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'redis.clients:jedis:6.0.0'
+
+	//implementation("com.yahoofinance-api:YahooFinanceAPI:3.17.0")
+
 	//implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 	//implementation 'ch.qos.logback:logback-classic:1.2.10'
 
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.amqp:spring-rabbit-test'
+	//testImplementation 'org.springframework.amqp:spring-rabbit-test'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1'
 
 }

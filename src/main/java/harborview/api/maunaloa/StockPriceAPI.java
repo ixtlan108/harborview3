@@ -1,5 +1,8 @@
 package harborview.api.maunaloa;
 
+import harborview.api.maunaloa.response.SpotResponse;
+import harborview.api.response.PayloadResponse;
+import harborview.api.util.ApiUtil;
 import harborview.domain.core.maunaloa.MaunaloaCore;
 import harborview.domain.nordnet.RiscRequest;
 import harborview.domain.nordnet.RiscResponse;
@@ -24,29 +27,36 @@ public class StockPriceAPI {
         this.maunaloaCore = maunaloaCore;
     }
 
+    @GetMapping(value = "/spot/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PayloadResponse<SpotResponse>> getSpot(@PathVariable("oid") int oid) {
+        var sp = maunaloaCore.getSpot(new StockTicker(oid));
+        return ApiUtil.mapWithFn(sp,
+                r -> new SpotResponse(r.getOpn(),r.getHi(),r.getLo(),r.getCls(),r.getUnixTime()));
+    }
+
     @GetMapping(value = "/tickers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<SelectItem>> tickers() {
-        return ResponseEntity.ok(maunaloaCore.getStockTickers());
+    public ResponseEntity<PayloadResponse<List<SelectItem>>> tickers() {
+        return ApiUtil.map(maunaloaCore.getStockTickers());
     }
 
     @GetMapping(value = "/days/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Charts> days(@PathVariable("oid") int oid) {
-        return ResponseEntity.ok(maunaloaCore.days(new StockTicker(oid)));
+    public ResponseEntity<PayloadResponse<Charts>> days(@PathVariable("oid") int oid) {
+        return ApiUtil.map(maunaloaCore.days(new StockTicker(oid)));
     }
 
     @GetMapping(value = "/weeks/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Charts> weeks(@PathVariable("oid") int oid) {
-        return ResponseEntity.ok(maunaloaCore.weeks(new StockTicker(oid)));
+    public ResponseEntity<PayloadResponse<Charts>> weeks(@PathVariable("oid") int oid) {
+        return ApiUtil.map(maunaloaCore.weeks(new StockTicker(oid)));
     }
 
     @GetMapping(value = "/months/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Charts> months(@PathVariable("oid") int oid) {
-        return ResponseEntity.ok(maunaloaCore.months(new StockTicker(oid)));
+    public ResponseEntity<PayloadResponse<Charts>> months(@PathVariable("oid") int oid) {
+        return ApiUtil.map(maunaloaCore.months(new StockTicker(oid)));
     }
 
     @PostMapping(value = "/calculate/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RiscResponse>> calcRiscStockPrices(@PathVariable("oid") int oid, @RequestBody List<RiscRequest> riscs) {
-        return ResponseEntity.ok(maunaloaCore.calcRiscStockPrices(riscs));
+    public ResponseEntity<PayloadResponse<List<RiscResponse>>> calcRiscStockPrices(@PathVariable("oid") int oid, @RequestBody List<RiscRequest> riscs) {
+        return ApiUtil.map(maunaloaCore.calcRiscStockPrices(riscs));
     }
 
 }

@@ -2,94 +2,23 @@ module HarborView.Maunaloa.ChartTransform where
 
 import Prelude
 
-{-
-import Effect.Class 
-    ( liftEffect
-    )
-import Effect (Effect)
-import Effect.Aff 
-    ( Aff
-    , launchAff_
-    )
-
-import Affjax as Affjax
-import Affjax.ResponseFormat as ResponseFormat
--}
-
---import Data.Either (Either(..))
-import Data.Array
-  ( take
-  , drop
-  , filter
-  , concat
-  , (:)
-  )
-
---import Data.Tuple (fst,snd)
---import Data.Nullable 
---    ( Nullable
---    )
-import Control.Monad.Reader
-  ( Reader
-  , ask
-  )
-import Data.Foldable
-  ( minimum
-  , maximum
-  , minimumBy
-  , maximumBy
-  )
-import Data.Ord
-  ( abs
-  )
-import Partial.Unsafe
-  ( unsafePartial
-  )
-import Data.Maybe
-  ( Maybe(..)
-  , fromJust
-  , fromMaybe
-  )
-
+import Control.Monad.Reader (Reader, ask)
+import Data.Array (take, drop, filter, concat, (:))
+import Data.Foldable (minimum, maximum, minimumBy, maximumBy)
+import Data.Maybe (Maybe(..), fromJust, fromMaybe)
+import Data.Ord (abs)
 import HarborView.Common (UnixTime(..))
-import HarborView.Maunaloa.Common as Common
-import HarborView.Maunaloa.Common
-  ( ChartId(..)
-  , ChartMapping(..)
-  , ChartType(..)
-  , ChartWidth
-  , Drop(..)
-  , Env(..)
-  , Scaling(..)
-  , StockTicker(..)
-  , Take(..)
-  , ValueRange(..)
-  )
-import HarborView.Maunaloa.JsonCharts
-  ( JsonChartResponse
-  , JsonChart
-  , JsonChartWindow(..)
-  , JsonCandlestick
-  )
+import HarborView.Maunaloa.Bar (Bars, barToPix)
+import HarborView.Maunaloa.Candlestick (candleToPix)
+import HarborView.Maunaloa.Chart (Chart(..))
 import HarborView.Maunaloa.Chart as Chart
-import HarborView.Maunaloa.Chart
-  ( Chart(..)
-  )
-import HarborView.Maunaloa.ChartCollection
-  ( ChartCollection(..)
-  , EmptyChartCollection(..)
-  )
-import HarborView.Maunaloa.Line
-  ( lineToPix
-  )
-import HarborView.Maunaloa.Candlestick
-  ( candleToPix
-  )
-import HarborView.Maunaloa.Bar
-  ( Bars
-  , barToPix
-  )
+import HarborView.Maunaloa.ChartCollection (ChartCollection(..), EmptyChartCollection(..))
+import HarborView.Maunaloa.Common (ChartId(..), ChartMapping(..), ChartType(..), ChartWidth, Drop(..), Env(..), Scaling(..), StockTicker(..), Take(..), ValueRange(..))
+import HarborView.Maunaloa.Common as Common
 import HarborView.Maunaloa.HRuler as H
+import HarborView.Maunaloa.JsonCharts (JsonCandlestick, JsonChart, JsonChartResponse, JsonChartWindow(..), JsonChartPayload)
+import HarborView.Maunaloa.Line (lineToPix)
+import Partial.Unsafe (unsafePartial)
 
 nullValueRange :: ValueRange
 nullValueRange = ValueRange { minVal: 0.0, maxVal: 0.0 }
@@ -255,7 +184,7 @@ transformMapping
      , scaling :: Scaling
      | r
      }
-  -> JsonChartResponse
+  -> JsonChartPayload
   -> ChartMapping
   -> Chart
 transformMapping env response cm@(ChartMapping mapping) =
@@ -290,7 +219,7 @@ incMonths WeekChart = 3
 incMonths MonthChart = 6
 incMonths EmptyChartType = 0
 
-transform :: JsonChartResponse -> Reader Env ChartCollection
+transform :: JsonChartPayload -> Reader Env ChartCollection
 transform response =
   ask >>= \(Env env) ->
     let
@@ -324,8 +253,8 @@ transformEmpty =
       pure $ EmptyChartCollection charts
 
 {-
-demo = 
-    let 
+demo =
+    let
         padding = Padding { bottom: 0.0, left: 50.0, right: 50.0, top: 0.0}
         xaxis = [4226,4225,4224,4221,4220,4219,4218,4217,4214,4213,4212,4211,4210,4207,4206,4205,4204,4203,4200,4199,4198,4197,
                 4196,4193,4192,4191,4190,4189,4186,4185,4184,4183,4182,4179,4178,4177,4176,4175,4172,4171,4170,4169,4168,4165,
@@ -334,6 +263,6 @@ demo =
                 4094,4093]
         tm = UnixTime 1262304000000.0
         ruler = H.create globalChartWidth tm xaxis padding
-    in 
-    logShow ruler   
+    in
+    logShow ruler
 -}

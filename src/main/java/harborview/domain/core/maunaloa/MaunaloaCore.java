@@ -2,6 +2,10 @@ package harborview.domain.core.maunaloa;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import harborview.api.nordnet.response.FindOptionResponse;
+import harborview.api.util.ApiUtil;
+import harborview.domain.error.ApplicationError;
+import harborview.domain.functional.Either;
 import harborview.domain.nordnet.NordnetRepository;
 import harborview.domain.stockmarket.StockMarketRepository;
 import harborview.chart.ChartFactory;
@@ -18,11 +22,11 @@ import harborview.dto.html.Charts;
 import harborview.dto.html.SelectItem;
 import harborview.util.StockOptionUtil;
 import oahu.dto.Tuple2;
-import oahu.exceptions.BinarySearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import vega.exception.BinarySearchException;
 import vega.financial.calculator.OptionCalculator;
 
 import java.util.ArrayList;
@@ -34,12 +38,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import harborview.dto.StatusCode;
+
 import static vega.financial.StockOptionType.CALL;
 
 @Component
 public class MaunaloaCore {
 
     private Logger logger = LoggerFactory.getLogger(MaunaloaCore.class);
+    //private final YahooRepository yahooAdapter;
     private final NordnetRepository nordnetAdapter;
     private final StockMarketRepository stockMarketAdapter;
     private final OptionCalculator optionCalculator;
@@ -58,6 +64,7 @@ public class MaunaloaCore {
 
     public MaunaloaCore(NordnetRepository nordnetAdapter,
                         StockMarketRepository stockMarketAdapter,
+                        //YahooRepository yahooAdapter,
                         @Qualifier("blackScholes") OptionCalculator optionCalculator) {
         this.nordnetAdapter = nordnetAdapter;
         this.stockMarketAdapter = stockMarketAdapter;
@@ -66,13 +73,15 @@ public class MaunaloaCore {
     }
 
     //@Cacheable(value="stockTickers")
-    public List<SelectItem> getStockTickers() {
-        if (stockTickers == null) {
-            logger.info("(getStockTickers) Empty cache");
-            stockTickers = stockMarketAdapter.getStocks().stream().map(
-                x -> new SelectItem(String.format("%s - %s",x.getTicker(),x.getCompanyName()),String.valueOf(x.getOid()))).collect(Collectors.toList());
-        }
-        return stockTickers;
+    public Either<ApplicationError,List<SelectItem>> getStockTickers() {
+        return ApiUtil.handle(() -> {
+            if (stockTickers == null) {
+                logger.info("(getStockTickers) Empty cache");
+                stockTickers = stockMarketAdapter.getStocks().stream().map(
+                        x -> new SelectItem(String.format("%s - %s", x.getTicker(), x.getCompanyName()), String.valueOf(x.getOid()))).collect(Collectors.toList());
+            }
+            return stockTickers;
+        });
     }
 
     private List<StockPrice> getPrices(StockTicker ticker) {
@@ -94,14 +103,14 @@ public class MaunaloaCore {
         var prices = getPrices(ticker);
         return factory.elmCharts(ticker, prices);
     }
-    public Charts days(StockTicker ticker) {
-        return charts(ticker, chartFactory);
+    public Either<ApplicationError,Charts> days(StockTicker ticker) {
+        return ApiUtil.handle(() -> charts(ticker, chartFactory));
     }
-    public Charts weeks(StockTicker ticker) {
-        return charts(ticker, chartWeekFactory);
+    public Either<ApplicationError,Charts> weeks(StockTicker ticker) {
+        return ApiUtil.handle(() -> charts(ticker, chartWeekFactory));
     }
-    public Charts months(StockTicker ticker) {
-        return charts(ticker, chartMonthFactory);
+    public Either<ApplicationError,Charts> months(StockTicker ticker) {
+        return ApiUtil.handle(() -> charts(ticker, chartMonthFactory));
     }
 
 
@@ -143,7 +152,11 @@ public class MaunaloaCore {
 
     RiscResponse calcRiscStockPrice(RiscRequest request) {
 
-        var oid = StockOptionUtil.stockOptionInfoFromTicker(request.getTicker()).first();
+        var info = StockOptionUtil.stockOptionInfoFromTicker(request.getTicker());
+
+        var oid = info.first();
+
+        var optionType = info.third();
 
         FindOptionResponse hit = nordnetAdapter.findOption(request.getTicker());
 
@@ -151,37 +164,38 @@ public class MaunaloaCore {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.COULD_NOT_FIND_OPTION_ERROR);
         }
 
-        var riscAdjustedPrice = hit.getStockOption().getAsk() - request.getRiscValue();
+        var payload = hit.payload();
+
+        var riscAdjustedPrice = payload.option().ask() - request.getRiscValue();
 
         if (riscAdjustedPrice < 0) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.RISC_ADJUSTED_PRICE_LESS_THAN_ZERO);
         }
 
-        if (hit.getStockOption().getIvBid() < 0) {
+        if (payload.option().ivBid() < 0) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.IV_LESS_THAN_ZERO);
         }
 
         double curStockPrice = 0.0;
         double curBreakEven = 0.0;
         try {
-            // Option price
-            curStockPrice = optionCalculator.stockPriceFor2(hit.getStockOption().getOptionType(),
+            curStockPrice = optionCalculator.stockPriceFor2(optionType,
                     riscAdjustedPrice,
-                    hit.getStockOption().getX(),
-                    hit.getStockOption().getDays(),
-                    hit.getStockOption().getIvBid(),
-                    hit.getStockPrice().getClose());
+                    payload.option().x(),
+                    payload.option().days(),
+                    payload.option().ivBid(),
+                    payload.option().close());
         } catch (BinarySearchException ex) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.CALCULATE_OPTION_PRICE_ERROR);
         }
 
         try {
-            curBreakEven = optionCalculator.stockPriceFor2(hit.getStockOption().getOptionType(),
-                    hit.getStockOption().getAsk(),
-                    hit.getStockOption().getX(),
-                    hit.getStockOption().getDays(),
-                    hit.getStockOption().getIvBid(),
-                    hit.getStockPrice().getClose());
+            curBreakEven = optionCalculator.stockPriceFor2(optionType,
+                    payload.option().ask(),
+                    payload.option().x(),
+                    payload.option().days(),
+                    payload.option().ivBid(),
+                    payload.option().close());
         } catch (BinarySearchException ex) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.BREAK_EVEN_ERROR);
         }
@@ -189,9 +203,9 @@ public class MaunaloaCore {
         var result = new RiscResponse(request.getTicker(), curStockPrice, RiscResponseStatus.OK);
 
         saveRiscResult(oid,
-                hit.getStockOption().getTicker(),
-                hit.getStockOption().getBid(),
-                hit.getStockOption().getAsk(),
+                request.getTicker().ticker(),
+                payload.option().bid(),
+                payload.option().ask(),
                 request.getRiscValue(),
                 curStockPrice,
                 riscAdjustedPrice,
@@ -200,12 +214,18 @@ public class MaunaloaCore {
         return result;
     }
 
-    public List<RiscResponse> calcRiscStockPrices(List<RiscRequest> request) {
-        var result = new ArrayList<RiscResponse>();
-        for (var risc : request) {
-            result.add(calcRiscStockPrice(risc));
-        }
-        return result;
+    public Either<ApplicationError,List<RiscResponse>> calcRiscStockPrices(List<RiscRequest> request) {
+        return ApiUtil.handle(() -> {
+            var result = new ArrayList<RiscResponse>();
+            for (var risc : request) {
+                result.add(calcRiscStockPrice(risc));
+            }
+            return result;
+        });
+    }
+
+    public Either<ApplicationError, StockPrice> getSpot(StockTicker stockTicker) {
+        return ApiUtil.handle(() -> stockMarketAdapter.getSpot(stockTicker));
     }
 
     public List<RLine> getRiscLines(StockTicker ticker) {
@@ -232,12 +252,13 @@ public class MaunaloaCore {
     public double optionPriceFor(StockOptionTicker ticker, double stockPrice) {
         var info = StockOptionUtil.stockOptionInfoFromTicker(ticker);
         try {
-            var option = nordnetAdapter.findOption(ticker).getStockOption();
+            //var option = nordnetAdapter.findOption(ticker).getStockOption();
+            var option = nordnetAdapter.findOption(ticker).payload().option();
 
             if (info.third() == CALL) {
-                return optionCalculator.callPrice2(stockPrice, option.getX(), option.getDays(), option.getIvBid());
+                return optionCalculator.callPrice2(stockPrice, option.x(), option.days(), option.ivBid());
             } else {
-                return optionCalculator.putPrice2(stockPrice, option.getX(), option.getDays(), option.getIvBid());
+                return optionCalculator.putPrice2(stockPrice, option.x(), option.days(), option.ivBid());
             }
         }
         catch (RuntimeException ex) {

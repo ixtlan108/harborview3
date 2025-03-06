@@ -56,7 +56,7 @@ public class StockOptionAPI {
 
     @GetMapping(value = "/purchases/{purchaseType}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StockOptionPurchaseResponse>> fetchOptionPurchases(@PathVariable("purchaseType") int purchaseType) {
-        var purchases = maunaloaCore.stockOptionPurchases(purchaseType, 0, null);
+        var purchases = maunaloaCore.stockOptionPurchases(purchaseType, 1, null);
         var response = responseTransform.mapStockOptionPurchases(purchases);
         return ResponseEntity.ok(response);
     }
@@ -64,18 +64,6 @@ public class StockOptionAPI {
 
     @PostMapping(value = "/purchase", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StatusDTO> purchaseOption(@RequestBody PurchaseOptionRequest request) {
-        /*
-        if (result.hasErrors()) {
-            List<String> errorMessages = result.getAllErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .toList();
-
-            var errorMessages = StockOptionUtil.validationErrorsToString(result.getAllErrors());
-            logger.error(errorMessages);
-            return new StatusDTO(false, errorMessages, REQUEST_VALIDATION_ERROR.getStatus());
-        }
-
-         */
         try {
             request.validate();
         }

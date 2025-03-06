@@ -39,7 +39,7 @@ public class MaunaloaCoreTest {
 
     @BeforeEach
     public void init() {
-        maunaloaCore = new MaunaloaCore(nordnetAdapter, null, calculaotor);
+        maunaloaCore = new MaunaloaCore(nordnetAdapter, null, null, calculaotor);
         //when(nordnetAdapter.equals(2)).thenReturn(true);
     }
 
@@ -103,8 +103,8 @@ public class MaunaloaCoreTest {
         var riscLines = maunaloaCore.getRiscLines(ticker);
         assertThat(riscLines.size()).isEqualTo(1);
 
-
     }
+
 
     FindOptionResponse createResponse() {
         var result = new FindOptionResponse();
@@ -119,4 +119,5 @@ public class MaunaloaCoreTest {
 
         return result;
     }
+
 }

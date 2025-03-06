@@ -1,6 +1,7 @@
 module HarborView.Maunaloa.LevelLine
   ( Line(..)
   , addLine
+  , deleteNonPersistent
   , deleteAll
   , fetchLevelLines
   , fetchSpot
@@ -10,7 +11,7 @@ module HarborView.Maunaloa.LevelLine
 
 import Prelude
 import Data.Maybe (Maybe(..))
---import Data.Array ((:)) 
+--import Data.Array ((:))
 import Data.Either (Either(..))
 import Data.Number.Format (toStringWith, fixed)
 import Effect (Effect)
@@ -202,7 +203,7 @@ statusFromJson = Decode.decodeJson
 spotFromJson :: Json -> Either JsonDecodeError JsonSpot
 spotFromJson = Decode.decodeJson
 
------------------------------ BEGIN URLs ----------------------------- 
+----------------------------- BEGIN URLs -----------------------------
 
 levelLinesURL :: StockTicker -> String
 levelLinesURL (StockTicker ticker) =
@@ -215,11 +216,11 @@ optionPriceURL (OptionTicker ticker) curStockPrice =
 
 spotURL :: StockTicker -> String
 spotURL (StockTicker ticker) =
-  mainURL <> "/risclines/spot/" <> ticker
+  mainURL <> "/stockprice/spot/" <> ticker
 
------------------------------ END URLs ----------------------------- 
+----------------------------- END URLs -----------------------------
 
------------------------------ BEGIN Fetch level lines ----------------------------- 
+----------------------------- BEGIN Fetch level lines -----------------------------
 
 addLine :: ChartType -> Effect Unit
 addLine ct =
@@ -298,14 +299,19 @@ fetchLevelLines ct ticker =
             handleErrorAff err
           Right lines1 ->
             liftEffect
-              ( clearLines (chartTypeAsInt ct) *>
-                  addRiscLines ct lines1
+              (
+                case lines1 of
+                  [] ->
+                    logShow "No level lines registered for this thicker"
+                  _ ->
+                    clearLines (chartTypeAsInt ct) *>
+                      addRiscLines ct lines1
               )
     )
 
------------------------------ END Fetch level lines ----------------------------- 
+----------------------------- END Fetch level lines -----------------------------
 
------------------------------ BEGIN Delete all level lines ----------------------------- 
+----------------------------- BEGIN Delete all level lines -----------------------------
 
 deleteAll_ :: StockTicker -> Aff (Either MaunaloaError StatusJson)
 deleteAll_ ticker =
@@ -328,6 +334,10 @@ deleteAll_ ticker =
     in
       pure result
 
+deleteNonPersistent :: ChartType -> Effect Unit
+deleteNonPersistent ct =
+  clearLines (chartTypeAsInt ct)
+
 deleteAll :: ChartType -> StockTicker -> Effect Unit
 deleteAll ct ticker =
   clearLines (chartTypeAsInt ct) *>
@@ -340,9 +350,9 @@ deleteAll ct ticker =
               pure unit
       )
 
------------------------------ END Delete all level lines ----------------------------- 
+----------------------------- END Delete all level lines -----------------------------
 
------------------------------ BEGIN Fetch Spot ----------------------------- 
+----------------------------- BEGIN Fetch Spot -----------------------------
 
 fetchSpot_ :: StockTicker -> Aff (Either MaunaloaError JsonSpot)
 fetchSpot_ ticker =
@@ -376,7 +386,7 @@ addSpot ct spot =
           currentCtx cti >>= \ctx ->
             let
               cndl = Candlestick.candleToPix vr spot
-              px = timeStampToPix hr (UnixTime spot.unixtime)
+              px = timeStampToPix hr (UnixTime spot.unixTime)
             in
               Candlestick.paintSingle (Pix px) cndl ctx
 
@@ -391,7 +401,7 @@ fetchSpot ct ticker =
             liftEffect (addSpot ct spot1)
     )
 
------------------------------ END Fetch Spot ----------------------------- 
+----------------------------- END Fetch Spot -----------------------------
 
 mouseEventDown :: ChartType -> Event.Event -> Effect Unit
 mouseEventDown ct evt =
@@ -448,15 +458,15 @@ handleMouseEventUpLine ct vr line =
     Just line1 ->
       handleUpdateOptionPrice ct vr line1
 
-{- 
+{-
         Just lref@(RiscLine rec0) ->76
             logShow rec0 *>
-            let 
+            let
                 oldOpPrice = rec0.bid
                 newPrice = oldOpPrice * 1.2
             in
-            updateRiscLine lref newPrice 
-        _ -> 
+            updateRiscLine lref newPrice
+        _ ->
             pure unit
 -}
 

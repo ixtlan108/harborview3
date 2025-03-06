@@ -4,7 +4,9 @@ package harborview.domain.stockmarket;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 
@@ -56,6 +58,9 @@ public class StockPrice implements vega.financial.StockPrice {
         this.setTm(tm);
     }
 
+    public long getUnixTime() {
+        return localDx.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
 
     private Stock stock = null;
     public void setStock(Stock stock) {

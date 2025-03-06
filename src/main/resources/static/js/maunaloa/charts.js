@@ -108,7 +108,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //---------------------- Elm.Maunaloa.Charts ---------------------------
 
-    const saveCanvases = (canvases, canvasVolume, canvasCyberCycle, scrapbook) => {
+    const chartTypeName = (ct) => {
+        switch (ct) {
+            case DAY:
+                return "day";
+            case WEEK:
+                return "week";
+            case MONTH:
+                return "mon";
+        }
+    };
+    const pngName = (chartType) => {
+        const dx = new Date();
+        const dayOfMonth = dx.getDate();
+        const ctn = chartTypeName(chartType);
+        if (dayOfMonth < 10) {
+            return `0${dayOfMonth}-${dx.getHours()}_${dx.getMinutes()}-${ctn}.png`;
+        }
+        else {
+            return `${dayOfMonth}-${dx.getHours()}_${dx.getMinutes()}-${ctn}.png`;
+        }
+    };
+    const saveCanvases = (chartType,canvases, canvasVolume, canvasCyberCycle, scrapbook) => {
         const c1 = canvases[0]; // this.canvas; //document.getElementById('canvas');
         const w1 = c1.width;
         const h1 = c1.height;
@@ -130,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "scrap.png";
+            a.download = pngName(chartType);
             document.body.appendChild(a);
             a.click();
             setTimeout(function () {
@@ -168,23 +189,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return [mainChart, osc, volume];
     };
 
-    /*
-    const fetchTickers = (nodeId, eventHandler) => {
-        fetch("/maunaloa/stockprice/tickers").then(result => {
-            result.json().then(data => {
-                const node = document.getElementById(nodeId);
-                node.addEventListener("change", eventHandler);
-
-                data.forEach(x => {
-                    let opt = document.createElement("option");
-                    opt.value = x.v;
-                    opt.text = x.t;
-                    node.add(opt);
-                })
-            });
-        });
-    };
-    */
 
     const DAY = 1;
     const WEEK = 2;
@@ -240,69 +244,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const init = (chartType) => {
         const _params = chartTypeParams(chartType);
-        /*
-        const _chartMappings = toChartMappings(_params.canvasesType);
-        var _currentTicker = null;
-        var _shiftIndex = 0;
-
-
-        const fetchPrices = (event) => {
-            if (isPositiveInt(event.target.value)) {
-                _currentTicker = event.target.value;
-                _shiftIndex = 0;
-                PS.paint(chartType)(_chartMappings)(event.target.value)(0)(SHIFT_WINDOW)();
-            }
-            else {
-                _currentTicker = null;
-                PS.paintEmpty(_chartMappings)();
-            }
-        };
-
-        fetchTickers(_params.fetchTickersNode, fetchPrices);
-
-        //---------------------- Shift events ----------------------
-
-        const shiftPricesPrev = (event) => {
-            if (_currentTicker == null) {
-                return;
-            }
-            _shiftIndex += SHIFT_WINDOW;
-            PS.paint(chartType)(_chartMappings)(_currentTicker)(_shiftIndex)(SHIFT_WINDOW)();
-        };
-        const shiftPricesNext = (event) => {
-            if (_currentTicker == null) {
-                return;
-            }
-            _shiftIndex -= SHIFT_WINDOW;
-            if (_shiftIndex < 0) {
-                _shiftIndex = 0;
-            }
-            PS.paint(chartType)(_chartMappings)(_currentTicker)(_shiftIndex)(SHIFT_WINDOW)();
-        }
-        const shiftPricesLast = (event) => {
-            if (_currentTicker == null) {
-                return;
-            }
-            _shiftIndex = 0;
-            PS.paint(chartType)(_chartMappings)(_currentTicker)(0)(SHIFT_WINDOW)();
-        };
-        const resetCharts = (event) => {
-            if (_currentTicker == null) {
-                return;
-            }
-            PS.resetCharts();
-            _shiftIndex = 0;
-            PS.paint(chartType)(_chartMappings)(_currentTicker)(0)(SHIFT_WINDOW)();
-        }
-        const prevBtn = document.querySelector(_params.prevBtnClass);
-        prevBtn.addEventListener("click", shiftPricesPrev);
-        const nextBtn = document.querySelector(_params.nextBtnClass);
-        nextBtn.addEventListener("click", shiftPricesNext);
-        const lastBtn = document.querySelector(_params.lastBtnClass);
-        lastBtn.addEventListener("click", shiftPricesLast);
-        const resetChartsBtn = document.querySelector(_params.resetChartsBtnClass);
-        resetChartsBtn.addEventListener("click", resetCharts);
-        */
 
         //---------------------- Scrapbooks ----------------------
         const scrapConfig = _params.scrapBookConfig;
@@ -310,7 +251,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const btnClear = document.getElementById(scrapConfig.BTN_CLEAR);
         btnClear.onclick = () => {
             scrap.clear();
-            //PS.clearLevelLines(chartType)();
         };
         scrap.clear();
         const btnSave = document.getElementById(scrapConfig.BTN_SAVE);
@@ -322,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
             blobCanvases.push(document.getElementById(canvasConfig.LEVEL_LINES));
             const canvasVolume = document.getElementById(canvasConfig.VOLUME);
             const canvasCyberCycle = document.getElementById(canvasConfig.OSC);
-            saveCanvases(blobCanvases, canvasVolume, canvasCyberCycle, scrap);
+            saveCanvases(chartType,blobCanvases, canvasVolume, canvasCyberCycle, scrap);
         };
 
     };

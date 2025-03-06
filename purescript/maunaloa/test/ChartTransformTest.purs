@@ -2,100 +2,32 @@ module Test.ChartTransformTest where
 
 import Prelude
 
-import Test.Unit.Assert as Assert
---import Test.Unit.Console (log)
-import Test.Unit
-  ( suite
-  , test
-  , failure
-  , TestSuite
-  , Test
-  )
-import Control.Monad.Reader
-  ( runReader
-  )
-import Data.Maybe
-  ( Maybe(..)
-  , fromMaybe
-  )
-import Data.Array
-  ( length
-  , take
-  , head
-  )
-import Data.Either
-  ( Either
-  , fromRight
-  )
---import Partial.Unsafe (unsafePartial)
-
+import Control.Monad.Reader (runReader)
+import Data.Argonaut.Core (Json, fromString)
 import Data.Argonaut.Parser as Parser
-import Data.Argonaut.Core
-  ( Json
-  , fromString
-  )
---import Data.Argonaut.Decode as Decode
---import Data.Argonaut.Decode.Error (JsonDecodeError)
-
-import HarborView.Maunaloa.JsonCharts
-  ( JsonChart
-  , JsonChartResponse
-  , JsonChartWindow(..)
-  , chartsFromJson
-  , emptyJsonChart
-  )
-import HarborView.Maunaloa.ChartCollection
-  ( ChartCollection(..)
-  , EmptyChartCollection(..)
-  )
+import Data.Array (length, take, head)
+import Data.Either (Either, fromRight)
+import Data.Maybe (Maybe(..), fromMaybe, fromJust)
 import HarborView.Common (UnixTime(..))
-import HarborView.Maunaloa.Common
-  ( HtmlId(..)
-  , StockTicker(..)
-  , ChartHeight(..)
-  , ChartWidth(..)
-  , Scaling(..)
-  , ValueRange
-  , Pix(..)
-  , Padding(..)
-  , ChartId(..)
-  , ChartMappings
-  , ChartMapping(..)
-  , Env(..)
-  , Drop(..)
-  , Take(..)
-  , ChartType(..)
-  , valueRange
-  )
-import HarborView.Maunaloa.Chart
-  ( Chart(..)
-  , ChartContent
-  , ChartContent2
-  , emptyChart
-  )
-import HarborView.Maunaloa.ChartTransform
-  ( minMaxRanges
-  , normalizeLine
-  , transform
-  , transformEmpty
-  , chartWindow
-  )
-import HarborView.Maunaloa.HRuler
-  ( HRuler(..)
-  )
-import HarborView.Maunaloa.VRuler
-  ( VRuler(..)
-  )
-import HarborView.Maunaloa.Candlestick
-  ( Candlestick(..)
-  )
+import HarborView.Maunaloa.Candlestick (Candlestick(..))
+import HarborView.Maunaloa.Chart (Chart(..), ChartContent, ChartContent2, emptyChart)
+import HarborView.Maunaloa.ChartCollection (ChartCollection(..), EmptyChartCollection(..))
+import HarborView.Maunaloa.ChartTransform (minMaxRanges, normalizeLine, transform, transformEmpty, chartWindow)
+import HarborView.Maunaloa.Common (HtmlId(..), StockTicker(..), ChartHeight(..), ChartWidth(..), Scaling(..), ValueRange, Pix(..), Padding(..), ChartId(..), ChartMappings, ChartMapping(..), Env(..), Drop(..), Take(..), ChartType(..), valueRange)
+import HarborView.Maunaloa.HRuler (HRuler(..))
+import HarborView.Maunaloa.JsonCharts (JsonChart, JsonChartResponse, JsonChartWindow(..), chartsFromJson, emptyJsonChart)
+import HarborView.Maunaloa.VRuler (VRuler(..))
+import Partial.Unsafe (unsafePartial)
+import Test.Unit (suite, test, failure, TestSuite, Test)
+import Test.Unit.Assert as Assert
 
 --import Effect.Console (logShow)
 --import Maunaloa.HRuler as H
 
 testJsonStr :: String
 testJsonStr =
-  """{"ticker":"NHY","chart":
+  """{"payload":
+      {"ticker":"NHY","chart":
             {"lines":[
                 [57.4,57.0,56.5,56.2,56.1,55.8,55.8,56.4,57.2,57.2,56.8,56.4,56.2,55.9,56.1,56.4,56.2,55.7,55.1,54.7,
                 54.4,54.0,53.5,52.8,51.9,51.1,50.8,50.9,51.4,52.3,53.2,53.8,54.0,53.9,54.0,54.3,54.7,55.0,55.0,55.0,
@@ -189,19 +121,23 @@ testJsonStr =
                 4196,4193,4192,4191,4190,4189,4186,4185,4184,4183,4182,4179,4178,4177,4176,4175,4172,4171,4170,4169,4168,4165,
                 4164,4163,4162,4158,4157,4156,4155,4151,4149,4148,4147,4144,4143,4142,4141,4140,4137,4136,4135,4134,4133,4130,
                 4129,4128,4127,4126,4123,4122,4121,4120,4119,4116,4115,4114,4113,4107,4106,4105,4102,4101,4100,4099,4098,4095,
-                4094,4093,4092,4091,4088,4087,4086,4085,4084,4081,4080,4079]}"""
+                4094,4093,4092,4091,4088,4087,4086,4085,4084,4081,4080,4079]}, "appStatusCode": 1, "error": null}"""
 
 testJson :: Either String Json
 testJson = Parser.jsonParser testJsonStr
 
 defaultJsonChartInfo :: JsonChartResponse
 defaultJsonChartInfo =
-  { ticker: "NHY"
-  , chart: emptyJsonChart
-  , chart2: emptyJsonChart
-  , chart3: emptyJsonChart
-  , xAxis: []
-  , minDx: 0.0
+  { payload : Just
+    { ticker: "NHY"
+    , chart: emptyJsonChart
+    , chart2: emptyJsonChart
+    , chart3: emptyJsonChart
+    , xAxis: []
+    , minDx: 0.0
+    }
+  , appStatusCode: 1
+  , msg: Nothing
   }
 
 chartMapping :: HtmlId -> ChartMapping
@@ -437,10 +373,11 @@ testChartTransformSuite =
       Assert.equal expectedLine actual
     test "transform" do
       let testResponse = testJsonChartResponse
-      testTransformChartMain testResponse.chart
-      testTransformChartBar testResponse.chart3
+      let testResponse1 = unsafePartial (fromJust testResponse.payload)
+      testTransformChartMain testResponse1.chart
+      testTransformChartBar testResponse1.chart3
 
-      let (ChartCollection coll) = runReader (transform testResponse) testEnv
+      let (ChartCollection coll) = runReader (transform testResponse1) testEnv
       let (HRuler hruler) = coll.hruler
       Assert.equal 1 (length coll.charts)
       Assert.equal (UnixTime 1615939200000.0) hruler.startTime
@@ -450,7 +387,7 @@ testChartTransformSuite =
       Assert.equal (Pix 9.029850746268657) hruler.ppx
       let actualXaxis10 = take 10 hruler.xaxis
       Assert.equal expectedXaxis10 actualXaxis10
-      let chart1 = getFirstChartFromColl coll.charts -- fromMaybe emptyChart (head collection.charts) 
+      let chart1 = getFirstChartFromColl coll.charts -- fromMaybe emptyChart (head collection.charts)
       Assert.equal expectedVruler chart1.vruler
       let line1_1 = fromMaybe [] (head chart1.lines)
       Assert.equal 90 (length line1_1)
@@ -459,12 +396,6 @@ testChartTransformSuite =
       Assert.equal expectedChartLines10 actualChartLines10
       let actualCandlesticks10 = take 10 chart1.candlesticks
       Assert.equal expectedCandlesticks10 actualCandlesticks10
-    {-
-    Assert.equal (HtmlId "test-canvasId") chart1.canvasId
-    Assert.equal expectedChartLevel chart1.chartLevel
-    Assert.equal (ChartWidth 1310.0) chart1.w
-    Assert.equal (ChartHeight 500.0) chart1.h
-    -}
     test "transformEmpty" do
       testTransformEmpty
       let (EmptyChartCollection coll) = runReader transformEmpty testEnv
@@ -474,4 +405,3 @@ testChartTransformSuite =
       Assert.equal (HtmlId "test-canvasId") chart1.canvasId
       Assert.equal (ChartWidth 1310.0) chart1.w
       Assert.equal (ChartHeight 500.0) chart1.h
-

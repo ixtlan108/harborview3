@@ -19,7 +19,7 @@ mainURL =
   --"http://localhost:8082/maunaloa"
   "/maunaloa"
 
-------------------------- Graph ------------------------- 
+------------------------- Graph -------------------------
 --class Graph a where
 --    draw :: a -> Context2D -> Effect Unit
 
@@ -32,7 +32,7 @@ instance showChartWidth :: Show ChartWidth where
 
 type Xaxis = Array Number
 
-------------------------- Pix ------------------------- 
+------------------------- Pix -------------------------
 newtype Pix = Pix Number
 
 derive instance eqPix :: Eq Pix
@@ -40,26 +40,26 @@ derive instance eqPix :: Eq Pix
 instance showPix :: Show Pix where
   show (Pix v) = "(Pix " <> show v <> ")"
 
-------------------------- ChartDim ------------------------- 
+------------------------- ChartDim -------------------------
 {-
 newtype ChartDim = ChartDim { w :: Number, h :: Number }
 
-derive instance eqChartDim :: Eq ChartDim 
+derive instance eqChartDim :: Eq ChartDim
 
 instance showChartDim :: Show ChartDim where
   show (ChartDim dim) = "(ChartDim w: " <> show dim.w <> ", h: " <> show dim.h <> ")"
 -}
 
-------------------------- Json ------------------------- 
+------------------------- Json -------------------------
 type JsonSpot =
   { h :: Number
   , l :: Number
   , o :: Number
   , c :: Number
-  , unixtime :: Number
+  , unixTime :: Number
   }
 
-------------------------- ChartWidth ------------------------- 
+------------------------- ChartWidth -------------------------
 newtype ChartWidth = ChartWidth Number
 
 instance showChartWidth :: Show ChartWidth where
@@ -67,7 +67,7 @@ instance showChartWidth :: Show ChartWidth where
 
 derive instance eqChartWidth :: Eq ChartWidth
 
-------------------------- ChartHeight ------------------------- 
+------------------------- ChartHeight -------------------------
 newtype ChartHeight = ChartHeight Number
 
 instance showChartHeight :: Show ChartHeight where
@@ -75,7 +75,7 @@ instance showChartHeight :: Show ChartHeight where
 
 derive instance eqChartHeight :: Eq ChartHeight
 
-------------------------- Ticker ------------------------- 
+------------------------- Ticker -------------------------
 newtype OptionTicker = OptionTicker String
 
 instance showOptionTicker :: Show OptionTicker where
@@ -86,7 +86,7 @@ newtype StockTicker = StockTicker String
 instance showStockTicker :: Show StockTicker where
   show (StockTicker x) = "(StockTicker: " <> x <> ")"
 
-------------------------- HtmlId ------------------------- 
+------------------------- HtmlId -------------------------
 data HtmlId
   = HtmlId String
   | NoHtmlId
@@ -97,7 +97,7 @@ instance showHtmlId :: Show HtmlId where
 
 derive instance eqHtmlId :: Eq HtmlId
 
-------------------------- ValueRange ------------------------- 
+------------------------- ValueRange -------------------------
 newtype ValueRange = ValueRange
   { minVal :: Number
   , maxVal :: Number
@@ -116,7 +116,7 @@ valueRangeZeroBased :: ValueRange -> ValueRange
 valueRangeZeroBased (ValueRange { maxVal }) =
   ValueRange { minVal: 0.0, maxVal: maxVal }
 
-------------------------- Padding ------------------------- 
+------------------------- Padding -------------------------
 newtype Padding = Padding
   { left :: Number
   , top :: Number
@@ -129,7 +129,7 @@ derive instance eqPadding :: Eq Padding
 instance showPadding :: Show Padding where
   show (Padding v) = "(Padding " <> show v <> ")"
 
-------------------------- RulerLine ------------------------- 
+------------------------- RulerLine -------------------------
 type RulerLineBoundary = { p1 :: Number, p2 :: Number }
 
 newtype RulerLineInfo = RulerLineInfo
@@ -140,7 +140,7 @@ newtype RulerLineInfo = RulerLineInfo
 instance showRulerLineInfo :: Show RulerLineInfo where
   show (RulerLineInfo v) = "(RulerLineInfo " <> show v <> ")"
 
-------------------------- Offset ------------------------- 
+------------------------- Offset -------------------------
 
 newtype OffsetBoundary = OffsetBoundary
   { oHead :: Int
@@ -150,10 +150,10 @@ newtype OffsetBoundary = OffsetBoundary
 instance showOffsetBoundary :: Show OffsetBoundary where
   show (OffsetBoundary v) = "(OffsetBoundary " <> show v <> ")"
 
-------------------------- Scaling ------------------------- 
+------------------------- Scaling -------------------------
 newtype Scaling = Scaling Number
 
-------------------------- Util ------------------------- 
+------------------------- Util -------------------------
 
 calcPpx :: ChartWidth -> OffsetBoundary -> Padding -> Number
 calcPpx (ChartWidth w) (OffsetBoundary b) (Padding p) =
@@ -165,14 +165,14 @@ calcPpx (ChartWidth w) (OffsetBoundary b) (Padding p) =
 
 {-
 calcPpx_ :: ChartDim -> Array Int -> Padding -> Maybe Number
-calcPpx_ (ChartDim dim) offsets (Padding p) = 
+calcPpx_ (ChartDim dim) offsets (Padding p) =
   head offsets >>= \offset0 ->
   last offsets >>= \offsetN ->
   let
     diffDays = toNumber $ offset0 - offsetN + 1
     padding_w = dim.w - p.left - p.right
-  in 
-  if diffDays < 0.0 then 
+  in
+  if diffDays < 0.0 then
     Nothing
   else
     Just $ padding_w / diffDays
@@ -244,4 +244,3 @@ newtype Env =
     , globalChartWidth :: ChartWidth
     , scaling :: Scaling
     }
-
