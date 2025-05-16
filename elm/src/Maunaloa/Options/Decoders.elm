@@ -77,3 +77,5 @@ payloadDecoder : JD.Decoder Payload
 payloadDecoder =
     JD.succeed Payload
     |> JP.required "payload" stockAndOptionsDecoder
+    |> JP.required "appStatusCode" JD.int
+    |> JP.optional "error" JD.string ""

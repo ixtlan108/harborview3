@@ -68,8 +68,9 @@ type alias Options =
     List Option
 
 type alias Payload =
-    {
-        payload : StockAndOptions
+    { payload : StockAndOptions
+    , appStatusCode : Int
+    , error : String
     }
 
 type alias StockAndOptions =
