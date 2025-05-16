@@ -18,6 +18,7 @@ module Maunaloa.Options.Types exposing
     , Spot(..)
     , Stock
     , StockAndOptions
+    , StockTickersResponse
     , StockId(..)
     , Ticker(..)
     , Volume(..)
@@ -25,8 +26,8 @@ module Maunaloa.Options.Types exposing
 
 import Common.DateUtil exposing (UnixTime)
 import Common.ModalDialog as DLG exposing (errorAlert)
-import Common.Select as CMB
-import Common.Types exposing (JsonStatus)
+import Common.Select as CMB exposing (SelectItem)
+import Common.Types exposing (JsonStatus )
 import Http
 import Table
 
@@ -66,9 +67,9 @@ type alias Option =
 type alias Options =
     List Option
 
-type alias Payload = 
+type alias Payload =
     {
-        payload :StockAndOptions
+        payload : StockAndOptions
     }
 
 type alias StockAndOptions =
@@ -89,6 +90,11 @@ type alias RiscResult =
     , status : Int
     }
 
+type alias StockTickersResponse =
+  { payload : List SelectItem
+  , appStatusCode : Int
+  , error : String
+  }
 
 type alias RiscItems =
     List RiscItem
@@ -157,7 +163,7 @@ type RiscMsg
 
 type Msg
     = AlertOk
-    | TickersFetched (Result Http.Error CMB.SelectItems)
+    | TickersFetched (Result Http.Error StockTickersResponse)
     | SetTableState Table.State
     | ResetCache
     | ToggleSelected String

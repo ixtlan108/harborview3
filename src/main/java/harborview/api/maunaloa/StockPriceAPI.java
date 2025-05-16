@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -36,7 +37,7 @@ public class StockPriceAPI {
 
     @GetMapping(value = "/tickers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PayloadResponse<List<SelectItem>>> tickers() {
-        return ApiUtil.map(maunaloaCore.getStockTickers());
+        return ApiUtil.mapWithDefault(maunaloaCore.getStockTickers(), Collections.emptyList());
     }
 
     @GetMapping(value = "/days/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)

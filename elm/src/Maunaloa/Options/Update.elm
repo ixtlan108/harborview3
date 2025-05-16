@@ -170,8 +170,11 @@ update msg model =
             ( { model | dlgAlert = DLG.DialogHidden }, Cmd.none )
 
         TickersFetched (Ok s) ->
+          if s.appStatusCode /= 1 then
+            ( model, Cmd.none )
+          else
             ( { model
-                | tickers = s
+                | tickers = s.payload
               }
             , Cmd.none
             )

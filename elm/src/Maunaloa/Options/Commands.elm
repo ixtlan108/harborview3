@@ -234,4 +234,4 @@ fetchTickers =
             mainUrl ++ "/stockprice/tickers"
     in
     Http.send TickersFetched <|
-        Http.get url DEC.selectItemListDecoder
+        Http.get url DEC.stockTickersDecoder

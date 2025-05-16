@@ -2,9 +2,11 @@ module Common.Decoders exposing
     ( jsonStatusDecoder
     , selectItemDecoder
     , selectItemListDecoder
+    , stockTickersDecoder
     )
 
 import Common.Select exposing (SelectItem)
+import Maunaloa.Options.Types exposing (StockTickersResponse)
 -- import Critters.Types exposing (JsonStatus)
 import Json.Decode as JD
 import Json.Decode.Pipeline as JP
@@ -32,3 +34,11 @@ selectItemDecoder =
 selectItemListDecoder : JD.Decoder (List SelectItem)
 selectItemListDecoder =
     JD.list selectItemDecoder
+
+
+stockTickersDecoder : JD.Decoder StockTickersResponse
+stockTickersDecoder =
+  JD.succeed StockTickersResponse
+    |> JP.required "payload"selectItemListDecoder
+    |> JP.required "appStatusCode" JD.int
+    |> JP.optional "error" JD.string ""
