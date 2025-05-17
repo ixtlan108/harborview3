@@ -103,6 +103,18 @@
       :tpl "rapanui/tpl/rapanui.html.tpl"
       :tpl-target "../src/main/resources/templates/rapanui/rapanui.html"}))
 
+(defn critters []
+  (let [spago
+          {
+            :js-file "/home/rcs/opt/java/harborview3/elm/elm-critters.js"
+            :js-target "../src/main/resources/static/js/critters/elm-critters-%s.js"
+            }
+        ]
+    { :spago spago
+      :sass nil
+      :tpl "critter/tpl/overlook.html.tpl"
+      :tpl-target "../src/main/resources/templates/critter/overlook.html"}))
+
 (defn options []
   (let [spago
           {
@@ -175,9 +187,14 @@
       (os/execute [(dyn :x-sass-cmd) sass-cmd-input out-file]))
     ((dyn :x-md5-cmd) out-file)))
 
-(defn run-elm []
+(defn compile-elm []
   (os/cd elm-dir)
   (os/execute [elm-cmd "make" "src/Maunaloa/Options/Main.elm" "--output=elm-options.js"])
+  (os/cd ps-dir))
+
+(defn compile-elm-critters []
+  (os/cd elm-dir)
+  (os/execute [elm-cmd "make" "src/Critters/Main.elm" "--output=elm-critters.js"])
   (os/cd ps-dir))
 
 (defn render [cfg spago-md5 sass-md5]
@@ -188,6 +205,19 @@
         content (string/slice (file/read f :all))]
     (file/close f)
     (let [result (string/format content spago-md5 sass-md5)
+          result-file (file/open (cfg :tpl-target) :w)]
+      (file/write result-file result)
+      (file/close result-file)
+      (print result))))
+
+(defn render-critters [cfg spago-md5]
+  (print "Enter render..")
+  (print (cfg :tpl))
+  (let [tpl (cfg :tpl)
+        f (file/open tpl :r)
+        content (string/slice (file/read f :all))]
+    (file/close f)
+    (let [result (string/format content spago-md5)
           result-file (file/open (cfg :tpl-target) :w)]
       (file/write result-file result)
       (file/close result-file)
@@ -225,10 +255,20 @@
   #   (copy-spago-files cfg spago-md5)
   #   (copy-sass-files cfg sass-md5)))
 
+  (defn run-critters []
+    (print "Enter run-options..")
+    (when (dyn :x-elm)
+      (compile-elm-critters))
+    (let [cfg (critters)
+          spago-md5 (run-spago cfg)]
+      (print "run-critters: " spago-md5)
+      (render-critters cfg spago-md5)
+      (copy-spago-files cfg spago-md5)))
+
 (defn run-options []
   (print "Enter run-options..")
   (when (dyn :x-elm)
-    (run-elm))
+    (compile-elm))
   (run (options)))
 
 (defn run-optionpurchase []
@@ -243,7 +283,7 @@
   (print "Enter run-rapanui..")
   (run (rapanui)))
 
-(def PROJ {"1" run-rapanui "2" run-maunaloa "3" run-optionpurchase "4" run-options})
+(def PROJ {"1" run-rapanui "2" run-maunaloa "3" run-optionpurchase "4" run-options "5" run-critters })
 
 (defn run [argx]
   (let [os-linux (= (argx "os") "linux")
