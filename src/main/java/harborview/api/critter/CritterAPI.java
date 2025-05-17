@@ -1,5 +1,7 @@
 package harborview.api.critter;
 
+import harborview.api.response.PayloadResponse;
+import harborview.api.util.ApiUtil;
 import harborview.domain.core.critter.CritterCore;
 import harborview.dto.StatusDTO;
 import harborview.dto.critter.OptionPurchaseDTO;
@@ -32,8 +34,8 @@ public class CritterAPI {
     }
 
     @GetMapping(value = "/purchases/{ptype}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<OptionPurchaseDTO>> purchases(@PathVariable("ptype") int ptype) {
-        return ResponseEntity.ok(critterCore.activePurchasesWithCritters(ptype));
+    public ResponseEntity<PayloadResponse<List<OptionPurchaseDTO>>> purchases(@PathVariable("ptype") int ptype) {
+        return ApiUtil.map(critterCore.activePurchasesWithCritters(ptype));
     }
 
     @GetMapping(value = "/purchases/toggle/{rulecategory}/{oid}/{active}", produces = MediaType.APPLICATION_JSON_VALUE)

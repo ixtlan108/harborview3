@@ -262,7 +262,7 @@
 (defn main [&]
   (let
     [ argx (ap/argparse "Deploy"
-            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: options" :required true}
+            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: options (elm), 5: critters (elm)" :required true}
             "os"    {:kind :option  :short "o" :help "Os: linux, macos. Default: linux" :default "linux"}
             "log"   {:kind :flag    :short "l" :help "If set, will write to log. Default: false" :default false}
             "elm"   {:kind :flag    :short "e" :default false :help "Default: false"}

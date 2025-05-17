@@ -1,5 +1,8 @@
 package harborview.domain.core.critter;
 
+import harborview.api.util.ApiUtil;
+import harborview.domain.error.ApplicationError;
+import harborview.domain.functional.Either;
 import harborview.domain.stockmarket.StockMarketRepository;
 import harborview.dto.critter.OptionPurchaseDTO;
 import org.slf4j.Logger;
@@ -20,14 +23,16 @@ public class CritterCore {
         this.stockMarketAdapter = stockMarketAdapter;
     }
 
-    public List<OptionPurchaseDTO> activePurchasesWithCritters(int purchaseType) {
-        var purchases = stockMarketAdapter.activePurchasesWithCritters(purchaseType);
-        if (purchases == null) {
-            logger.warn(String.format("Empty list for critters, purchaseType=%d", purchaseType));
-            return Collections.emptyList();
-        }
-        return purchases.stream().map(OptionPurchaseDTO::new).
-                collect(Collectors.toList());
+    public Either<ApplicationError,List<OptionPurchaseDTO>> activePurchasesWithCritters(int purchaseType) {
+        return ApiUtil.handle(() -> {
+            var purchases = stockMarketAdapter.activePurchasesWithCritters(purchaseType);
+            if (purchases == null) {
+                logger.warn(String.format("Empty list for critters, purchaseType=%d", purchaseType));
+                return Collections.emptyList();
+            }
+            return purchases.stream().map(OptionPurchaseDTO::new).
+                    collect(Collectors.toList());
+        });
     }
 
     public void toggleRule(int ruleId, boolean active, boolean isAccRule) {
