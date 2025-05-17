@@ -141,14 +141,14 @@ toggle ticker opt =
         opt
 
 
-setRisc : Float -> RiscResults -> Option -> Option
-setRisc curRisc riscResults opt =
+setRisc : Float -> RiscResult -> Option -> Option
+setRisc curRisc riscResult opt =
     let
         predicate =
             \x -> x.ticker == opt.ticker
 
         curRiscItem =
-            List.head <| List.filter predicate riscResults
+            List.head <| List.filter predicate riscResult.payload
     in
     case curRiscItem of
         Nothing ->
@@ -183,16 +183,16 @@ calcRisc stockTicker riscStr options =
                     U.listAsHttpBody
                         (List.map (\x -> [ ( "ticker", JE.string x.ticker ), ( "risc", JE.float risc ) ]) checked)
 
-                myDecoder =
-                    JD.succeed RiscResult
-                        |> JP.required "ticker" JD.string
-                        |> JP.required "stockprice" JD.float
-                        |> JP.required "status" JD.int
+                -- myDecoder =
+                --     JD.succeed RiscResult
+                --         |> JP.required "ticker" JD.string
+                --         |> JP.required "stockprice" JD.float
+                --         |> JP.required "status" JD.int
             in
             Http.send
                 (RiscMsgFor << RiscCalculated)
             <|
-                Http.post url jbody (JD.list myDecoder)
+                Http.post url jbody D.riscResultDecoder
 
 
 

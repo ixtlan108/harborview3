@@ -13,6 +13,7 @@ module Maunaloa.Options.Types exposing
     , RiscItem
     , RiscItems
     , RiscMsg(..)
+    , RiscResultPayload
     , RiscResult
     , RiscResults
     , Spot(..)
@@ -84,12 +85,17 @@ type alias RiscItem =
     , risc : Float
     }
 
+type alias RiscResultPayload =
+  { ticker : String
+  , stockprice : Float
+  , status : Int
+  }
 
 type alias RiscResult =
-    { ticker : String
-    , stockprice : Float
-    , status : Int
-    }
+  { payload : List RiscResultPayload
+  , appStatusCode : Int
+  , error : String
+  }
 
 type alias StockTickersResponse =
   { payload : List SelectItem
@@ -158,7 +164,7 @@ type PurchaseMsg
 
 type RiscMsg
     = CalcRisc
-    | RiscCalculated (Result Http.Error RiscResults)
+    | RiscCalculated (Result Http.Error RiscResult)
     | RiscChange String
 
 

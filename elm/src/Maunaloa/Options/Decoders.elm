@@ -1,17 +1,23 @@
-module Maunaloa.Options.Decoders exposing (payloadDecoder, optionDecoder, stockAndOptionsDecoder, stockDecoder)
+module Maunaloa.Options.Decoders exposing
+  ( payloadDecoder
+  , optionDecoder
+  , stockAndOptionsDecoder
+  , stockDecoder
+  , riscResultDecoder
+  )
 
 import Common.Types exposing (JsonStatus)
 import Common.Utils as U
 import Json.Decode as JD
 import Json.Decode.Pipeline as JP
-import Maunaloa.Options.Types exposing (Payload, Option, Options, Stock, StockAndOptions)
+import Maunaloa.Options.Types exposing (Payload, Option, RiscResult, RiscResultPayload, Stock, StockAndOptions)
 
-
-purchaseStatusDecoder =
-    JD.succeed JsonStatus
-        |> JP.required "ok" JD.bool
-        |> JP.required "msg" JD.string
-        |> JP.required "statusCode" JD.int
+-- purchaseStatusDecoder : JD.Decoder JsonStatus
+-- purchaseStatusDecoder =
+--     JD.succeed JsonStatus
+--         |> JP.required "ok" JD.bool
+--         |> JP.required "msg" JD.string
+--         |> JP.required "statusCode" JD.int
 
 
 buildOption :
@@ -77,5 +83,26 @@ payloadDecoder : JD.Decoder Payload
 payloadDecoder =
     JD.succeed Payload
     |> JP.required "payload" stockAndOptionsDecoder
+    |> JP.required "appStatusCode" JD.int
+    |> JP.optional "error" JD.string ""
+
+riscResultPayloadDecoder : JD.Decoder RiscResultPayload
+riscResultPayloadDecoder =
+    JD.succeed RiscResultPayload
+        |> JP.required "ticker" JD.string
+        |> JP.required "stockprice" JD.float
+        |> JP.required "status" JD.int
+
+-- defaultRiscResultPayloadDecoder : RiscResultPayload
+-- defaultRiscResultPayloadDecoder =
+--         { ticker =  ""
+--         , stockprice = 0.0
+--         , status = 0
+--         }
+
+riscResultDecoder : JD.Decoder RiscResult
+riscResultDecoder =
+  JD.succeed RiscResult
+    |> JP.required "payload" (JD.list riscResultPayloadDecoder)
     |> JP.required "appStatusCode" JD.int
     |> JP.optional "error" JD.string ""
