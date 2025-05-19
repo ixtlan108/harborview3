@@ -15,7 +15,7 @@ import HarborView.Maunaloa.ChartCollection (ChartCollection(..), EmptyChartColle
 import HarborView.Maunaloa.ChartTransform (minMaxRanges, normalizeLine, transform, transformEmpty, chartWindow)
 import HarborView.Maunaloa.Common (HtmlId(..), StockTicker(..), ChartHeight(..), ChartWidth(..), Scaling(..), ValueRange, Pix(..), Padding(..), ChartId(..), ChartMappings, ChartMapping(..), Env(..), Drop(..), Take(..), ChartType(..), valueRange)
 import HarborView.Maunaloa.HRuler (HRuler(..))
-import HarborView.Maunaloa.JsonCharts (JsonChart, JsonChartResponse, JsonChartWindow(..), chartsFromJson, emptyJsonChart)
+import HarborView.Maunaloa.JsonCharts (JsonChart, JsonChartResponse, JsonChartWindow(..), chartsDecoder, emptyJsonChart)
 import HarborView.Maunaloa.VRuler (VRuler(..))
 import Partial.Unsafe (unsafePartial)
 import Test.Unit (suite, test, failure, TestSuite, Test)
@@ -160,7 +160,7 @@ testJsonChartResponse :: JsonChartResponse
 testJsonChartResponse =
   let
     json = fromRight (fromString "") testJson
-    result = chartsFromJson json
+    result = chartsDecoder json
   in
     fromRight defaultJsonChartInfo result
 
