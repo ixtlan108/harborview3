@@ -6,6 +6,7 @@ import Prelude
 
 -- import Data.Tuple (Tuple(..),fst,snd)
 import Data.Int (toNumber)
+import Data.Maybe (Maybe)
 
 import Effect (Effect)
 
@@ -51,12 +52,18 @@ instance showChartDim :: Show ChartDim where
 -}
 
 ------------------------- Json -------------------------
-type JsonSpot =
+type JsonSpotPayload =
   { h :: Number
   , l :: Number
   , o :: Number
   , c :: Number
   , unixTime :: Number
+  }
+
+type JsonSpot =
+  { payload :: Maybe JsonSpotPayload
+  , appStatusCode :: Int
+  , msg :: Maybe String
   }
 
 ------------------------- ChartWidth -------------------------
