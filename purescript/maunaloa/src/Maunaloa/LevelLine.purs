@@ -11,8 +11,6 @@ module HarborView.Maunaloa.LevelLine
 
 import Prelude
 
-import Affjax.ResponseFormat as ResponseFormat
-import Affjax.Web as Affjax
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode as Decode
 import Data.Argonaut.Decode.Error (JsonDecodeError)
@@ -26,19 +24,19 @@ import Effect.Class (liftEffect)
 import Effect.Console (logShow)
 import Graphics.Canvas (CanvasElement, Context2D)
 import Graphics.Canvas as Canvas
-import HarborView.Common (UnixTime(..), defaultEventHandling)
+import HarborView.Common (UnixTime(..), HarborViewError, defaultEventHandling)
 import HarborView.Maunaloa.Candlestick as Candlestick
 import HarborView.Maunaloa.Common (Pix(..), ChartMapping(..), HtmlId(..), OptionTicker(..), StockTicker(..), ChartType, JsonSpot, chartTypeAsInt, mainURL, alert)
 import HarborView.Maunaloa.HRuler (HRuler, timeStampToPix)
-import HarborView.Maunaloa.MaunaloaError (MaunaloaError(..), handleErrorAff)
+import HarborView.Maunaloa.MaunaloaError (handleErrorAff)
 import HarborView.Maunaloa.VRuler (VRuler, valueToPix, pixToValue)
+import HarborView.Util.HttpUtil as HU
 import Web.DOM.Element (toEventTarget, Element)
 import Web.DOM.NonElementParentNode (NonElementParentNode, getElementById)
 import Web.Event.Event (EventType(..))
 import Web.Event.Event as Event
 import Web.Event.EventTarget as EventTarget
 import Web.HTML as HTML
-import Web.HTML.Event.EventTypes (offline)
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.Window as Window
 
@@ -159,8 +157,8 @@ type RiscLineJson =
 
 type RiscLinesJson = Array RiscLineJson
 
-riscLinesFromJson :: Json -> Either JsonDecodeError RiscLinesJson
-riscLinesFromJson = Decode.decodeJson
+riscLinesDecoder :: Json -> Either JsonDecodeError RiscLinesJson
+riscLinesDecoder = Decode.decodeJson
 
 type UpdatedOptionPriceJson =
   { value :: Number
@@ -175,11 +173,11 @@ type StatusJson =
   , statusCode :: Int
   }
 
-statusFromJson :: Json -> Either JsonDecodeError StatusJson
-statusFromJson = Decode.decodeJson
+statusDecoder :: Json -> Either JsonDecodeError StatusJson
+statusDecoder = Decode.decodeJson
 
-spotFromJson :: Json -> Either JsonDecodeError JsonSpot
-spotFromJson = Decode.decodeJson
+spotDecoder :: Json -> Either JsonDecodeError JsonSpot
+spotDecoder = Decode.decodeJson
 
 ----------------------------- BEGIN URLs -----------------------------
 
@@ -202,7 +200,7 @@ spotURL (StockTicker ticker) =
 
 addLine :: ChartType -> Effect Unit
 addLine ct =
-  randomRgb >>= \curColor ->
+  liftEffect (randomRgb) >>= \curColor ->
     let
       line = StdLine { y: 200.0, selected: false, lt: ltSTD, color: curColor }
     in
@@ -246,112 +244,53 @@ addRiscLines ct lines =
   in
     Traversable.traverse_ addRiscLine1 lines
 
-fetchLevelLines_ :: StockTicker -> Aff (Either MaunaloaError RiscLinesJson)
-fetchLevelLines_ ticker =
-  Affjax.get ResponseFormat.json (levelLinesURL ticker) >>= \res ->
-    let
-      result :: Either MaunaloaError RiscLinesJson
-      result =
-        case res of
-          Left err ->
-            Left $ AffjaxError (Affjax.printError err)
-          Right response ->
-            let
-              lines = riscLinesFromJson response.body
-            in
-              case lines of
-                Left err ->
-                  Left $ JsonError (show err)
-                Right lines1 ->
-                  Right lines1
-    in
-      pure result
+fetchLevelLines_ :: StockTicker -> Aff (Either HarborViewError RiscLinesJson)
+fetchLevelLines_ ticker = HU.get (levelLinesURL ticker) riscLinesDecoder
 
-fetchLevelLines :: ChartType -> StockTicker -> Effect Unit
+fetchLevelLines :: ChartType -> StockTicker -> Aff Unit
 fetchLevelLines ct ticker =
-  -- defaultEventHandling evt *>
-  launchAff_
-    ( fetchLevelLines_ ticker >>= \lines ->
-        case lines of
-          Left err ->
-            handleErrorAff err
-          Right lines1 ->
-            liftEffect
-              (
-                case lines1 of
-                  [] ->
-                    logShow "No level lines registered for this thicker"
-                  _ ->
-                    clearLines (chartTypeAsInt ct) *>
-                      addRiscLines ct lines1
-              )
-    )
+  fetchLevelLines_ ticker >>= \lines ->
+    case lines of
+      Left err ->
+        handleErrorAff err
+      Right lines1 ->
+        case lines1 of
+          [] ->
+            liftEffect $ logShow "No level lines registered for this thicker"
+          _ ->
+            liftEffect $
+              clearLines (chartTypeAsInt ct) *>
+              addRiscLines ct lines1
 
 ----------------------------- END Fetch level lines -----------------------------
 
 ----------------------------- BEGIN Delete all level lines -----------------------------
 
-deleteAll_ :: StockTicker -> Aff (Either MaunaloaError StatusJson)
+deleteAll_ :: StockTicker -> Aff (Either HarborViewError StatusJson)
 deleteAll_ ticker =
-  Affjax.delete ResponseFormat.json (levelLinesURL ticker) >>= \res ->
-    let
-      result :: Either MaunaloaError StatusJson
-      result =
-        case res of
-          Left err ->
-            Left $ AffjaxError (Affjax.printError err)
-          Right response ->
-            let
-              status = statusFromJson response.body
-            in
-              case status of
-                Left err ->
-                  Left $ JsonError (show err)
-                Right status1 ->
-                  Right status1
-    in
-      pure result
+  HU.delete (levelLinesURL ticker) statusDecoder
 
 deleteNonPersistent :: ChartType -> Effect Unit
 deleteNonPersistent ct =
   clearLines (chartTypeAsInt ct)
 
-deleteAll :: ChartType -> StockTicker -> Effect Unit
+deleteAll :: ChartType -> StockTicker -> Aff Unit
 deleteAll ct ticker =
-  clearLines (chartTypeAsInt ct) *>
-    launchAff_
-      ( deleteAll_ ticker >>= \status ->
-          case status of
-            Left err ->
-              handleErrorAff err
-            Right _ ->
-              pure unit
-      )
+  liftEffect (clearLines (chartTypeAsInt ct)) *>
+    deleteAll_ ticker >>= \status ->
+      case status of
+        Left err ->
+          handleErrorAff err
+        Right _ ->
+          pure unit
 
 ----------------------------- END Delete all level lines -----------------------------
 
 ----------------------------- BEGIN Fetch Spot -----------------------------
 
-fetchSpot_ :: StockTicker -> Aff (Either MaunaloaError JsonSpot)
+fetchSpot_ :: StockTicker -> Aff (Either HarborViewError JsonSpot)
 fetchSpot_ ticker =
-  Affjax.get ResponseFormat.json (spotURL ticker) >>= \res ->
-    let
-      result :: Either MaunaloaError JsonSpot
-      result =
-        case res of
-          Left err ->
-            Left $ AffjaxError (Affjax.printError err)
-          Right response ->
-            let
-              spot = spotFromJson response.body
-            in
-              case spot of
-                Left err ->
-                  Left $ JsonError (show err)
-                Right spot1 ->
-                  Right spot1
-    in
-      pure result
+  HU.get (spotURL ticker) spotDecoder
 
 addSpot :: ChartType -> JsonSpot -> Effect Unit
 addSpot ct spot =
@@ -374,16 +313,14 @@ addSpot ct spot =
                   in
                     Candlestick.paintSingle (Pix px) cndl ctx
 
-fetchSpot :: ChartType -> StockTicker -> Effect Unit
+fetchSpot :: ChartType -> StockTicker -> Aff Unit
 fetchSpot ct ticker =
-  launchAff_
-    ( fetchSpot_ ticker >>= \spot ->
-        case spot of
-          Left err ->
-            handleErrorAff err
-          Right spot1 ->
-            liftEffect (addSpot ct spot1)
-    )
+  fetchSpot_ ticker >>= \spot ->
+      case spot of
+        Left err ->
+          handleErrorAff err
+        Right spot1 ->
+          liftEffect (addSpot ct spot1)
 
 ----------------------------- END Fetch Spot -----------------------------
 
@@ -397,26 +334,13 @@ mouseEventDrag ct evt =
   defaultEventHandling evt *>
     onMouseDrag (chartTypeAsInt ct) evt
 
-fetchUpdatedOptionPrice :: OptionTicker -> Number -> Aff (Either MaunaloaError Number)
+fetchUpdatedOptionPrice :: OptionTicker -> Number -> Aff (Either HarborViewError Number)
 fetchUpdatedOptionPrice ticker curStockPrice =
-  Affjax.get ResponseFormat.json (optionPriceURL ticker curStockPrice) >>= \res ->
-    let
-      result :: Either MaunaloaError Number
-      result =
-        case res of
-          Left err ->
-            Left $ AffjaxError (Affjax.printError err)
-          Right response ->
-            let
-              json = updOptionPriceFromJson response.body
-            in
-              case json of
-                Left err ->
-                  Left $ JsonError (show err)
-                Right json1 ->
-                  Right json1.value
-    in
-      pure result
+  let
+    fn :: UpdatedOptionPriceJson -> Number
+    fn v = v.value
+  in
+  HU.getTransform (optionPriceURL ticker curStockPrice) updOptionPriceFromJson fn
 
 handleUpdateOptionPrice :: ChartType -> VRuler -> Line -> Effect Unit
 handleUpdateOptionPrice ct vr lref@(RiscLine line) =
