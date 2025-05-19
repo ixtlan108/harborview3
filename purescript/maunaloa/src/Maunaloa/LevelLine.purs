@@ -10,59 +10,37 @@ module HarborView.Maunaloa.LevelLine
   ) where
 
 import Prelude
-import Data.Maybe (Maybe(..))
---import Data.Array ((:))
-import Data.Either (Either(..))
-import Data.Number.Format (toStringWith, fixed)
-import Effect (Effect)
-import Effect.Class (liftEffect)
-import Effect.Console (logShow)
-import Effect.Aff (Aff, launchAff_)
 
-import Affjax.Web as Affjax
 import Affjax.ResponseFormat as ResponseFormat
-import Data.Traversable as Traversable
-
-import Graphics.Canvas as Canvas
-import Graphics.Canvas (CanvasElement, Context2D)
-import Web.Event.Event (EventType(..))
-import Web.Event.Event as Event
-import Web.Event.EventTarget as EventTarget
---import Effect.Ref as Ref
-import Web.DOM.NonElementParentNode (NonElementParentNode, getElementById)
-import Web.DOM.Element (toEventTarget, Element)
-import Web.HTML as HTML
-import Web.HTML.Window as Window
-import Web.HTML.HTMLDocument as HTMLDocument
-
+import Affjax.Web as Affjax
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode as Decode
 import Data.Argonaut.Decode.Error (JsonDecodeError)
-import HarborView.Maunaloa.MaunaloaError
-  ( MaunaloaError(..)
-  , handleErrorAff
-  )
-
-import HarborView.Common
-  ( UnixTime(..)
-  , defaultEventHandling
-  )
-
-import HarborView.Maunaloa.Common
-  ( Pix(..)
-  , ChartMapping(..)
-  , HtmlId(..)
-  , OptionTicker(..)
-  , StockTicker(..)
-  , ChartType
-  , JsonSpot
-  , chartTypeAsInt
-  , mainURL
-  , alert
-  )
-import HarborView.Maunaloa.VRuler (VRuler, valueToPix, pixToValue)
-import HarborView.Maunaloa.HRuler (HRuler, timeStampToPix)
+import Data.Either (Either(..))
+import Data.Maybe (Maybe(..))
+import Data.Number.Format (toStringWith, fixed)
+import Data.Traversable as Traversable
+import Effect (Effect)
+import Effect.Aff (Aff, launchAff_)
+import Effect.Class (liftEffect)
+import Effect.Console (logShow)
+import Graphics.Canvas (CanvasElement, Context2D)
+import Graphics.Canvas as Canvas
+import HarborView.Common (UnixTime(..), defaultEventHandling)
 import HarborView.Maunaloa.Candlestick as Candlestick
+import HarborView.Maunaloa.Common (Pix(..), ChartMapping(..), HtmlId(..), OptionTicker(..), StockTicker(..), ChartType, JsonSpot, chartTypeAsInt, mainURL, alert)
+import HarborView.Maunaloa.HRuler (HRuler, timeStampToPix)
+import HarborView.Maunaloa.MaunaloaError (MaunaloaError(..), handleErrorAff)
+import HarborView.Maunaloa.VRuler (VRuler, valueToPix, pixToValue)
+import Web.DOM.Element (toEventTarget, Element)
+import Web.DOM.NonElementParentNode (NonElementParentNode, getElementById)
+import Web.Event.Event (EventType(..))
+import Web.Event.Event as Event
+import Web.Event.EventTarget as EventTarget
+import Web.HTML as HTML
+import Web.HTML.Event.EventTypes (offline)
+import Web.HTML.HTMLDocument as HTMLDocument
+import Web.HTML.Window as Window
 
 {-
 import Data.IORef (newIORef,modifyIORef,readIORef)
@@ -381,14 +359,20 @@ addSpot ct spot =
     let
       cti = chartTypeAsInt ct
     in
-      currentVruler cti >>= \vr ->
-        currentHruler cti >>= \hr ->
-          currentCtx cti >>= \ctx ->
-            let
-              cndl = Candlestick.candleToPix vr spot
-              px = timeStampToPix hr (UnixTime spot.unixTime)
-            in
-              Candlestick.paintSingle (Pix px) cndl ctx
+      if spot.appStatusCode /= 1 then
+        logShow("Error " <> show spot.appStatusCode)
+      else
+        case spot.payload of
+          Nothing -> logShow "Paload is null"
+          Just payload1 ->
+            currentVruler cti >>= \vr ->
+              currentHruler cti >>= \hr ->
+                currentCtx cti >>= \ctx ->
+                  let
+                    cndl = Candlestick.candleToPix vr payload1
+                    px = timeStampToPix hr (UnixTime payload1.unixTime)
+                  in
+                    Candlestick.paintSingle (Pix px) cndl ctx
 
 fetchSpot :: ChartType -> StockTicker -> Effect Unit
 fetchSpot ct ticker =
