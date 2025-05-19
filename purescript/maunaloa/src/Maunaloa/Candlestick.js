@@ -12,10 +12,10 @@ export const fi_paint_candlestix = function (xaxis) {
         for (var i = 0; i < numCandlestix; ++i) {
           paintCandlestick(xaxis[i], candlestix[i], ctx);
         }
-      }
-    }
-  }
-}
+      };
+    };
+  };
+};
 
 export const fi_paint_candlestick_single = function (px) {
   return function (candlestick) {
@@ -24,11 +24,15 @@ export const fi_paint_candlestick_single = function (px) {
         ctx.strokeStyle = "#000000";
         ctx.fillStyle = "#ffaa00";
         ctx.lineWidth = 0.5;
+        const x0 = px - 5;
+        const y0 = candlestick.h - 2;
+        const height = candlestick.l + 5;
+        ctx.clearRect(x0, y0, 10, height);
         paintCandlestick(px, candlestick, ctx);
-      }
-    }
-  }
-}
+      };
+    };
+  };
+};
 
 const paintCandlestick = function (x, cndl, ctx) {
   const x0 = x - 4;
@@ -43,8 +47,7 @@ const paintCandlestick = function (x, cndl, ctx) {
     const cndlHeight = cndl.c - cndl.o;
     ctx.rect(x0, cndl.o, 8, cndlHeight);
     ctx.fillRect(x0, cndl.o, 8, cndlHeight);
-  }
-  else {
+  } else {
     // Bullish
     var cndlHeight = cndl.o - cndl.c;
     // If doji
@@ -55,8 +58,7 @@ const paintCandlestick = function (x, cndl, ctx) {
       ctx.lineTo(x, cndl.l);
       ctx.moveTo(x0, cndl.c);
       ctx.lineTo(x1, cndl.c);
-    }
-    else {
+    } else {
       ctx.moveTo(x, cndl.h);
       ctx.lineTo(x, cndl.c);
       ctx.moveTo(x, cndl.o);
@@ -65,4 +67,4 @@ const paintCandlestick = function (x, cndl, ctx) {
     }
   }
   ctx.stroke();
-}
+};
