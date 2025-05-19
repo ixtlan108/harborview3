@@ -2,6 +2,7 @@ module HarborView.Maunaloa.Core where
 
 import Prelude
 
+import Effect.Aff.Class (class MonadAff)
 import Control.Monad.Reader (runReader)
 import Data.Either (Either(..))
 import Data.Int (toNumber)
@@ -9,7 +10,7 @@ import Data.Maybe (Maybe(..))
 import Data.Number.Format (toString)
 import Data.Traversable (traverse_)
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (logShow)
 import HarborView.Maunaloa.ChartCollection as ChartCollection
@@ -20,6 +21,7 @@ import HarborView.Maunaloa.JsonCharts (JsonChartPayload, fetchCharts)
 import HarborView.Maunaloa.LevelLine as LevelLine
 import HarborView.Maunaloa.MaunaloaError (handleErrorAff)
 import HarborView.Maunaloa.Repository as Repository
+import Test.BarTest (x)
 
 createEnv :: ChartType -> StockTicker -> Drop -> Take -> ChartMappings -> Env
 createEnv ctype tik curDrop curTake mappings =
@@ -61,30 +63,13 @@ resetCharts :: Effect Unit
 resetCharts =
   Repository.resetCharts
 
-paintNoCache :: ChartType -> StockTicker -> Drop -> Take -> Effect Unit
-paintNoCache EmptyChartType _ _ _ =
-  pure unit
-paintNoCache chartType ticker dropAmt takeAmt =
-  let
-    mappings = chartTypeAsMappings chartType
-    reposId = reposIdFor chartType ticker
-    curEnv = createEnv chartType ticker dropAmt takeAmt mappings
-  in
-  launchAff_ $
-    fetchCharts ticker chartType >>= \charts ->
-      case charts of
-        Left err ->
-          handleErrorAff err
-        Right jsonChartResponse ->
-          case jsonChartResponse.payload of
-            Just jsonChartPayload ->
-              let
-                collection = runReader (ChartTransform.transform jsonChartPayload) curEnv
-              in
-              (liftEffect $ Repository.setJsonResponse reposId jsonChartPayload) *>
-              ChartCollection.paintAff chartType collection
-            Nothing ->
-              pure unit
+
+-- demo :: forall m. MonadAff m => m Int
+-- demo = pure 12
+
+-- demo2 :: Aff Int
+-- demo2 =
+--   demo >>= \x -> pure (x + 3)
 
 paint :: ChartType -> StockTicker -> Drop -> Take -> Effect Unit
 paint EmptyChartType _ _ _ =
@@ -149,7 +134,7 @@ addLevelLine :: ChartType -> Effect Unit
 addLevelLine ct =
   LevelLine.addLine ct
 
-fetchLevelLines :: ChartType -> StockTicker -> Effect Unit
+fetchLevelLines :: ChartType -> StockTicker -> Aff Unit
 fetchLevelLines ct ticker =
   LevelLine.fetchLevelLines ct ticker
 
@@ -157,11 +142,11 @@ deleteNonPersistentLevelLines :: ChartType -> Effect Unit
 deleteNonPersistentLevelLines ct =
   LevelLine.deleteNonPersistent ct
 
-deleteAllLevelLines :: ChartType -> StockTicker -> Effect Unit
+deleteAllLevelLines :: ChartType -> StockTicker -> Aff Unit
 deleteAllLevelLines ct ticker =
   LevelLine.deleteAll ct ticker
 
-fetchSpot :: ChartType -> StockTicker -> Effect Unit
+fetchSpot :: ChartType -> StockTicker -> Aff Unit
 fetchSpot ct ticker =
   LevelLine.fetchSpot ct ticker
 

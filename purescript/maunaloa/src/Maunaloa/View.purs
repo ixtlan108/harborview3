@@ -235,7 +235,7 @@ handleAction = case _ of
       liftEffect (Core.addLevelLine ct1)
   FetchRiscLines _ ->
     H.get >>= \st ->
-      liftEffect (Core.fetchLevelLines st.ct (StockTicker st.selectedTicker))
+      H.liftAff $ Core.fetchLevelLines st.ct (StockTicker st.selectedTicker)
   Previous _ ->
     navigate 90
   Next _ ->
@@ -255,21 +255,16 @@ handleAction = case _ of
       if st.selectedTicker == "0" then
         pure unit
       else
-        liftEffect (
-          Core.deleteNonPersistentLevelLines st.ct
-        )
+        liftEffect $ Core.deleteNonPersistentLevelLines st.ct
   DeleteAll _ ->
     H.get >>= \st ->
       if st.selectedTicker == "0" then
         pure unit
       else
-        liftEffect (
-          logShow st.selectedTicker *>
-          Core.deleteAllLevelLines st.ct (StockTicker st.selectedTicker)
-        )
+        H.liftAff $ Core.deleteAllLevelLines st.ct (StockTicker st.selectedTicker)
   FetchSpot _ ->
     H.get >>= \st ->
       if st.selectedTicker == "0" then
         pure unit
       else
-        liftEffect (Core.fetchSpot st.ct (StockTicker st.selectedTicker))
+        H.liftAff $ Core.fetchSpot st.ct (StockTicker st.selectedTicker)
