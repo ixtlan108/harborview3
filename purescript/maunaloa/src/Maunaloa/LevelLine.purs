@@ -256,7 +256,7 @@ fetchLevelLines ct ticker =
       Right lines1 ->
         case lines1 of
           [] ->
-            pure unit -- liftEffect $ logShow "No level lines registered for this thicker"
+            liftEffect $ logShow "No level lines registered for this thicker"
           _ ->
             liftEffect $
               clearLines (chartTypeAsInt ct) *>
