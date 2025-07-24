@@ -12,9 +12,6 @@
     <div th:replace="~{head.html :: scripts}"></div>
     <div th:replace="~{footer.html :: footer}"></div>
 
-    <!--
-    <script type="text/javascript" src="/js/sortable.min.js"></script>
-    -->
     <script type="text/javascript" src="/js/rapanui/rapanui-%s.js"></script>
     <link rel="stylesheet" href="/css/rapanui/rapanui-%s.css">
 
