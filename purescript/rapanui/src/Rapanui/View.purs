@@ -20,6 +20,7 @@ import HarborView.UI.Checkbox as CB
 import HarborView.UI.Common (Title(..))
 import HarborView.UI.Input (InputParams)
 import HarborView.UI.Input as Inp
+import HarborView.ModalDialog as DLG
 
 import Rapanui.Command (handleAction)
 import Rapanui.Common (MainAction(..), Oid(..), OptionTicker(..), Rtyp(..))
@@ -247,6 +248,7 @@ render st =
     --, mkInput defaultInputParams { inpVal = InpNum st.interval, evt = IntervalChange }
     --, mkInput_ defaultInputParams { inpVal = InpI $ Just st.tickDemo }
     , createTable st
+    , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 
 {-

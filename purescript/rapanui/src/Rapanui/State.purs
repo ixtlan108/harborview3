@@ -6,6 +6,7 @@ module Rapanui.State
 import Halogen.Subscription (Emitter)
 import Data.Maybe (Maybe(..))
 import Halogen (SubscriptionId)
+import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Critter.Rules (StockOptionPurchase)
 import Rapanui.Common (MainAction)
 
@@ -17,6 +18,7 @@ type State =
   , interval :: Maybe Number
   , subId :: Maybe SubscriptionId
   , emitter :: Maybe (Emitter MainAction)
+  , modalStateBottom :: ModalState
   }
 
 defaultState :: State
@@ -26,6 +28,7 @@ defaultState =
   , interval: Just 300.0 -- seconds ie 5 minutes
   , subId: Nothing
   , emitter: Nothing
+  , modalStateBottom: ModalHidden
   }
 
 --instance Show State where

@@ -6,6 +6,7 @@ module Rapanui.Nordnet.CoreJson
   , JsonPayload
   , StockOptionResponse
   , JsonStockOptionItem
+  , PayloadResponse
   , critterResponseDecoder
   , defaultResponseDecoder
   , stockOptionDecoder
@@ -20,6 +21,12 @@ import Data.Maybe (Maybe)
 --import Data.Maybe (Maybe)
 
 --import Prelude
+
+type PayloadResponse a =
+  { appstatus :: Int
+  , msg :: Maybe String
+  , payload :: Maybe a
+  }
 
 type JsonAccRule =
   { oid :: Int
@@ -44,11 +51,13 @@ type JsonPayload =
   , critters :: Array JsonCritter
   }
 
-type CritterResponse =
+type CritterResponsex =
   { appStatusCode :: Int
   , error :: Maybe String
   , payload :: Array JsonPayload
   }
+
+type CritterResponse = PayloadResponse (Array JsonPayload)
 
 critterResponseDecoder :: Json -> Either JsonDecodeError CritterResponse
 critterResponseDecoder = Decode.decodeJson

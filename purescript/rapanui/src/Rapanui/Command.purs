@@ -12,13 +12,16 @@ import Effect.Aff (Milliseconds(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
 import Effect.Console (logShow)
+import Halogen (SubscriptionId)
 import Halogen as H
+import Halogen.Subscription (Emitter)
 import HarborView.Common (handleError)
 import HarborView.HalogenCommon (timer)
+import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
-import Rapanui.Nordnet.Transform as Transform
+-- import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
 
 --import Web.UIEvent.MouseEvent (MouseEvent)
@@ -45,20 +48,22 @@ mapJsonResult
   => CritterResponse
   -> m Unit
 mapJsonResult result =
-  case result.payload of
-    [] ->
-      pure unit
-    items ->
-      H.modify_
-        \stx ->
-          stx
-            { stockOptions = Transform.mapPayloads items
-            }
+  pure unit
+  -- case result.payload of
+  --   [] ->
+  --     pure unit
+  --   items ->
+  --     H.modify_
+  --       \stx ->
+  --         stx
+  --           { stockOptions = Transform.mapPayloads items
+  --           }
 
 unsubscribeTimer
-  :: forall cs o m
-   . MonadAff m
-  => H.HalogenM State MainAction cs o m Unit
+  :: forall slots output m r
+  . H.HalogenM { subId :: Maybe SubscriptionId
+                | r
+                } MainAction slots output m Unit
 unsubscribeTimer =
   H.get >>= \st ->
     case st.subId of
@@ -68,10 +73,14 @@ unsubscribeTimer =
         H.unsubscribe su
 
 handleTimer
-  :: forall cs o m
-   . MonadAff m
+  :: forall cs o m r
+  . MonadAff m
   => Boolean
-  -> H.HalogenM State MainAction cs o m Unit
+  -> H.HalogenM { emitter :: Maybe (Emitter MainAction)
+                , interval :: Maybe Number
+                , subId :: Maybe SubscriptionId
+                | r
+                } MainAction cs o m Unit
 handleTimer subs =
   if subs == true then
     H.get >>= \st ->
@@ -100,9 +109,10 @@ handleTimer subs =
     unsubscribeTimer
 
 handleFetchCritters
-  :: forall cs o m
-    . MonadAff m
-  => H.HalogenM State MainAction cs o m Unit
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => m Unit
 handleFetchCritters =
   H.get >>= \st ->
     case st.stockOptions of
@@ -115,6 +125,19 @@ handleFetchCritters =
                     mapJsonResult result1
             _ ->
               pure unit
+
+handleTick
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => m Unit
+handleTick =
+  H.modify_
+    \stx ->
+      let
+        oldVal = stx.tickDemo
+      in
+        stx { tickDemo = oldVal + 1 }
 
 handleAction
   :: forall cs o m
@@ -136,18 +159,15 @@ handleAction = case _ of
   Timer subs _ ->
     handleTimer subs
   Tick ->
-    H.modify_
-      \stx ->
-        let
-          oldVal = stx.tickDemo
-        in
-          stx { tickDemo = oldVal + 1 }
+    handleTick
   Noop _ ->
     pure unit
   IntervalChange s ->
     unsubscribeTimer *>
       H.modify_
         \stx -> stx { interval = fromString s, emitter = Nothing }
+  ModalDialogBottomClose _ ->
+    H.modify_ \stx -> stx { modalStateBottom = ModalHidden }
 
 {-
     (liftEffect $ logShow accOid)
