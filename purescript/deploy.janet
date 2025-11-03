@@ -1,4 +1,5 @@
 (import jpm)
+(import jpm/shutil :as shutil)
 (import spork/argparse :as ap)
 #(import spork/argparse :refer '[argparse])
 
@@ -40,42 +41,6 @@
 (def ps-dir (string/format "%s/purescript" home-dir))
 (def elm-dir (string/format "%s/elm" home-dir))
 
-(defn template-app [pkg main stem is-joy-backend]
-  (let [spago
-          { :pkg pkg
-            :module main
-            :target (string/slice (buffer/push-string @"dist/" stem ".js"))
-            :js-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js"))
-            :js-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js.map"))
-            :js-map-target
-              (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".js.map"))
-                (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem "/" stem ".js.map")))
-            :js-target
-              (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".js"))
-                (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem "/" stem "-%s.js")))}
-
-        sass
-          { :src "../sass-src"
-            :pkg stem
-            :scss-file (string/slice (buffer/push-string @"" stem ".scss"))
-            :css-file (string/slice (buffer/push-string @"" stem ".css"))
-            :css-file-2 (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css"))
-            :css-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css.map"))
-            :css-map-target
-              (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css.map"))
-                (string/slice (buffer/push-string  @"../src/main/resources/static/css/" stem "/" stem ".css.map")))
-            :css-target
-              (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css"))
-                (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem "/" stem "-%s.css")))}]
-
-    { :spago spago
-      :sass sass
-      :tpl (string/slice (buffer/push-string @"" pkg "/tpl/index.html.tpl"))
-      :tpl-target (string/slice (buffer/push-string @"../src/main/resources/templates/" stem "/index.html"))}))
 
 
 (defn run-spago [cfg]
@@ -103,7 +68,6 @@
         pkg (sass-cfg :pkg)
         scss (sass-cfg :scss-file)
         css (sass-cfg :css-file)
-        #out-file (string/slice (buffer/push-string @"" pkg "/dist/" css))
         out-file (sass-out-file cfg)
         sass-cmd-input (string/slice (buffer/push-string @"" src "/" pkg "/" scss))]
     (when (dyn :x-sass)
@@ -120,20 +84,6 @@
   (os/cd elm-dir)
   (os/execute [elm-cmd "make" "src/Critters/Main.elm" "--output=elm-critters.js"])
   (os/cd ps-dir))
-
-
-# (defn render [cfg spago-md5 sass-md5]
-#   (print "Enter render..")
-#   (print (cfg :tpl))
-#   (let [tpl (cfg :tpl)
-#         f (file/open tpl :r)
-#         content (string/slice (file/read f :all))]
-#     (file/close f)
-#     (let [result (string/format content spago-md5 sass-md5)
-#           result-file (file/open (cfg :tpl-target) :w)]
-#       (file/write result-file result)
-#       (file/close result-file)
-#       (print result))))
 
 (defn render [cfg spago-md5 sass-md5]
   (let [is-joy (dyn :x-joy)]
@@ -187,41 +137,73 @@
     (copy-spago-files cfg spago-md5)
     (copy-sass-files cfg sass-md5)))
 
-  # (let [cfg (options)
-  #       spago-md5 (run-spago cfg)
-  #       sass-md5 (run-sass cfg)]
-  #   (render cfg spago-md5 sass-md5)
-  #   (copy-spago-files cfg spago-md5)
-  #   (copy-sass-files cfg sass-md5)))
+(defn critters []
+  (let [spago
+          {
+            :js-file "/home/rcs/opt/java/harborview3/elm/elm-critters.js"
+            :js-target "../src/main/resources/static/js/critters/elm-critters-%s.js"}]
+            
+        
+    { :spago spago
+      :sass nil
+      :tpl "critter/tpl/overlook.html.tpl"
+      :tpl-target "../src/main/resources/templates/critter/overlook.html"}))
 
-#(defn run-critters []
-# (print "Enter run-options..")
-# (when (dyn :x-elm)
-#   (compile-elm-critters))
-# (let [cfg (critters)
-#         spago-md5 (run-spago cfg)
-#     (print "run-critters: " spago-md5)
-#     (render-critters cfg spago-md5)
-#     (copy-spago-files cfg spago-md5))))
+(defn options []
+  (let [spago
+          {
+            :js-file "/home/rcs/opt/java/harborview3/elm/elm-options.js"
+            :js-target "../src/main/resources/static/js/maunaloa/elm-options-%s.js"}
+            
+        sass
+          { :src "../sass-src"
+            :pkg "options"
+            :scss-file "options.scss"
+            :css-file "options.css"
+            :css-file-2 "options/dist/options.css"
+            :css-map-file "options/dist/options.css.map"
+            :css-map-target"../src/main/resources/static/css/maunaloa/options.css.map"
+            :css-target "../src/main/resources/static/css/maunaloa/options-%s.css"}]
+          
+    { :spago spago
+      :sass sass
+      :tpl "options/tpl/options.html.tpl"
+      :tpl-target "../src/main/resources/templates/maunaloa/options.html"}))
 
-# (defn run-options []
-#   (print "Enter run-options..")
-#   (when (dyn :x-elm)
-#     (compile-elm))
-#   (run (options)))
-
-# (defn run-optionpurchase []
-#   (print "Enter run-maunaoa..")
-#   (run (optionpurchase)))
-
-# (defn run-maunaloa []
-#   (print "Enter run-maunaoa..")
-#   (run (maunaloa)))
-
-#(defn run-rapanui []
-#  (print "Enter run-rapanui..")
-#  (run (rapanui)))
-
+(defn template-app [pkg main stem is-joy-backend]
+  (let [spago
+          { :pkg pkg
+            :module main
+            :target (string/slice (buffer/push-string @"dist/" stem ".js"))
+            :js-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js"))
+            :js-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js.map"))
+            :js-map-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".js.map"))
+                (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem "/" stem ".js.map")))
+            :js-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".js"))
+                (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem "/" stem "-%s.js")))}
+        sass
+          { :src "../sass-src"
+            :pkg stem
+            :scss-file (string/slice (buffer/push-string @"" stem ".scss"))
+            :css-file (string/slice (buffer/push-string @"" stem ".css"))
+            :css-file-2 (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css"))
+            :css-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css.map"))
+            :css-map-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css.map"))
+                (string/slice (buffer/push-string  @"../src/main/resources/static/css/" stem "/" stem ".css.map")))
+            :css-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css"))
+                (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem "/" stem "-%s.css")))}]
+    { :spago spago
+      :sass sass
+      :tpl (string/slice (buffer/push-string @"" pkg "/tpl/index.html.tpl"))
+      :tpl-target (string/slice (buffer/push-string @"../src/main/resources/templates/" stem "/index.html"))}))
 
 (defn run-template-app [pkg main stem]
   (printf "Enter %s.." pkg)
@@ -231,10 +213,33 @@
 (defn run-rapanui []
   (run-template-app "rapanui" "RapanuiMain" "rapanui"))
 
-(def PROJ {"1" run-rapanui}) #"2" run-maunaloa "3" run-optionpurchase "4" run-options "5" run-critters)
+(defn run-maunaloa []
+  (run-template-app "maunaloa" "Main" "maunaloa"))
+
+(defn run-optionpurchase[]
+  (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
+
+(defn run-critters []
+ (print "Enter run-options..")
+ (when (dyn :x-elm)
+   (compile-elm-critters))
+ (let [cfg (critters)
+         spago-md5 (run-spago cfg)]
+     (print "run-critters: " spago-md5)
+     (render-critters cfg spago-md5)
+     (copy-spago-files cfg spago-md5)))
+
+(defn run-options []
+  (print "Enter run-options..")
+  (when (dyn :x-elm)
+    (compile-elm))
+  (run (options)))
+
+(def PROJ {"1" run-rapanui "2" run-maunaloa "3" run-optionpurchase "4" run-options "5" run-critters})
 
 
 (defn run [argx]
+  (printf "%q" argx)
   (let [os-linux (= (argx "os") "linux")
         md5-cmd (if os-linux md5-linux md5-macos)
         sass-cmd (if os-linux "/usr/bin/sass" "/opt/homebrew/bin/sass")
