@@ -5,6 +5,8 @@ module Rapanui.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
+import Halogen.Subscription (Emitter)
+import Halogen (SubscriptionId)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Number (fromString)
@@ -56,9 +58,10 @@ mapJsonResult result =
             }
 
 unsubscribeTimer
-  :: forall cs o m
-   . MonadAff m
-  => H.HalogenM State MainAction cs o m Unit
+  :: forall slots output m r
+  . H.HalogenM { subId :: Maybe SubscriptionId
+                | r
+                } MainAction slots output m Unit
 unsubscribeTimer =
   H.get >>= \st ->
     case st.subId of
@@ -68,10 +71,14 @@ unsubscribeTimer =
         H.unsubscribe su
 
 handleTimer
-  :: forall cs o m
-   . MonadAff m
+  :: forall slots output m r
+  . MonadAff m
   => Boolean
-  -> H.HalogenM State MainAction cs o m Unit
+  -> H.HalogenM { emitter :: Maybe (Emitter MainAction)
+                , interval :: Maybe Number
+                , subId :: Maybe SubscriptionId
+                | r
+                } MainAction slots output m Unit
 handleTimer subs =
   if subs == true then
     H.get >>= \st ->
@@ -100,9 +107,10 @@ handleTimer subs =
     unsubscribeTimer
 
 handleFetchCritters
-  :: forall cs o m
-    . MonadAff m
-  => H.HalogenM State MainAction cs o m Unit
+  :: forall m
+    . MonadState State m
+    => MonadAff m
+    => m Unit
 handleFetchCritters =
   H.get >>= \st ->
     case st.stockOptions of
@@ -115,6 +123,19 @@ handleFetchCritters =
                     mapJsonResult result1
             _ ->
               pure unit
+
+handleTick
+  :: forall m
+    . MonadState State m
+  => MonadAff m
+  => m Unit
+handleTick =
+  H.modify_
+    \stx ->
+      let
+        oldVal = stx.tickDemo
+      in
+        stx { tickDemo = oldVal + 1 }
 
 handleAction
   :: forall cs o m
@@ -136,12 +157,7 @@ handleAction = case _ of
   Timer subs _ ->
     handleTimer subs
   Tick ->
-    H.modify_
-      \stx ->
-        let
-          oldVal = stx.tickDemo
-        in
-          stx { tickDemo = oldVal + 1 }
+    handleTick
   Noop _ ->
     pure unit
   IntervalChange s ->
