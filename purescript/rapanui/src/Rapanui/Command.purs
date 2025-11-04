@@ -71,14 +71,14 @@ unsubscribeTimer =
         H.unsubscribe su
 
 handleTimer
-  :: forall slots output m r
+  :: forall cs o m r
   . MonadAff m
   => Boolean
   -> H.HalogenM { emitter :: Maybe (Emitter MainAction)
                 , interval :: Maybe Number
                 , subId :: Maybe SubscriptionId
                 | r
-                } MainAction slots output m Unit
+                } MainAction cs o m Unit
 handleTimer subs =
   if subs == true then
     H.get >>= \st ->
@@ -108,9 +108,9 @@ handleTimer subs =
 
 handleFetchCritters
   :: forall m
-    . MonadState State m
-    => MonadAff m
-    => m Unit
+   . MonadState State m
+  => MonadAff m
+  => m Unit
 handleFetchCritters =
   H.get >>= \st ->
     case st.stockOptions of
@@ -126,7 +126,7 @@ handleFetchCritters =
 
 handleTick
   :: forall m
-    . MonadState State m
+   . MonadState State m
   => MonadAff m
   => m Unit
 handleTick =

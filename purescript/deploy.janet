@@ -113,20 +113,32 @@
       (file/close result-file)
       (print result))))
 
+(defn clear-static-files [path]
+ (let (fx (os/dir path))
+  (each i fx 
+    (let (fi (string/slice (buffer/push-string @"" path "/" i)))
+      (os/rm fi)))))
+
 (defn copy-sass-files [cfg sass-md5]
   (print "Enter copy-sass-files..")
   (let [sass-cfg (cfg :sass)
         from-f (sass-cfg :css-file-2)
+        with-joy (dyn :x-joy)
         to-f (string/format (sass-cfg :css-target) sass-md5)]
+    (if (not with-joy) 
+     (clear-static-files (sass-cfg :css-static)))
     (jpm/shutil/copyfile from-f to-f)))
 
 (defn copy-spago-files [cfg spago-md5]
   (print "Enter copy-spago-files..")
   (let [spago-cfg (cfg :spago)
         from-f (spago-cfg :js-file)
+        with-joy (dyn :x-joy)
         to-f (string/format (spago-cfg :js-target) spago-md5)
         from-map-f (spago-cfg :js-map-file)
         to-map-f (spago-cfg :js-map-target)]
+    (if (not with-joy) 
+     (clear-static-files (spago-cfg :js-static)))
     (shutil/copyfile from-f to-f)
     (shutil/copyfile from-map-f to-map-f)))
 
@@ -176,6 +188,8 @@
             :module main
             :target (string/slice (buffer/push-string @"dist/" stem ".js"))
             :js-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js"))
+            :js-static 
+              (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem))
             :js-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js.map"))
             :js-map-target
               (if is-joy-backend
@@ -192,6 +206,8 @@
             :css-file (string/slice (buffer/push-string @"" stem ".css"))
             :css-file-2 (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css"))
             :css-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css.map"))
+            :css-static 
+              (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem))
             :css-map-target
               (if is-joy-backend
                 (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css.map"))
@@ -204,6 +220,7 @@
       :sass sass
       :tpl (string/slice (buffer/push-string @"" pkg "/tpl/index.html.tpl"))
       :tpl-target (string/slice (buffer/push-string @"../src/main/resources/templates/" stem "/index.html"))}))
+
 
 (defn run-template-app [pkg main stem]
   (printf "Enter %s.." pkg)
