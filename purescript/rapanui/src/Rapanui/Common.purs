@@ -33,6 +33,7 @@ data MainAction
   | Tick
   | Noop String
   | IntervalChange String
+  | ModalDialogBottomClose MouseEvent
 
 newtype OptionTicker = OptionTicker String
 

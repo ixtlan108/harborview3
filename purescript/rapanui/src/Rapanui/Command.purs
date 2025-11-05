@@ -5,8 +5,6 @@ module Rapanui.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
-import Halogen.Subscription (Emitter)
-import Halogen (SubscriptionId)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Number (fromString)
@@ -14,13 +12,16 @@ import Effect.Aff (Milliseconds(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
 import Effect.Console (logShow)
+import Halogen (SubscriptionId)
 import Halogen as H
+import Halogen.Subscription (Emitter)
 import HarborView.Common (handleError)
 import HarborView.HalogenCommon (timer)
+import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
-import Rapanui.Nordnet.Transform as Transform
+-- import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
 
 --import Web.UIEvent.MouseEvent (MouseEvent)
@@ -47,15 +48,16 @@ mapJsonResult
   => CritterResponse
   -> m Unit
 mapJsonResult result =
-  case result.payload of
-    [] ->
-      pure unit
-    items ->
-      H.modify_
-        \stx ->
-          stx
-            { stockOptions = Transform.mapPayloads items
-            }
+  pure unit
+  -- case result.payload of
+  --   [] ->
+  --     pure unit
+  --   items ->
+  --     H.modify_
+  --       \stx ->
+  --         stx
+  --           { stockOptions = Transform.mapPayloads items
+  --           }
 
 unsubscribeTimer
   :: forall slots output m r
@@ -164,6 +166,8 @@ handleAction = case _ of
     unsubscribeTimer *>
       H.modify_
         \stx -> stx { interval = fromString s, emitter = Nothing }
+  ModalDialogBottomClose _ ->
+    H.modify_ \stx -> stx { modalStateBottom = ModalHidden }
 
 {-
     (liftEffect $ logShow accOid)
