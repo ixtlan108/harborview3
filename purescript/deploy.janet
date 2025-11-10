@@ -155,7 +155,6 @@
             :js-file "/home/rcs/opt/java/harborview3/elm/elm-critters.js"
             :js-target "../src/main/resources/static/js/critters/elm-critters-%s.js"}]
             
-        
     { :spago spago
       :sass nil
       :tpl "critter/tpl/overlook.html.tpl"
@@ -193,11 +192,11 @@
             :js-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".js.map"))
             :js-map-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".js.map"))
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".js.map"))
                 (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem "/" stem ".js.map")))
             :js-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".js"))
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".js"))
                 (string/slice (buffer/push-string @"../src/main/resources/static/js/" stem "/" stem "-%s.js")))}
         sass
           { :src "../sass-src"
@@ -210,11 +209,11 @@
               (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem))
             :css-map-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css.map"))
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css.map"))
                 (string/slice (buffer/push-string  @"../src/main/resources/static/css/" stem "/" stem ".css.map")))
             :css-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"../janet/appwindow3/public/" stem ".css"))
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css"))
                 (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem "/" stem "-%s.css")))}]
     { :spago spago
       :sass sass
