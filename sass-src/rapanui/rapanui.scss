@@ -9,3 +9,34 @@ body {
   /*font-family: "Tangerine", sans-serif;*/
   font-size: 1rem;
 }
+
+.container {  
+  display: grid;
+  grid-template-columns: 1fr 600px 1fr;
+  grid-template-rows: 40px 40px auto;
+  gap: 5px 5px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". buttons ."
+    ". tick-interval ."
+    ". critters .";
+}
+
+.buttons { 
+  grid-area: buttons; 
+  display: flex;
+  flex-direction: row;
+}
+
+.tick-interval { 
+  grid-area: tick-interval; 
+  display: flex;
+  flex-direction: row;
+}
+
+.critters { 
+  grid-area: critters; 
+  display: flex;
+  flex-direction: row;
+}
+
