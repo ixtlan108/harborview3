@@ -2,6 +2,7 @@
 (import joy/responder :as r)
 (import json :as j)
 
+(import /api/rapanui :as rapanui)
 
 # Layout
 (defn app-layout [{:body body :request request}]
@@ -29,13 +30,10 @@
 (joy/route :get "/rapanui" :home)
 
 
-(defn moq-rapanui []
+(defn home [request]
   [:div {:id "rapanui"}
     [ [:link {:href "/rapanui.css" :rel "stylesheet"}]
       [:script {:src "/rapanui.js" :defer ""}]]])
-
-(defn home [request]
-  (moq-rapanui))
 
 # Middleware
 (def app (-> (joy/handler)
