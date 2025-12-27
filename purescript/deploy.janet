@@ -258,7 +258,7 @@
   (printf "%q" argx)
   (let [os-linux (= (argx "os") "linux")
         md5-cmd (if os-linux md5-linux md5-macos)
-        sass-cmd (if os-linux "/usr/bin/sass" "/opt/homebrew/bin/sass")
+        sass-cmd (if os-linux "/usr/local/bin/sass" "/opt/homebrew/bin/sass")
         spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
     (with-dyns [:x-sass (argx "sass")
                 :x-spago (argx "spago")
