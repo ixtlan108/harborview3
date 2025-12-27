@@ -1,0 +1,18 @@
+:root {
+  --bg-color: #fff;
+  --color-1: #000;
+  --color-2: #000;
+  --color-disabled: #e6efff;
+  --bg-color-disabled: #434f72;
+  --btn-color: #ff6df5;
+  --grid-gap: 5px;
+  --row-height: 3.2rem;
+  --top: 44px;
+  --menu-bg-color: #9873a4;
+  --menu-bg-color-hover: #ca90c1;
+  --navbar-bg-color: #695784;
+  --table-td-border-color: #ca90c1;
+  --table-th-background-color: #434f72;
+}
+
+

@@ -214,9 +214,27 @@
             :css-target
               (if is-joy-backend
                 (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css"))
+                (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem "/" stem "-%s.css")))}
+        css 
+          { :src "../sass-src"
+            :pkg stem
+            :scss-file (string/slice (buffer/push-string @"" stem ".scss"))
+            :css-file (string/slice (buffer/push-string @"" stem ".css"))
+            :css-file-2 (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css"))
+            :css-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css.map"))
+            :css-static 
+              (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem))
+            :css-map-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css.map"))
+                (string/slice (buffer/push-string  @"../src/main/resources/static/css/" stem "/" stem ".css.map")))
+            :css-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css"))
                 (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem "/" stem "-%s.css")))}]
     { :spago spago
       :sass sass
+      :css css
       :tpl (string/slice (buffer/push-string @"" pkg "/tpl/index.html.tpl"))
       :tpl-target (string/slice (buffer/push-string @"../src/main/resources/templates/" stem "/index.html"))}))
 
@@ -251,14 +269,17 @@
     (compile-elm))
   (run (options)))
 
-(def PROJ {"1" run-rapanui "2" run-maunaloa "3" run-optionpurchase "4" run-options "5" run-critters})
-
+(def PROJ {"1" run-rapanui 
+           "2" run-maunaloa 
+           "3" run-optionpurchase 
+           "4" run-options 
+           "5" run-critters})
 
 (defn run [argx]
   (printf "%q" argx)
   (let [os-linux (= (argx "os") "linux")
         md5-cmd (if os-linux md5-linux md5-macos)
-        sass-cmd (if os-linux "/usr/bin/sass" "/opt/homebrew/bin/sass")
+        sass-cmd (if os-linux "/usr/local/bin/sass" "/opt/homebrew/bin/sass")
         spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
     (with-dyns [:x-sass (argx "sass")
                 :x-spago (argx "spago")
