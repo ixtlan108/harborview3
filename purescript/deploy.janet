@@ -1,7 +1,6 @@
 (import jpm)
 (import jpm/shutil :as shutil)
 (import spork/argparse :as ap)
-(import ./css)
 #(import spork/argparse :refer '[argparse])
 
 (defn calc-md5-sum [f-name]
@@ -270,18 +269,11 @@
     (compile-elm))
   (run (options)))
 
-(defn run-debug []
-  (let (cfg (template-app "rapanui" "RapanuiMain" "rapanui" true))
-    (pp "run-debug")
-    (css/run-css cfg)))
-
 (def PROJ {"1" run-rapanui 
            "2" run-maunaloa 
            "3" run-optionpurchase 
            "4" run-options 
-           "5" run-critters
-           "x" run-debug})
-
+           "5" run-critters})
 
 (defn run [argx]
   (printf "%q" argx)
