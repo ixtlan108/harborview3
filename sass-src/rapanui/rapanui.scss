@@ -1,11 +1,12 @@
-@use "../globals/logo";
-/*@import "../colorscheme/tokyo";*/
-@use "colorcheme";
-@use "../components/modal_dialog_bottom";
+
+import globals/logo
+import rapanui/colorscheme
+import components/modal_dialog_bottom
+
 
 body {
-  background-color: colorcheme.$bg-color;
-  color: colorcheme.$color-1;
+  background-color: var(--bg-color);
+  color: var(--color-1);
   font-family: "Poppins", sans-serif;
   /*font-family: "Tangerine", sans-serif;*/
   font-size: 1rem;

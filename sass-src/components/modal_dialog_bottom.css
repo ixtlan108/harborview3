@@ -1,0 +1,139 @@
+/* The Modal (background) */
+.modal-bottom {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.1);
+  /* Black w/ opacity */
+  -webkit-animation-name: fadeIn;
+  /* Fade in the background */
+  -webkit-animation-duration: 0.4s;
+  animation-name: fadeIn;
+  animation-duration: 0.4s
+}
+
+/* Modal Content */
+.modal-bottom--content {
+  position: fixed;
+  bottom: 0;
+  background-color: #fefefe;
+  color: black;
+  width: 100%;
+  -webkit-animation-name: slideIn;
+  -webkit-animation-duration: 0.4s;
+  animation-name: slideIn;
+  animation-duration: 0.4s
+}
+
+.modal-bottom--title {
+  margin-top: 0.4rem;
+  margin-left: 1.5rem;
+}
+
+/* The Close Button */
+.modal-bottom--close {
+  color: whitesmoke;
+  float: left;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.modal-bottom--close:hover,
+.modal-bottom--close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-bottom--header-err {
+  padding: 2px 16px;
+  background-color: red;
+  color: white;
+}
+
+.modal-bottom--header-warn {
+  padding: 2px 16px;
+  background-color: orange;
+  color: white;
+}
+
+.modal-bottom--header-photo-validated {
+  padding: 2px 16px;
+  background-color: fuchsia;
+  color: white;
+}
+
+.modal-bottom--header-info {
+  padding: 2px 16px;
+  background-color: green;
+  color: white;
+}
+
+.modal-bottom--body {
+  padding: 2px 16px;
+}
+
+.modal-bottom--footer {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+/* Add Animation */
+@-webkit-keyframes slideIn {
+  from {
+    bottom: -300px;
+    opacity: 0
+  }
+
+  to {
+    bottom: 0;
+    opacity: 1
+  }
+}
+
+@keyframes slideIn {
+  from {
+    bottom: -300px;
+    opacity: 0
+  }
+
+  to {
+    bottom: 0;
+    opacity: 1
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
