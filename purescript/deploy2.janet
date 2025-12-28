@@ -107,12 +107,28 @@
      (clear-static-files (css-cfg :css-static)))
     (jpm/shutil/copyfile from-f to-f)))
 
+(defn render [cfg spago-md5 sass-md5]
+  (let [is-joy (dyn :x-joy)]
+    (when (not is-joy)
+      (print "Enter render..")
+      (let [tpl (cfg :tpl)
+            f (file/open tpl :r)
+            content (string/slice (file/read f :all))]
+        (file/close f)
+        (print "tpl file: " tpl)
+        (let [result (string/format content spago-md5 sass-md5)
+              result-file (file/open (cfg :tpl-target) :w)]
+          (file/write result-file result)
+          (file/close result-file)
+          (print result))))))
+
 (defn run [cfg]
   (let [css-md5 (css/run-css cfg)
         spago-md5 (run-spago cfg)]
     (printf "css md5: %s" css-md5)
     (copy-spago-files cfg spago-md5)
-    (copy-css-files cfg css-md5)))
+    (copy-css-files cfg css-md5)
+    (render cfg spago-md5 css-md5)))
 
 (defn run-template-app [pkg main stem]
   (printf "Enter %s.." pkg)
