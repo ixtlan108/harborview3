@@ -50,26 +50,23 @@
     (file/close f)))
     
     
-(defn css-out-file [cfg]
-  (let [css-cfg (cfg :css)
-        pkg (css-cfg :pkg)
+(defn css-out-file [css-cfg]
+  (let [pkg (css-cfg :pkg)
         css (css-cfg :css-file)]
     (string/slice (buffer/push-string @"" pkg "/dist/" css))))
 
-(defn css-in-file [cfg]
-  (let [css-cfg (cfg :css)
-        src (css-cfg :src)
+(defn css-in-file [css-cfg]
+  (let [src (css-cfg :src)
         pkg (css-cfg :pkg)
         scss (css-cfg :scss-file)]
     (string/slice (buffer/push-string @"" src "/" pkg "/" scss))))
 
-(defn import-in-file (cfg fname)
-  (let [css-cfg (cfg :css)
-        src (css-cfg :src)]
-    (string/slice (buffer/push-string @"" src "/" fname ".scss" ))))
+(defn import-in-file (css-cfg fname)
+  (let [src (css-cfg :src)]
+    (string/slice (buffer/push-string @"" src "/" fname ".scss"))))
 
 (defn import-file (fname out)
-  (let (f (css-file fname)
+  (let (f (file/open fname :r)
         iter (file/lines f))
     (each val iter
       (file/write out val))
@@ -82,17 +79,20 @@
         pkg (css-cfg :pkg)
         scss (css-cfg :scss-file)
         css (css-cfg :css-file)
-        out-file (css-out-file cfg)
-        in-file (css-in-file cfg)
+        out-file (css-out-file css-cfg)
+        in-file (css-in-file css-cfg)
         f (file/open in-file)
+        f-out (file/open out-file :w)
         iter (file/lines f)]
     (pp out-file)
     (pp in-file)
     (each val iter
       (if (peg/match "import" val)
-        (let (s (file-name-for val))
-          (pp (import-in-file cfg s)))))
-    (file/close f)))
+        (let (s (file-name-for val)
+              cur-in (import-in-file css-cfg s))
+          (import-file cur-in f-out))))
+    (file/close f)
+    (file/close f-out)))
 
 
 (run2 (template-app "rapanui" "RapanuiMain" "rapanui" true))
