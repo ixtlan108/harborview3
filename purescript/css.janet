@@ -1,7 +1,5 @@
 
 
-(def sass-home "/home/rcs/opt/java/harborview3/sass-src")
-
 (defn template-app [pkg main stem is-joy-backend]
   (let [css 
           { :src "../sass-src"
@@ -28,28 +26,6 @@
   (let (s (string/split " " css-import))
     (string/trim (get s 1))))
 
-
-(defn css-path (file-name)
-  (string/slice 
-    (buffer/push-string @"" sass-home "/" file-name ".scss")))
-
-(defn css-file (file-name)
-  (let (cp (css-path file-name))
-    (file/open cp :r)))
-
-
-
-(defn run (cfg)
-  (let (f (css-file "rapanui/rapanui") 
-        iter (file/lines f)
-        out ())
-    (each val iter
-      (if (peg/match "import" val)
-        (let (s (file-name-for val)))))
-           #(import-file s 3))))
-    (file/close f)))
-    
-    
 (defn css-out-file [css-cfg]
   (let [pkg (css-cfg :pkg)
         css (css-cfg :css-file)]
@@ -73,7 +49,7 @@
       #(pp (string/slice val)))
     (file/close f)))
 
-(defn run2 (cfg)
+(defn run-css (cfg)
   (let [css-cfg (cfg :css)
         src (css-cfg :src)
         pkg (css-cfg :pkg)
@@ -90,9 +66,10 @@
       (if (peg/match "import" val)
         (let (s (file-name-for val)
               cur-in (import-in-file css-cfg s))
-          (import-file cur-in f-out))))
+          (import-file cur-in f-out))
+        (file/write f-out val)))
     (file/close f)
     (file/close f-out)))
 
 
-(run2 (template-app "rapanui" "RapanuiMain" "rapanui" true))
+# (run-css (template-app "rapanui" "RapanuiMain" "rapanui" true))
