@@ -8,27 +8,30 @@
     s1))
 
 
-(defn css-file (pkg file-name)
-  (let (css-path (string/slice (buffer/push-string @"" sass-home "/" pkg "/" file-name ".scss")))
-    (file/open css-path :r)))
+(defn css-path (file-name)
+  (string/slice 
+    (buffer/push-string @"" sass-home "/" file-name ".scss")))
 
-(defn import-file (pkg fname)
-  (let (f (css-file pkg fname)
+(defn css-file (file-name)
+  (let (cp (css-path file-name))
+    (pp cp)
+    (file/open cp :r)))
+
+(defn import-file (fname)
+  (let (f (css-file fname)
         iter (file/lines f))
     (each val iter
-      (pp val))))
+      (pp val))
+    (file/close f)))
 
 
 (defn run ()
-  (let (f (css-file "rapanui" "rapanui") 
-        iterator (file/lines f))
-    (pp f)
-    (each val iterator
+  (let (f (css-file "rapanui/rapanui") 
+        iter (file/lines f))
+    (each val iter
       (if (peg/match "import" val)
-        (do
-          (print val)
-          (let (s (file-name-for val))
-            (pp s)))))
+        (let (s (file-name-for val))
+           (import-file s))))
     (file/close f)))
     
     
