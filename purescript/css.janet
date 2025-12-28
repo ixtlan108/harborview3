@@ -2,10 +2,31 @@
 
 (def sass-home "/home/rcs/opt/java/harborview3/sass-src")
 
+(defn template-app [pkg main stem is-joy-backend]
+  (let [css 
+          { :src "../sass-src"
+            :pkg stem
+            :scss-file (string/slice (buffer/push-string @"" stem ".scss"))
+            :css-file (string/slice (buffer/push-string @"" stem ".css"))
+            :css-file-2 (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css"))
+            :css-map-file (string/slice (buffer/push-string @"" pkg "/dist/" stem ".css.map"))
+            :css-static 
+              (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem))
+            :css-map-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css.map"))
+                (string/slice (buffer/push-string  @"../src/main/resources/static/css/" stem "/" stem ".css.map")))
+            :css-target
+              (if is-joy-backend
+                (string/slice (buffer/push-string @"../janet/harborview/public/" stem ".css"))
+                (string/slice (buffer/push-string @"../src/main/resources/static/css/" stem "/" stem "-%s.css")))}]
+    {:css css}))
+
+              
+
 (defn file-name-for (css-import)
-  (let (s (string/split " " css-import)
-        s1 (string/trim (get s 1)))
-    s1))
+  (let (s (string/split " " css-import))
+    (string/trim (get s 1))))
 
 
 (defn css-path (file-name)
@@ -14,26 +35,64 @@
 
 (defn css-file (file-name)
   (let (cp (css-path file-name))
-    (pp cp)
     (file/open cp :r)))
 
-(defn import-file (fname)
+
+
+(defn run (cfg)
+  (let (f (css-file "rapanui/rapanui") 
+        iter (file/lines f)
+        out ())
+    (each val iter
+      (if (peg/match "import" val)
+        (let (s (file-name-for val)))))
+           #(import-file s 3))))
+    (file/close f)))
+    
+    
+(defn css-out-file [cfg]
+  (let [css-cfg (cfg :css)
+        pkg (css-cfg :pkg)
+        css (css-cfg :css-file)]
+    (string/slice (buffer/push-string @"" pkg "/dist/" css))))
+
+(defn css-in-file [cfg]
+  (let [css-cfg (cfg :css)
+        src (css-cfg :src)
+        pkg (css-cfg :pkg)
+        scss (css-cfg :scss-file)]
+    (string/slice (buffer/push-string @"" src "/" pkg "/" scss))))
+
+(defn import-in-file (cfg fname)
+  (let [css-cfg (cfg :css)
+        src (css-cfg :src)]
+    (string/slice (buffer/push-string @"" src "/" fname ".scss" ))))
+
+(defn import-file (fname out)
   (let (f (css-file fname)
         iter (file/lines f))
     (each val iter
-      (pp val))
+      (file/write out val))
+      #(pp (string/slice val)))
     (file/close f)))
 
-
-(defn run ()
-  (let (f (css-file "rapanui/rapanui") 
-        iter (file/lines f))
+(defn run2 (cfg)
+  (let [css-cfg (cfg :css)
+        src (css-cfg :src)
+        pkg (css-cfg :pkg)
+        scss (css-cfg :scss-file)
+        css (css-cfg :css-file)
+        out-file (css-out-file cfg)
+        in-file (css-in-file cfg)
+        f (file/open in-file)
+        iter (file/lines f)]
+    (pp out-file)
+    (pp in-file)
     (each val iter
       (if (peg/match "import" val)
         (let (s (file-name-for val))
-           (import-file s))))
+          (pp (import-in-file cfg s)))))
     (file/close f)))
-    
-    
 
-(run)
+
+(run2 (template-app "rapanui" "RapanuiMain" "rapanui" true))
