@@ -27,21 +27,22 @@
     (file/close f)))
 
 (defn run-css (cfg)
-  (let [css-cfg (cfg :css)
-        scss (css-cfg :scss-file)
-        out-file (css-out-file css-cfg)
-        in-file (css-in-file css-cfg)
-        f (file/open in-file)
-        f-out (file/open out-file :w)
-        iter (file/lines f)]
-    (each val iter
-      (if (peg/match "import" val)
-        (let (s (file-name-for val)
-              cur-in (import-in-file css-cfg s))
-          (import-file cur-in f-out))
-        (file/write f-out val)))
-    (file/close f)
-    (file/close f-out)
+  (let (css-cfg (cfg :css)
+        out-file (css-out-file css-cfg))
+    (when (dyn :x-css)
+      (let [scss (css-cfg :scss-file)
+            in-file (css-in-file css-cfg)
+            f (file/open in-file)
+            f-out (file/open out-file :w)
+            iter (file/lines f)]
+        (each val iter
+          (if (peg/match "import" val)
+            (let (s (file-name-for val)
+                  cur-in (import-in-file css-cfg s))
+              (import-file cur-in f-out))
+            (file/write f-out val)))
+        (file/close f)
+        (file/close f-out)))
     ((dyn :x-md5-cmd) out-file)))
 
 
