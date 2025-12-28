@@ -72,6 +72,31 @@
     (let (fi (string/slice (buffer/push-string @"" path "/" i)))
       (os/rm fi)))))
 
+(defn run-spago [cfg]
+  (print "Enter run-spago..")
+  (let [spago-cfg (cfg :spago)
+        md5-file (spago-cfg :js-file)]
+    (when (dyn :x-spago)
+      (let [pkg (spago-cfg :pkg)
+            main-module (spago-cfg :module)
+            target (spago-cfg :target)]
+        (print "EXECUTING SPAGO..")
+        (os/execute [(dyn :x-spago-cmd) "bundle" "--package" pkg "--source-maps" "--module" main-module "--outfile" target])))
+    ((dyn :x-md5-cmd) md5-file)))
+
+(defn copy-spago-files [cfg spago-md5]
+  (print "Enter copy-spago-files..")
+  (let [spago-cfg (cfg :spago)
+        from-f (spago-cfg :js-file)
+        with-joy (dyn :x-joy)
+        to-f (string/format (spago-cfg :js-target) spago-md5)
+        from-map-f (spago-cfg :js-map-file)
+        to-map-f (spago-cfg :js-map-target)]
+    (if (not with-joy) 
+     (clear-static-files (spago-cfg :js-static)))
+    (shutil/copyfile from-f to-f)
+    (shutil/copyfile from-map-f to-map-f)))
+
 (defn copy-css-files [cfg css-md5]
   (print "Enter copy-css-files..")
   (let [css-cfg (cfg :css)
@@ -83,8 +108,10 @@
     (jpm/shutil/copyfile from-f to-f)))
 
 (defn run [cfg]
-  (let [css-md5 (css/run-css cfg)]
-    (pp css-md5)
+  (let [css-md5 (css/run-css cfg)
+        spago-md5 (run-spago cfg)]
+    (printf "css md5: %s" css-md5)
+    (copy-spago-files cfg spago-md5)
     (copy-css-files cfg css-md5)))
 
 (defn run-template-app [pkg main stem]
