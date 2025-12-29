@@ -15,13 +15,12 @@ import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
+import HarborView.ModalDialog as DLG
 import HarborView.UI.Button (ButtonParams, mkButton)
 import HarborView.UI.Checkbox as CB
-import HarborView.UI.Common (Title(..))
+import HarborView.UI.Common (InputWrapperParams, Title(..), mkInputWrapper)
 import HarborView.UI.Input (InputParams)
 import HarborView.UI.Input as Inp
-import HarborView.ModalDialog as DLG
-
 import Rapanui.Command (handleAction)
 import Rapanui.Common (MainAction(..), Oid(..), OptionTicker(..), Rtyp(..))
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
@@ -158,35 +157,15 @@ details opx =
           ]
       ]
 
-{-
-  emptyTable
-createTable_ [ item ] =
-  HH.table_
-    [ gpObjHead
-    , HH.tbody_ $ createTableRows item
-    ]
-createTable_ all =
-  let
-    allx = Array.concat $ map createTableRows all
-  in
-    HH.table
-      [ HP.classes [ ClassName "sortable" ] ]
-      [ gpObjHead
-      , HH.tbody_ $ allx
-      ]
--}
-
 createTable :: ∀ w. State -> HTML w MainAction
 createTable st =
   HH.div_ $ map details st.stockOptions
-
---createTable_ st.stockOptions
 
 defaultButtonParams :: forall i. String -> (MouseEvent -> i) -> ButtonParams i
 defaultButtonParams t curEvt =
   let
     clazz =
-      "ps-btn btn btn-outline-success"
+      "ps-mr-1 ps-btn btn btn-outline-success"
   in
     { title: Title t
     , evt: curEvt
@@ -194,26 +173,12 @@ defaultButtonParams t curEvt =
     , disabled: false
     }
 
--- defaultInputParams :: InputParams MainAction
--- defaultInputParams =
---   { title: Title "Timer (sec)"
---   , evt: Noop
---   , inpVal: InpNum Nothing
---   , lblClasses: []
---   , inpClasses: []
---   , spanClasses: []
---   , disabled: false
---   , dateMax: ""
---   }
-
 defaultInputParams :: forall i. (String -> i) -> InputParams i
 defaultInputParams curEvt =
     { evt: curEvt
-    , style: Nothing
     , disabled: false
-    , inpClasses: [ ClassName "form-control" ]
-    , spanClasses: [ ClassName "form-group" ]
-    , dateMax: Nothing -- DU.todayStr
+    , clazz: [ ClassName "form-control ps-input" ]
+    , placeholder: Nothing
     }
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
@@ -225,30 +190,34 @@ component =
     , eval: H.mkEval H.defaultEval { handleAction = handleAction }
     }
 
-defaultLabelClasses :: Array ClassName
-defaultLabelClasses = [ ClassName "ps-label" ]
+wrapperParams :: String -> InputWrapperParams
+wrapperParams t =
+  { title: Title t
+  , lblClazz: [ ClassName "ps-label" ]
+  , spanClazz: [ ClassName "form-group ps-mr-1" ]
+  }
 
 render :: ∀ s m. MonadAff m => State -> H.ComponentHTML MainAction s m
 render st =
   let
     interval =
-      (Inp.mkInputWrapper (Title "Interval") defaultLabelClasses
+      (mkInputWrapper (wrapperParams "Interval")
         (Inp.mkInputNum st.interval $ (defaultInputParams $ IntervalChange))) -- { style = Just $ isDoneStyle phs.isDone }))
 
     tick =
-      (Inp.mkInputWrapper (Title "Tick") defaultLabelClasses
+      (mkInputWrapper (wrapperParams "Tick")
         (Inp.mkInputInt (Just st.tickDemo) $ (defaultInputParams $ Noop))) -- { style = Just $ isDoneStyle phs.isDone }))
+    buttons =
+      [ mkButton $ defaultButtonParams "Fetch Purchases" FetchPurchases
+      , mkButton $ defaultButtonParams "Start Timer" (Timer true)
+      , mkButton $ defaultButtonParams "Stop Timer" (Timer false)
+      ]
   in
-  HH.div []
-    [ mkButton $ defaultButtonParams "Fetch Purchases" FetchPurchases
-    , mkButton $ defaultButtonParams "Start Timer" (Timer true)
-    , mkButton $ defaultButtonParams "Stop Timer" (Timer false)
-    , interval
-    , tick
-    --, mkInput defaultInputParams { inpVal = InpNum st.interval, evt = IntervalChange }
-    --, mkInput_ defaultInputParams { inpVal = InpI $ Just st.tickDemo }
-    , createTable st
-    , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
+  HH.div [ HP.classes [ ClassName "containerx" ] ]
+    [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
+      , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick]
+      , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st]
+      -- , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 
 {-

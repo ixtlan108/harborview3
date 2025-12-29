@@ -18,7 +18,8 @@
       [:link {:href "https://fonts.googleapis.com" :rel "preconnect"}]
       [:link {:href "https://fonts.gstatic.com" :rel "preconnect" :crossorigin true}]
       [:link {:href "https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" :rel "stylesheet"}]
-      [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/2.0.15/bootstrap-native-v4.min.js" :defer ""}]]
+      # [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/2.0.15/bootstrap-native-v4.min.js" :defer ""}]
+      [:script {:src "https://cdn.jsdelivr.net/npm/bootstrap.native@5.1.6/dist/bootstrap-native.min.js" :defer ""}]]
 
      [:body
        body]]))

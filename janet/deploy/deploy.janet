@@ -22,7 +22,7 @@
             :js-target "../src/main/resources/static/js/maunaloa/elm-options-%s.js"}
             
         sass
-          { :src "../sass-src"
+          { :src co/src-css
             :pkg "options"
             :scss-file "options.scss"
             :css-file "options.css"

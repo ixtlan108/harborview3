@@ -25,7 +25,7 @@ import Data.Maybe (Maybe)
 type PayloadResponse a =
   { appstatus :: Int
   , msg :: Maybe String
-  , payload :: Maybe a
+  , payload :: a
   }
 
 type JsonAccRule =

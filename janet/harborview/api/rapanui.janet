@@ -20,7 +20,7 @@
   (let (ticker "NHY9E30")
     {:ticker ticker 
      :oid 47
-     ::price 5.8
+     :price 5.8
      :critters [(critter ticker)]}))
   
 

@@ -28,11 +28,10 @@ run node qs =
 
 main :: Effect Unit
 main =
-  HA.runHalogenAff
-    $ HA.awaitLoad
-        *>
-          let
-            qs1 = QuerySelector "#rapanui"
-          in
-            HA.selectElement qs1 >>= \node1 ->
-              run node1 qs1
+  HA.runHalogenAff $
+    HA.awaitLoad *>
+      let
+        qs1 = QuerySelector "#rapanui"
+      in
+        HA.selectElement qs1 >>= \node1 ->
+          run node1 qs1

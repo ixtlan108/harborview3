@@ -21,7 +21,7 @@ import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
--- import Rapanui.Nordnet.Transform as Transform
+import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
 
 --import Web.UIEvent.MouseEvent (MouseEvent)
@@ -48,16 +48,15 @@ mapJsonResult
   => CritterResponse
   -> m Unit
 mapJsonResult result =
-  pure unit
-  -- case result.payload of
-  --   [] ->
-  --     pure unit
-  --   items ->
-  --     H.modify_
-  --       \stx ->
-  --         stx
-  --           { stockOptions = Transform.mapPayloads items
-  --           }
+  case result.payload of
+    [] ->
+      pure unit
+    items ->
+      H.modify_
+        \stx ->
+          stx
+            { stockOptions = Transform.mapPayloads items
+            }
 
 unsubscribeTimer
   :: forall slots output m r
