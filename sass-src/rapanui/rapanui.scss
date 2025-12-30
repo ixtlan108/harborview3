@@ -1,17 +1,14 @@
 
 import globals/logo
-import rapanui/colorscheme
+import colorscheme/tokyo
 import components/modal_dialog_bottom
-
-
-
 
 body {
   background-color: var(--bg-color);
   color: var(--color-1);
   font-family: "Poppins", sans-serif;
   /*font-family: "Tangerine", sans-serif;*/
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .ps-input {
@@ -52,3 +49,22 @@ body {
   margin-right: 1rem;
 }
 
+.form-control,
+.form-control:focus,
+.form-control:disabled {
+  border-radius: 0px;
+}
+
+.form-control,
+.form-control:focus {
+  background-color: #122342;
+  color: #fbf4c8;
+}
+
+.form-control:disabled {
+  /*
+  background-color: #727687;
+  */
+  background-color: $bg-color-disabled;
+  color: $color-disabled;
+}
