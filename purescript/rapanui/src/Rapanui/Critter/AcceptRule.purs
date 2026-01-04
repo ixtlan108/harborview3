@@ -29,13 +29,13 @@ applyAcc'
   (Ask s)
   stock -- (StockOption{option: StockOptionItem{bid: (Bid b2)}})
   c
-  (Rtyp rt)
+  rt
   (AccVal value) =
     let
       (Bid b2) = stock.option.bid
     in
     case rt of
-      7 ->
+      DIFF_BOUGHT ->
         let
           diffFromBought = s - b2
         in

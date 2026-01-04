@@ -6,8 +6,6 @@ import Prelude
 
 import Test.Unit (suite, test, TestSuite)
 import Test.Unit.Assert as Assert
---import Data.Maybe (Maybe(..))
---import Rapanui.OptionSale.OptionSaleItem (OptionSale(..), findOptionSale)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..), validOptionSales)
 import Rapanui.Common (Bid(..), Cid(..))
 

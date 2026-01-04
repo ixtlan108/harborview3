@@ -1,5 +1,6 @@
 module Rapanui.Common
   ( AccVal(..)
+  , Spot(..)
   , Ask(..)
   , Bid(..)
   , Cid(..)
@@ -14,7 +15,9 @@ module Rapanui.Common
   , Pid(..)
   , PosixTimeInt(..)
   , Rtyp(..)
+  , StatusCode(..)
   , Status(..)
+  , rtypDesc
   ) where
 
 -- import Prelude
@@ -37,7 +40,8 @@ data MainAction
 
 newtype OptionTicker = OptionTicker String
 
-derive instance genericOptionTicker :: Generic OptionTicker _
+derive instance Generic OptionTicker _
+
 instance Show OptionTicker where
   show = genericShow
 
@@ -45,13 +49,15 @@ instance Show OptionTicker where
 
 newtype Oid = Oid Int
 
-derive instance genericOid :: Generic Oid _
+derive instance Generic Oid _
+
 instance Show Oid where
   show = genericShow
 
 newtype Pid = Pid Int
 
-derive instance genericPid :: Generic Pid _
+derive instance Generic Pid _
+
 instance Show Pid where
   show = genericShow
 
@@ -59,15 +65,65 @@ newtype Cid = Cid Int
 
 derive instance Eq Cid
 
-derive instance genericCid :: Generic Cid _
+derive instance Generic Cid _
+
 instance Show Cid where
   show = genericShow
 
-newtype Rtyp = Rtyp Int
+-- newtype SaleAmount = SaleAmount Int
 
-derive instance genericRtyp :: Generic Rtyp _
+-- derive instance Eq SaleAmount
+
+-- derive instance Generic SaleAmount _
+-- instance Show SaleAmount where
+--   show = genericShow
+
+-- newtype Rtyp = Rtyp Int
+
+data StatusCode =
+   TRUE_ACTIVE                -- 1 | True/active/valid
+   | FALSE_INACTIVE           -- 0 | False/inact./invalid
+   | CRITTER_ACTIVE           -- 7 | Critter active
+   | CRITTER_INACTIVE         -- 8 | Critter inactive
+   | OPTION_TEST_PURCHASE     -- 4 | Option test purchase
+   | OPTION_PURCHASE          -- 3 | Option purchase
+   | OPTION_PAPER_PURCH       -- 11 | Option paper purch.
+   | CRITTER_SOLD             -- 9 | Critter sold
+   | OPTION_FULLY_SOLD        -- 2 | Option fully sold
+   | SNA
+
+derive instance Eq StatusCode
+
+derive instance Generic StatusCode _
+
+instance Show StatusCode where
+  show = genericShow
+
+data Rtyp =
+  DIFF_WATERMARK        -- 1 |
+  | DIFF_BOUGHT         -- 7 |
+  | OPTION_PRICE_ROOF   -- 6 | Option price roof (valid if below option price)
+  | OPTION_PRICE_FLOOR  -- 5 | Option price floor (valid if above option price)
+  | STOCK_PRICE_ROOF    -- 4 | Stock price roof (valid if below stock price)
+  | STOCK_PRICE_FLOOR   -- 3 | Stock price floor (valid if above stock price)
+  | NA
+
+derive instance Generic Rtyp _
+
 instance Show Rtyp where
   show = genericShow
+
+
+rtypDesc :: Rtyp -> String
+rtypDesc r =
+  case r of
+    DIFF_WATERMARK -> "Diff > last watermark by value"
+    DIFF_BOUGHT -> "Diff Bid Ask > acc. value"
+    OPTION_PRICE_ROOF -> "Option price roof (valid if below option price)"
+    OPTION_PRICE_FLOOR -> "Option price floor (valid if above option price)"
+    STOCK_PRICE_ROOF -> "Stock price roof (valid if below stock price)"
+    STOCK_PRICE_FLOOR -> "Stock price floor (valid if above stock price)"
+    NA -> "N/A"
 
 newtype CritterType = CritterType String
 
@@ -83,9 +139,12 @@ newtype Bid = Bid Number
 
 derive instance Eq Bid
 
-derive instance genericBid :: Generic Bid _
+derive instance Generic Bid _
+
 instance Show Bid where
   show = genericShow
+
+newtype Spot = Spot Number
 
 newtype Ask = Ask Number
 

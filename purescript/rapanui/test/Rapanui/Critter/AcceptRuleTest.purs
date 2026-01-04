@@ -4,16 +4,14 @@ module Test.Rapanui.Critter.AcceptRuleTest
 
 import Prelude
 
-import Rapanui.Common (AccVal(..), Ask(..), Bid(..), Status(..), Msg(..), Oid(..), Pid(..), Cid(..), Rtyp(..))
-import Rapanui.StockMarket.StockOption (StockOption)
-import Rapanui.Critter.Rules (AcceptRule)
+import Data.Maybe (Maybe(..))
+import Rapanui.Common (AccVal(..), Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), Pid(..), Rtyp(..), Spot(..), Status(..))
 import Rapanui.Critter.AcceptRule as Acc
---import Rapanui.OptionSale.OptionSaleItem
---import Rapanui.StockOption
-
-import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
-import Rapanui.Nordnet.CoreJson (StockOptionResponse)
+import Rapanui.Critter.Rules (AcceptRule)
+import Rapanui.Nordnet.CoreJson (StockOptionPayload)
 import Rapanui.Nordnet.Transform as Transform
+import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
+import Rapanui.StockMarket.StockOption (StockOption)
 import Test.Unit (suite, test, TestSuite)
 import Test.Unit.Assert as Assert
 
@@ -22,46 +20,42 @@ acc1 v =
   { oid: (Oid 1)
   , pid: (Pid 23)
   , cid: (Cid 47)
-  , rtyp: (Rtyp 7)
+  , rtyp: DIFF_BOUGHT
   , value: v
   , active: true
   }
 
 s1 :: StockOption
 s1 =
-  let
-    item =
-      { bid: Bid 9.0
-      , ask: Ask 11.0
-      }
-  in
-    { option: item
-    , status: Status 7
-    , msg: Msg ""
-    }
+  { spot: Spot 120.0
+  , option: { bid: Bid 9.0, ask: Ask 11.0 }
+  , optionStatus: Status 7
+  , msg: Nothing
+  }
 
 
 c1 :: Cid
 c1 = Cid 47
 
-createResponse :: Number -> Number -> Int -> StockOptionResponse
+createResponse :: Number -> Number -> Int -> StockOptionPayload
 createResponse bid ask status =
-  let
-    item = { bid: bid, ask: ask }
-  in
-    { option: item
-    , status: status
-    , msg: ""
-    }
+  { appstatus : 0
+    , payload: { spot: 120.0
+                 , option: { bid: bid, ask: ask }
+                 , optionStatus: status
+                 , msg: Nothing
+                 }
+    , msg: Just "-"
+  }
 
 testAccRuleSuite :: TestSuite
 testAccRuleSuite =
   suite "TestAccRuleSuite" do
     test "apply' 1 NoSale" do
-      let actual = Acc.applyAcc' (Ask 12.0) s1 c1 (Rtyp 7) (AccVal 5.0)
+      let actual = Acc.applyAcc' (Ask 12.0) s1 c1 DIFF_BOUGHT (AccVal 5.0)
       Assert.equal NoSale actual
     test "apply' 2 Sale" do
-      let actual = Acc.applyAcc' (Ask 12.0) s1 c1 (Rtyp 7) (AccVal 2.5)
+      let actual = Acc.applyAcc' (Ask 12.0) s1 c1 DIFF_BOUGHT (AccVal 2.5)
       Assert.equal (Sale { critterId: c1, price: Bid 9.0 }) actual
     test "apply 1 NoSale" do
       let actual = Acc.applyAcc (Ask 12.0) s1 (acc1 2.0)

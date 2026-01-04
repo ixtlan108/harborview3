@@ -2,6 +2,7 @@ module HarborView.Common where
 
 import Prelude
 
+import Data.Newtype (class Newtype, unwrap)
 import Data.Either (Either(..))
 import Data.Number.Format as Format
 import Effect (Effect)
@@ -71,7 +72,7 @@ defaultEventHandling event =
 dayInMillis :: Number
 dayInMillis = 86400000.0
 
-------------------------- UnixTime ------------------------- 
+------------------------- UnixTime -------------------------
 newtype UnixTime = UnixTime Number
 
 derive instance eqUnixTime :: Eq UnixTime
@@ -81,3 +82,7 @@ instance showUnixTime :: Show UnixTime where
 
 instance ordUnixTime :: Ord UnixTime where
   compare (UnixTime u1) (UnixTime u2) = compare u1 u2
+
+  ------------------------- Diverse -------------------------
+mapx :: forall f a b. Functor f => Newtype a b => f a -> f b
+mapx x = map (\v -> unwrap v) x

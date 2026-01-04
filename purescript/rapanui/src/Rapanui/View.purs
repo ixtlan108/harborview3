@@ -15,17 +15,13 @@ import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
-import HarborView.ModalDialog as DLG
-import HarborView.UI.Button (ButtonParams, mkButton)
+--import HarborView.ModalDialog as DLG
 import HarborView.UI.Checkbox as CB
-import HarborView.UI.Common (InputWrapperParams, Title(..), mkInputWrapper)
-import HarborView.UI.Input (InputParams)
-import HarborView.UI.Input as Inp
 import Rapanui.Command (handleAction)
-import Rapanui.Common (MainAction(..), Oid(..), OptionTicker(..), Rtyp(..))
+import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc)
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
 import Rapanui.State (State, defaultState)
-import Web.UIEvent.MouseEvent (MouseEvent)
+import Rapanui.UI as RU
 
 --noSort ∷ ∀ r i. Array (IProp (class ∷ String | r) i)
 --noSort =
@@ -38,7 +34,7 @@ tableHeader =
     [ HH.tr
         []
         [ HH.th [] [ HH.text "Oid" ]
-        , HH.th [] [ HH.text "Sell" ]
+        , HH.th [] [ HH.text "Ask" ]
         , HH.th [] [ HH.text "Status" ]
         , HH.th [] [ HH.text "-" ]
         , HH.th [] [ HH.text "Acc.oid" ]
@@ -49,8 +45,8 @@ tableHeader =
         ]
     ]
 
-critterPart :: forall w. Maybe Critter -> Array (HTML w MainAction)
-critterPart crit =
+critterPart :: forall w. Maybe Ask -> Maybe Critter -> Array (HTML w MainAction)
+critterPart ask crit =
   case crit of
     Nothing ->
       [ HH.td [] [ HH.text "-" ]
@@ -62,13 +58,19 @@ critterPart crit =
     Just c ->
       let
         Oid oid = c.oid
+        askPrice =
+          case ask of
+            Just (Ask value) -> value
+            _ -> 0.0
       in
         [ HH.td [] [ HH.text (Common.fromInt oid) ]
-        , HH.td [] [ HH.text ("10") ]
-        , HH.td [] [ HH.text (Common.fromInt c.status) ]
+        , HH.td [] [ HH.text (show askPrice) ]
+        --, HH.td [] [ HH.text (Common.fromInt c.status) ]
+        , HH.td [] [ HH.text (show c.status) ]
         , HH.td [] [ HH.text "New Acc Rule" ]
         --, HH.td [] [ H.a [ A.href "#", A.class "newaccrule href-td", E.onClick (AccRuleMsgFor (NewAccRule <| Oid c.oid)) ] [ HH.text "New Acc" ] ]
         ]
+
 
 accPart :: forall w. Maybe AcceptRule -> Array (HTML w MainAction)
 accPart acc =
@@ -84,24 +86,24 @@ accPart acc =
     Just curAcc ->
       let
         Oid oid = curAcc.oid
-        Rtyp rtyp = curAcc.rtyp
+        -- Rtyp rtyp = curAcc.rtyp
         cbActive =
           CB.mkCheckboxSimple (CB.defaultSimpleChecboxParam $ IsActive oid)
       in
         [ HH.td [] [ HH.text (Common.fromInt oid) ]
-        , HH.td [] [ HH.text (Common.fromInt rtyp) ]
-        , HH.td [] [ HH.text "rtyp desc" ]
+        , HH.td [] [ HH.text (show curAcc.rtyp) ]
+        , HH.td [] [ HH.text $ rtypDesc curAcc.rtyp ]
         --, HH.td [] [ HH.text (rtypDesc curAcc.rtyp) ]
         , HH.td [] [ HH.text (Common.numToString curAcc.value) ]
         , HH.td [] [ cbActive ]
         --, HH.td [] [ H.a [ A.href "#", A.class "newdnyrule href-td", E.onClick (DenyRuleMsgFor (NewDenyRule <| Oid curAcc.oid)) ] [ HH.text "New Deny" ] ]
         ]
 
-critAcc1Tr :: forall w. Maybe Critter -> Maybe AcceptRule -> HTML w MainAction
-critAcc1Tr crit acc =
+critAcc1Tr :: forall w. Maybe Ask -> Maybe Critter -> Maybe AcceptRule -> HTML w MainAction
+critAcc1Tr ask crit acc =
   let
     tdRow =
-      Array.concat [ critterPart crit, accPart acc ]
+      Array.concat [ critterPart ask crit, accPart acc ]
   in
     HH.tr [] tdRow
 
@@ -109,7 +111,7 @@ acc1Tr :: forall w. AcceptRule -> HTML w MainAction
 acc1Tr acc =
   let
     tdRow =
-      Array.concat [ critterPart Nothing, accPart (Just acc) ]
+      Array.concat [ critterPart Nothing Nothing, accPart (Just acc) ]
   in
     HH.tr [] tdRow
 
@@ -119,14 +121,14 @@ accsTr acc =
     Nothing -> []
     Just acc1 -> map acc1Tr acc1
 
-critterRows :: forall w. Critter -> Array (HTML w MainAction)
-critterRows crit =
+critterRows :: forall w. Ask -> Critter -> Array (HTML w MainAction)
+critterRows ask crit =
   case crit.accRules of
     [] ->
-      [ critAcc1Tr (Just crit) Nothing ]
+      [ critAcc1Tr (Just ask) (Just crit) Nothing ]
 
     [ acc ] ->
-      [ critAcc1Tr (Just crit) (Just acc) ]
+      [ critAcc1Tr (Just ask) (Just crit) (Just acc) ]
 
     items ->
       let
@@ -134,14 +136,14 @@ critterRows crit =
           Array.head items
 
         firstRow =
-          critAcc1Tr (Just crit) firstAcc
+          critAcc1Tr (Just ask) (Just crit) firstAcc
 
       in
         firstRow : accsTr (Array.tail items)
 
 critterArea :: forall w. StockOptionPurchase -> Array (HTML w MainAction)
 critterArea opx =
-  Array.concat (map critterRows opx.critters)
+  Array.concat (map (critterRows opx.price) opx.critters)
 
 details :: forall w. StockOptionPurchase -> HTML w MainAction
 details opx =
@@ -161,25 +163,6 @@ createTable :: ∀ w. State -> HTML w MainAction
 createTable st =
   HH.div_ $ map details st.stockOptions
 
-defaultButtonParams :: forall i. String -> (MouseEvent -> i) -> ButtonParams i
-defaultButtonParams t curEvt =
-  let
-    clazz =
-      "ps-mr-1 ps-btn btn btn-outline-success"
-  in
-    { title: Title t
-    , evt: curEvt
-    , btnClazz: [ ClassName clazz ]
-    , disabled: false
-    }
-
-defaultInputParams :: forall i. (String -> i) -> InputParams i
-defaultInputParams curEvt =
-    { evt: curEvt
-    , disabled: false
-    , clazz: [ ClassName "form-control ps-input" ]
-    , placeholder: Nothing
-    }
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
 component =
@@ -190,33 +173,25 @@ component =
     , eval: H.mkEval H.defaultEval { handleAction = handleAction }
     }
 
-wrapperParams :: String -> InputWrapperParams
-wrapperParams t =
-  { title: Title t
-  , lblClazz: [ ClassName "ps-label" ]
-  , spanClazz: [ ClassName "form-group ps-mr-1" ]
-  }
-
 render :: ∀ s m. MonadAff m => State -> H.ComponentHTML MainAction s m
 render st =
   let
     interval =
-      (mkInputWrapper (wrapperParams "Interval")
-        (Inp.mkInputNum st.interval $ (defaultInputParams $ IntervalChange))) -- { style = Just $ isDoneStyle phs.isDone }))
+      RU.inpInterval st.interval
 
     tick =
-      (mkInputWrapper (wrapperParams "Tick")
-        (Inp.mkInputInt (Just st.tickDemo) $ (defaultInputParams $ Noop))) -- { style = Just $ isDoneStyle phs.isDone }))
+      RU.inpTick (Just st.tickCounter)
+
     buttons =
-      [ mkButton $ defaultButtonParams "Fetch Purchases" FetchPurchases
-      , mkButton $ defaultButtonParams "Start Timer" (Timer true)
-      , mkButton $ defaultButtonParams "Stop Timer" (Timer false)
+      [ RU.fetchPurchases
+      , RU.startTimer
+      , RU.stopTimer
       ]
   in
   HH.div [ HP.classes [ ClassName "containerx" ] ]
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
-      , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick]
-      , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st]
+      , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
+      , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
       -- , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 

@@ -2,6 +2,7 @@ module Rapanui.Critter.Rules where
 
 import Rapanui.Common (Cid, Oid, Ask, OptionTicker, Pid, Rtyp)
 
+
 --import Prelude
 type AcceptRule =
   { oid :: Oid
@@ -15,7 +16,7 @@ type AcceptRule =
 type Critter =
   { oid :: Oid
   , vol :: Int
-  , status :: Int
+  , status :: Int -- StatusCode
   , accRules :: Array AcceptRule
   }
 
@@ -24,6 +25,7 @@ type StockOptionPurchase =
   , oid :: Oid
   , price :: Ask
   , critters :: Array Critter
+  , isSold :: Boolean
   }
 
 --derive instance genericSomeType :: Generic StockOptionPurchase _

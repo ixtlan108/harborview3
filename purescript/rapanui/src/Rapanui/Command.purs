@@ -5,6 +5,7 @@ module Rapanui.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
+import Data.Array as A
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Number (fromString)
@@ -19,28 +20,14 @@ import HarborView.Common (handleError)
 import HarborView.HalogenCommon (timer)
 import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
+import Rapanui.Critter.Core as Core
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
 import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
+import Rapanui.StockMarket.OptionSaleItem (OptionSale)
+import Rapanui.StockMarket.OptionSaleItem as OSI
 
---import Web.UIEvent.MouseEvent (MouseEvent)
-
--- data MainAction
---   = Initialize
---   | Demo MouseEvent
---   | Timer Boolean MouseEvent
---   | IsActive Int Boolean
---   | Tick
---   | Noop String
-
--- timer :: forall m a. MonadAff m => a -> m (HS.Emitter a)
--- timer val = do
---   { emitter, listener } <- H.liftEffect HS.create
---   _ <- H.liftAff $ Aff.forkAff $ forever do
---     Aff.delay $ Milliseconds 1000.0
---     H.liftEffect $ HS.notify listener val
---   pure emitter
 
 mapJsonResult
   :: forall m
@@ -115,15 +102,33 @@ handleFetchCritters
 handleFetchCritters =
   H.get >>= \st ->
     case st.stockOptions of
-            [] ->
-              H.liftAff Nordnet.fetchCritters >>= \result ->
-                case result of
-                  Left err ->
-                    liftEffect $ handleError err
-                  Right result1 ->
-                    mapJsonResult result1
-            _ ->
-              pure unit
+      [] ->
+        H.liftAff Nordnet.fetchCritters >>= \result ->
+          case result of
+            Left err ->
+              liftEffect $ handleError err
+            Right result1 ->
+              mapJsonResult result1
+      _ ->
+        pure unit
+
+handleTickResult
+  :: forall m
+   . MonadAff m
+  => Array OptionSale
+  -> m Unit
+handleTickResult items =
+  if A.null items then
+    pure unit
+  else
+    let
+      vs = OSI.validOptionSales items
+    in
+    if A.null vs then
+      pure unit
+    else
+      H.liftAff (Nordnet.registerSales items) *>
+        pure unit
 
 handleTick
   :: forall m
@@ -131,12 +136,13 @@ handleTick
   => MonadAff m
   => m Unit
 handleTick =
-  H.modify_
-    \stx ->
-      let
-        oldVal = stx.tickDemo
-      in
-        stx { tickDemo = oldVal + 1 }
+  H.get >>= \st ->
+    H.liftAff (Core.applyPurchases st.stockOptions) >>= \result ->
+      (liftEffect $ logShow $ result) *>
+      (H.modify_
+        \stx ->
+          stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>
+      handleTickResult result
 
 handleAction
   :: forall cs o m
