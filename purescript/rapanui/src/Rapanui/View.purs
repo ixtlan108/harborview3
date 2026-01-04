@@ -84,12 +84,12 @@ accPart acc =
     Just curAcc ->
       let
         Oid oid = curAcc.oid
-        Rtyp rtyp = curAcc.rtyp
+        -- Rtyp rtyp = curAcc.rtyp
         cbActive =
           CB.mkCheckboxSimple (CB.defaultSimpleChecboxParam $ IsActive oid)
       in
         [ HH.td [] [ HH.text (Common.fromInt oid) ]
-        , HH.td [] [ HH.text (Common.fromInt rtyp) ]
+        , HH.td [] [ HH.text (show curAcc.rtyp) ]
         , HH.td [] [ HH.text "rtyp desc" ]
         --, HH.td [] [ HH.text (rtypDesc curAcc.rtyp) ]
         , HH.td [] [ HH.text (Common.numToString curAcc.value) ]

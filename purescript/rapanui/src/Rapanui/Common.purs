@@ -72,7 +72,16 @@ instance Show Cid where
 -- instance Show SaleAmount where
 --   show = genericShow
 
-newtype Rtyp = Rtyp Int
+-- newtype Rtyp = Rtyp Int
+
+data Rtyp =
+  DIFF_WATERMARK        -- 1 |
+  | DIFF_BOUGHT         -- 7 |
+  | OPTION_PRICE_ROOF   -- 6 | Option price roof (valid if below option price)
+  | OPTION_PRICE_FLOOR  -- 5 | Option price floor (valid if above option price)
+  | STOCK_PRICE_ROOF    -- 4 | Stock price roof (valid if below stock price)
+  | STOCK_PRICE_FLOOR   -- 3 | Stock price floor (valid if above stock price)
+  | NA
 
 derive instance Generic Rtyp _
 instance Show Rtyp where

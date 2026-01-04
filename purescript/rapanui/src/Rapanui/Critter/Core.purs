@@ -24,7 +24,7 @@ applyPurchase_ opx purchase =
       ask = opx.option.ask
       fn = Critter.applyCritter ask opx
     in
-      map fn purchase.critters
+      Ar.concat $ map fn purchase.critters
   else
     []
 

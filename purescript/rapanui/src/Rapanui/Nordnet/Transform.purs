@@ -5,18 +5,7 @@ module Rapanui.Nordnet.Transform
 
 import Prelude
 
-import Rapanui.Common
-  ( Bid(..)
-    , Ask(..)
-    , Spot(..)
-    , Status(..)
-    , Msg(..)
-    , Oid(..)
-    , Pid(..)
-    , Cid(..)
-    , Rtyp(..)
-    , OptionTicker(..)
-  )
+import Rapanui.Common (Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), OptionTicker(..), Pid(..), Rtyp(..), Spot(..), Status(..))
 import Rapanui.Critter.Rules (AcceptRule, Critter, StockOptionPurchase)
 import Rapanui.Nordnet.CoreJson (JsonCritter, JsonPayload, JsonAccRule, StockOptionResponse)
 import Rapanui.StockMarket.StockOption (StockOption)
@@ -35,13 +24,19 @@ mapAccRule { oid, pid, cid, rtyp, value, active } =
   }
   -}
 
+mapRtyp :: Int -> Rtyp
+mapRtyp ji =
+  case ji of
+    7 -> DIFF_BOUGHT
+    _ -> NA
+
 mapAccRule :: JsonAccRule -> AcceptRule
 mapAccRule ja =
   { active: true
   , cid: Cid ja.cid
   , oid: Oid ja.oid
   , pid: Pid ja.pid
-  , rtyp: Rtyp ja.rtyp
+  , rtyp: mapRtyp ja.rtyp
   , value: ja.value
   }
 
