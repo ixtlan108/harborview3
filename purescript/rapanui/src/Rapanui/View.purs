@@ -206,7 +206,7 @@ render st =
 
     tick =
       (mkInputWrapper (wrapperParams "Tick")
-        (Inp.mkInputInt (Just st.tickDemo) $ (defaultInputParams $ Noop))) -- { style = Just $ isDoneStyle phs.isDone }))
+        (Inp.mkInputInt (Just st.tickCounter) $ (defaultInputParams $ Noop))) -- { style = Just $ isDoneStyle phs.isDone }))
     buttons =
       [ mkButton $ defaultButtonParams "Fetch Purchases" FetchPurchases
       , mkButton $ defaultButtonParams "Start Timer" (Timer true)

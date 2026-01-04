@@ -24,23 +24,6 @@ import Rapanui.Nordnet.CoreJson (CritterResponse)
 import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
 
---import Web.UIEvent.MouseEvent (MouseEvent)
-
--- data MainAction
---   = Initialize
---   | Demo MouseEvent
---   | Timer Boolean MouseEvent
---   | IsActive Int Boolean
---   | Tick
---   | Noop String
-
--- timer :: forall m a. MonadAff m => a -> m (HS.Emitter a)
--- timer val = do
---   { emitter, listener } <- H.liftEffect HS.create
---   _ <- H.liftAff $ Aff.forkAff $ forever do
---     Aff.delay $ Milliseconds 1000.0
---     H.liftEffect $ HS.notify listener val
---   pure emitter
 
 mapJsonResult
   :: forall m
@@ -133,10 +116,7 @@ handleTick
 handleTick =
   H.modify_
     \stx ->
-      let
-        oldVal = stx.tickDemo
-      in
-        stx { tickDemo = oldVal + 1 }
+       stx { tickCounter = stx.tickCounter + 1 }
 
 handleAction
   :: forall cs o m

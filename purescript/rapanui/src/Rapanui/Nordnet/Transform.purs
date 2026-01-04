@@ -5,7 +5,18 @@ module Rapanui.Nordnet.Transform
 
 import Prelude
 
-import Rapanui.Common (Bid(..), Ask(..), Status(..), Msg(..), Oid(..), Pid(..), Cid(..), Rtyp(..), OptionTicker(..))
+import Rapanui.Common
+  ( Bid(..)
+    , Ask(..)
+    , Spot(..)
+    , Status(..)
+    , Msg(..)
+    , Oid(..)
+    , Pid(..)
+    , Cid(..)
+    , Rtyp(..)
+    , OptionTicker(..)
+  )
 import Rapanui.Critter.Rules (AcceptRule, Critter, StockOptionPurchase)
 import Rapanui.Nordnet.CoreJson (JsonCritter, JsonPayload, JsonAccRule, StockOptionResponse)
 import Rapanui.StockMarket.StockOption (StockOption)
@@ -52,6 +63,7 @@ mapPayload payload =
   , ticker: OptionTicker payload.ticker
   , price: Ask payload.price
   , critters: mapCritters payload.critters
+  , isSold: false
   }
 
 mapPayloads :: Array JsonPayload -> Array StockOptionPurchase
@@ -66,8 +78,9 @@ mapStockOptionResponse response =
       , ask: Ask response.option.ask
       }
   in
-    { option: item
-    , status: Status response.status
+    { spot: Spot response.spot
+    , option: item
+    , optionStatus: Status response.optionStatus
     , msg: Msg response.msg
     }
 

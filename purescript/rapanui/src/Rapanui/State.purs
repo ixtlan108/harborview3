@@ -14,7 +14,7 @@ import Rapanui.Common (MainAction)
 
 type State =
   { stockOptions :: Array StockOptionPurchase
-  , tickDemo :: Int
+  , tickCounter :: Int
   , interval :: Maybe Number
   , subId :: Maybe SubscriptionId
   , emitter :: Maybe (Emitter MainAction)
@@ -24,7 +24,7 @@ type State =
 defaultState :: State
 defaultState =
   { stockOptions: []
-  , tickDemo: 0
+  , tickCounter: 0
   , interval: Just 300.0 -- seconds ie 5 minutes
   , subId: Nothing
   , emitter: Nothing

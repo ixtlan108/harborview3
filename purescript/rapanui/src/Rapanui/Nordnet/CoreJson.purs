@@ -51,12 +51,6 @@ type JsonPayload =
   , critters :: Array JsonCritter
   }
 
-type CritterResponsex =
-  { appStatusCode :: Int
-  , error :: Maybe String
-  , payload :: Array JsonPayload
-  }
-
 type CritterResponse = PayloadResponse (Array JsonPayload)
 
 critterResponseDecoder :: Json -> Either JsonDecodeError CritterResponse
@@ -76,8 +70,9 @@ type JsonStockOptionItem =
   }
 
 type StockOptionResponse =
-  { option :: JsonStockOptionItem
-  , status :: Int
+  { spot :: Number
+  , option :: JsonStockOptionItem
+  , optionStatus :: Int
   , msg :: String
   }
 

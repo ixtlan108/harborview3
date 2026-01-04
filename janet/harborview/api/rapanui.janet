@@ -31,6 +31,12 @@
 
 (joy/route :get "/critter/purchase/:purchasetype" purchase)
 
+(defn stock-option [req]
+  (printf "%q" req)
+  (let (response {:appstatus 0 :msg nil :payload [(ticker-payload)]})
+    (r/respond :json (j/encode response))))
+
+(joy/route :get "/rapanui/stockoption/:ticker" stock-option)
 
 # {"appStatusCode": 1,
 #  "error": null,

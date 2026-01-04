@@ -3,16 +3,26 @@ module Rapanui.Critter.CritterRule
 
 import Prelude
 
+--import Data.Array as AR
+--import Data.Maybe (fromJust)
+--import Partial.Unsafe (unsafePartial)
 import Rapanui.Common (Ask)
 import Rapanui.Critter.AcceptRule as A
-import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
-import Rapanui.StockMarket.StockOption (StockOption)
 import Rapanui.Critter.Rules (Critter)
+import Rapanui.StockMarket.OptionSaleItem (OptionSale(..), validOptionSales)
+import Rapanui.StockMarket.StockOption (StockOption)
 
 
-extractSale :: Array OptionSale -> OptionSale
-extractSale sales =
-  NoSale
+-- extractSale :: Array OptionSale -> OptionSale
+-- extractSale sales =
+--   let
+--     result = validOptionSales sales
+--   in
+--   if AR.null result == true then
+--     NoSale
+--   else
+--     unsafePartial $ fromJust $ AR.head result
+
 {-
   let
     hits = [x | x@(Sale{}) <- sales] :: [OptionSale]
@@ -22,13 +32,13 @@ extractSale sales =
       (x : _) -> x
 -}
 
-applyCritter :: Ask -> StockOption -> Critter -> OptionSale
+applyCritter :: Ask -> StockOption -> Critter -> Array OptionSale
 applyCritter s o c =
   if c.status == 7
     then
-      extractSale $ map (A.applyAcc s o) c.accRules
+      validOptionSales $ map (A.applyAcc s o) c.accRules
     else
-      NotActive
+      [NotActive]
 
 {-
   if status c == 7

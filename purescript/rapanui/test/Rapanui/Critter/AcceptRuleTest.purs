@@ -4,7 +4,7 @@ module Test.Rapanui.Critter.AcceptRuleTest
 
 import Prelude
 
-import Rapanui.Common (AccVal(..), Ask(..), Bid(..), Status(..), Msg(..), Oid(..), Pid(..), Cid(..), Rtyp(..))
+import Rapanui.Common (AccVal(..), Ask(..), Bid(..), Spot(..), Status(..), Msg(..), Oid(..), Pid(..), Cid(..), Rtyp(..))
 import Rapanui.StockMarket.StockOption (StockOption)
 import Rapanui.Critter.Rules (AcceptRule)
 import Rapanui.Critter.AcceptRule as Acc
@@ -29,16 +29,11 @@ acc1 v =
 
 s1 :: StockOption
 s1 =
-  let
-    item =
-      { bid: Bid 9.0
-      , ask: Ask 11.0
-      }
-  in
-    { option: item
-    , status: Status 7
-    , msg: Msg ""
-    }
+  { spot: Spot 120.0
+  , option: { bid: Bid 9.0, ask: Ask 11.0 }
+  , optionStatus: Status 7
+  , msg: Msg ""
+  }
 
 
 c1 :: Cid
@@ -46,13 +41,11 @@ c1 = Cid 47
 
 createResponse :: Number -> Number -> Int -> StockOptionResponse
 createResponse bid ask status =
-  let
-    item = { bid: bid, ask: ask }
-  in
-    { option: item
-    , status: status
-    , msg: ""
-    }
+  { spot: 120.0
+  , option: { bid: bid, ask: ask }
+  , optionStatus: status
+  , msg: ""
+  }
 
 testAccRuleSuite :: TestSuite
 testAccRuleSuite =

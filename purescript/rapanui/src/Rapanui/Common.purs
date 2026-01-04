@@ -1,5 +1,6 @@
 module Rapanui.Common
   ( AccVal(..)
+  , Spot(..)
   , Ask(..)
   , Bid(..)
   , Cid(..)
@@ -37,7 +38,7 @@ data MainAction
 
 newtype OptionTicker = OptionTicker String
 
-derive instance genericOptionTicker :: Generic OptionTicker _
+derive instance Generic OptionTicker _
 instance Show OptionTicker where
   show = genericShow
 
@@ -45,13 +46,13 @@ instance Show OptionTicker where
 
 newtype Oid = Oid Int
 
-derive instance genericOid :: Generic Oid _
+derive instance Generic Oid _
 instance Show Oid where
   show = genericShow
 
 newtype Pid = Pid Int
 
-derive instance genericPid :: Generic Pid _
+derive instance Generic Pid _
 instance Show Pid where
   show = genericShow
 
@@ -59,13 +60,21 @@ newtype Cid = Cid Int
 
 derive instance Eq Cid
 
-derive instance genericCid :: Generic Cid _
+derive instance Generic Cid _
 instance Show Cid where
   show = genericShow
 
+-- newtype SaleAmount = SaleAmount Int
+
+-- derive instance Eq SaleAmount
+
+-- derive instance Generic SaleAmount _
+-- instance Show SaleAmount where
+--   show = genericShow
+
 newtype Rtyp = Rtyp Int
 
-derive instance genericRtyp :: Generic Rtyp _
+derive instance Generic Rtyp _
 instance Show Rtyp where
   show = genericShow
 
@@ -83,9 +92,11 @@ newtype Bid = Bid Number
 
 derive instance Eq Bid
 
-derive instance genericBid :: Generic Bid _
+derive instance Generic Bid _
 instance Show Bid where
   show = genericShow
+
+newtype Spot = Spot Number
 
 newtype Ask = Ask Number
 
