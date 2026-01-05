@@ -11,6 +11,6 @@ import Test.Unit.Main (runTest)
 
 main :: Effect Unit
 main = runTest do
-  --testAccRuleSuite
-  --testOptionSaleSuite
+  testAccRuleSuite
+  testOptionSaleSuite
   testCoreSuite
