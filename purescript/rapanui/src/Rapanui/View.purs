@@ -65,7 +65,8 @@ critterPart crit =
       in
         [ HH.td [] [ HH.text (Common.fromInt oid) ]
         , HH.td [] [ HH.text ("10") ]
-        , HH.td [] [ HH.text (Common.fromInt c.status) ]
+        --, HH.td [] [ HH.text (Common.fromInt c.status) ]
+        , HH.td [] [ HH.text (show c.status) ]
         , HH.td [] [ HH.text "New Acc Rule" ]
         --, HH.td [] [ H.a [ A.href "#", A.class "newaccrule href-td", E.onClick (AccRuleMsgFor (NewAccRule <| Oid c.oid)) ] [ HH.text "New Acc" ] ]
         ]

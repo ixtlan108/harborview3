@@ -4,12 +4,13 @@ module Test.Rapanui.Critter.CoreTest
 
 import Prelude
 
-import Rapanui.Common (Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), OptionTicker(..), Pid(..), Rtyp(..), Spot(..), Status(..))
+import Rapanui.Common (Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), OptionTicker(..), Pid(..), Rtyp(..), Spot(..), Status(..), StatusCode(..))
+import Rapanui.Critter.Core as Core
 import Rapanui.Critter.CritterRule as Critter
 import Rapanui.Critter.Rules (StockOptionPurchase, AcceptRule, Critter)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
-import Rapanui.StockMarket.StockOption (StockOption)
-import Test.Unit (TestSuite, suite, test, walkSuite)
+import Rapanui.StockMarket.StockOption (StockOption, StockOptionItem)
+import Test.Unit (TestSuite, suite, test)
 import Test.Unit.Assert as Assert
 
 o1 :: StockOption
@@ -34,7 +35,7 @@ c1 :: Critter
 c1 =
   { oid: Oid 12
     , vol: 10
-    , status: 7
+    , status: CRITTER_ACTIVE
     , accRules: []
   }
 
@@ -50,5 +51,5 @@ p1 =
 testCoreSuite :: TestSuite
 testCoreSuite =
   suite "TestCoreSuite" do
-    test "NoSale:w'" do
+    test "NoSale" do
       Assert.equal 1 1

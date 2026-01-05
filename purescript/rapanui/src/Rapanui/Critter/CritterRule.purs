@@ -3,10 +3,7 @@ module Rapanui.Critter.CritterRule
 
 import Prelude
 
---import Data.Array as AR
---import Data.Maybe (fromJust)
---import Partial.Unsafe (unsafePartial)
-import Rapanui.Common (Ask)
+import Rapanui.Common (Ask, StatusCode(..))
 import Rapanui.Critter.AcceptRule as A
 import Rapanui.Critter.Rules (Critter)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..), validOptionSales)
@@ -34,7 +31,7 @@ import Rapanui.StockMarket.StockOption (StockOption)
 
 applyCritter :: Ask -> StockOption -> Critter -> Array OptionSale
 applyCritter s o c =
-  if c.status == 7
+  if c.status == CRITTER_ACTIVE
     then
       validOptionSales $ map (A.applyAcc s o) c.accRules
     else
