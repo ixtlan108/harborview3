@@ -23,6 +23,7 @@ import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
 import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
+import Rapanui.Critter.Core as Core
 
 
 mapJsonResult
@@ -98,15 +99,15 @@ handleFetchCritters
 handleFetchCritters =
   H.get >>= \st ->
     case st.stockOptions of
-            [] ->
-              H.liftAff Nordnet.fetchCritters >>= \result ->
-                case result of
-                  Left err ->
-                    liftEffect $ handleError err
-                  Right result1 ->
-                    mapJsonResult result1
-            _ ->
-              pure unit
+      [] ->
+        H.liftAff Nordnet.fetchCritters >>= \result ->
+          case result of
+            Left err ->
+              liftEffect $ handleError err
+            Right result1 ->
+              mapJsonResult result1
+      _ ->
+        pure unit
 
 handleTick
   :: forall m
@@ -114,9 +115,12 @@ handleTick
   => MonadAff m
   => m Unit
 handleTick =
-  H.modify_
-    \stx ->
-       stx { tickCounter = stx.tickCounter + 1 }
+  H.get >>= \st ->
+    H.liftAff (Core.applyPurchases st.stockOptions) >>= \result ->
+      (liftEffect $ logShow $ result) *>
+      H.modify_
+        \stx ->
+          stx { tickCounter = stx.tickCounter + 1, optionSales = result }
 
 handleAction
   :: forall cs o m

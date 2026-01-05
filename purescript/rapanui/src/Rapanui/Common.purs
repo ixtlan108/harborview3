@@ -17,6 +17,7 @@ module Rapanui.Common
   , Rtyp(..)
   , StatusCode(..)
   , Status(..)
+  , rtypDesc
   ) where
 
 -- import Prelude
@@ -111,6 +112,18 @@ derive instance Generic Rtyp _
 
 instance Show Rtyp where
   show = genericShow
+
+
+rtypDesc :: Rtyp -> String
+rtypDesc r =
+  case r of
+    DIFF_WATERMARK -> "Diff > last watermark by value"
+    DIFF_BOUGHT -> "Diff Bid Ask > acc. value"
+    OPTION_PRICE_ROOF -> "Option price roof (valid if below option price)"
+    OPTION_PRICE_FLOOR -> "Option price floor (valid if above option price)"
+    STOCK_PRICE_ROOF -> "Stock price roof (valid if below stock price)"
+    STOCK_PRICE_FLOOR -> "Stock price floor (valid if above stock price)"
+    NA -> "N/A"
 
 newtype CritterType = CritterType String
 

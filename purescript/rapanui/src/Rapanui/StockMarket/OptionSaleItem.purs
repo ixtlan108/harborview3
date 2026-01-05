@@ -25,6 +25,7 @@ data OptionSale
 derive instance Eq OptionSale
 
 derive instance Generic OptionSale _
+
 instance Show OptionSale where
   show = genericShow
 

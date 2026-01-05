@@ -2,6 +2,7 @@ module Rapanui.StockMarket.StockOption where
 
 -- import Prelude
 
+import Data.Maybe (Maybe)
 import Rapanui.Common (Bid,Ask,Spot,Status,Msg)
 
 type StockOptionItem =
@@ -13,5 +14,5 @@ type StockOption =
   { spot :: Spot
   , option :: StockOptionItem
   , optionStatus :: Status
-  , msg :: Msg
+  , msg :: Maybe Msg
   }

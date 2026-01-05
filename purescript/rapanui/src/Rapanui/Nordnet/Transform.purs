@@ -7,7 +7,7 @@ import Prelude
 
 import Rapanui.Common (Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), OptionTicker(..), Pid(..), Rtyp(..), Spot(..), Status(..), StatusCode(..))
 import Rapanui.Critter.Rules (AcceptRule, Critter, StockOptionPurchase)
-import Rapanui.Nordnet.CoreJson (JsonCritter, JsonPayload, JsonAccRule, StockOptionResponse)
+import Rapanui.Nordnet.CoreJson (JsonCritter, JsonPayload, JsonAccRule, StockOptionPayload)
 import Rapanui.StockMarket.StockOption (StockOption)
 
 --import Rapanui.State (State)
@@ -24,17 +24,31 @@ mapAccRule { oid, pid, cid, rtyp, value, active } =
   }
   -}
 
+  -- DIFF_WATERMARK        -- 1 |
+  -- | DIFF_BOUGHT         -- 7 |
+  -- | OPTION_PRICE_ROOF   -- 6 | Option price roof (valid if below option price)
+  -- | OPTION_PRICE_FLOOR  -- 5 | Option price floor (valid if above option price)
+  -- | STOCK_PRICE_ROOF    -- 4 | Stock price roof (valid if below stock price)
+  -- | STOCK_PRICE_FLOOR   -- 3 | Stock price floor (valid if above stock price)
+  -- | NA
+
 mapRtyp :: Int -> Rtyp
 mapRtyp ji =
   case ji of
+    1 -> DIFF_WATERMARK
+    3 -> STOCK_PRICE_FLOOR
+    4 -> STOCK_PRICE_ROOF
+    5 -> OPTION_PRICE_FLOOR
+    6 -> OPTION_PRICE_ROOF
     7 -> DIFF_BOUGHT
     _ -> NA
 
-mapStatusCode :: Int -> StatusCode
-mapStatusCode si =
-  case si of
-    7 -> CRITTER_ACTIVE
-    _  -> SNA
+-- mapStatusCode :: Int -> StatusCode
+-- mapStatusCode si =
+--   case si of
+--     7 -> CRITTER_ACTIVE
+--     9 -> CRITTER_SOLD
+--     _  -> SNA
 
 mapAccRule :: JsonAccRule -> AcceptRule
 mapAccRule ja =
@@ -50,7 +64,7 @@ mapCritter :: JsonCritter -> Critter
 mapCritter jc =
   { oid: Oid jc.oid
   , vol: jc.vol
-  , status: mapStatusCode jc.status
+  , status: jc.status -- mapStatusCode jc.status
   , accRules: map mapAccRule jc.accRules
   }
 
@@ -71,18 +85,19 @@ mapPayloads :: Array JsonPayload -> Array StockOptionPurchase
 mapPayloads payloads =
   map mapPayload payloads
 
-mapStockOptionResponse :: StockOptionResponse -> StockOption
+mapStockOptionResponse :: StockOptionPayload -> StockOption
 mapStockOptionResponse response =
   let
+    pl = response.payload
     item =
-      { bid: Bid response.option.bid
-      , ask: Ask response.option.ask
+      { bid: Bid pl.option.bid
+      , ask: Ask pl.option.ask
       }
   in
-    { spot: Spot response.spot
+    { spot: Spot pl.spot
     , option: item
-    , optionStatus: Status response.optionStatus
-    , msg: Msg response.msg
+    , optionStatus: Status pl.optionStatus
+    , msg: Msg <$> pl.msg
     }
 
 {-

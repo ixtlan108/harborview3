@@ -171,26 +171,27 @@
   (let [with-joy (dyn :x-joy)]
     (run (template-app pkg main stem with-joy))))
 
-(defn build-app (pkg)
-  (printf "BUILD %s.." pkg)
-  (os/cd co/src-ps)
-  (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg])
-  (os/cd co/cud))
+(defn build-app [pkg]
+  (if (dyn :x-build) 
+    (do
+      (printf "BUILD %s.." pkg)
+      (os/cd co/src-ps)
+      (if (dyn :x-quiet) 
+         (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
+         (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
+      (os/cd co/cud))))
 
 (defn run-rapanui []
-  (if (dyn :x-build) 
-    (build-app "rapanui")
-    (run-template-app "rapanui" "RapanuiMain" "rapanui")))
+  (build-app "rapanui")
+  (run-template-app "rapanui" "RapanuiMain" "rapanui"))
 
 (defn run-maunaloa []
-  (if (dyn :x-build) 
-    (build-app "rigaphoto-app")
-    (run-template-app "maunaloa" "Main" "maunaloa")))
+  (build-app "rigaphoto-app")
+  (run-template-app "maunaloa" "Main" "maunaloa"))
 
 (defn run-optionpurchase[]
-  (if (dyn :x-build) 
-    (build-app "rigaphoto-app")
-    (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase")))
+  (build-app "rigaphoto-app")
+  (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
 
 (def elm-cmd "/usr/local/bin/elm")
 
@@ -222,26 +223,22 @@
   (os/cd ps-dir))
 
 (defn run-critters []
-  (if (dyn :x-build) 
-    (build-app "rigaphoto-app")
-    (do
-       (print "Enter run-options..")
-       (when (dyn :x-elm)
-         (compile-elm-critters))
-       (let [cfg (critters)
-               spago-md5 (run-spago cfg)]
-           (print "run-critters: " spago-md5)
-           (render-critters cfg spago-md5)
-           (copy-spago-files cfg spago-md5)))))
+  (build-app "rigaphoto-app")
+  (print "Enter run-options..")
+  (when (dyn :x-elm)
+    (compile-elm-critters))
+  (let [cfg (critters)
+          spago-md5 (run-spago cfg)]
+    (print "run-critters: " spago-md5)
+    (render-critters cfg spago-md5)
+    (copy-spago-files cfg spago-md5)))
 
 (defn run-options []
-  (if (dyn :x-build) 
-    (build-app "rigaphoto-app")
-    (do
-      (print "Enter run-options.."
-        (when (dyn :x-elm)
-          (compile-elm))
-        (run (options))))))
+  (build-app "rigaphoto-app")
+  (print "Enter run-options..")
+  (when (dyn :x-elm)
+    (compile-elm))
+  (run (options)))
 
 
 (def PROJ {"1" run-rapanui 
@@ -257,6 +254,7 @@
         spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
     (with-dyns [:x-css (argx "css")
                 :x-spago (argx "spago")
+                :x-quiet (argx "quiet")
                 :x-elm (argx "elm")
                 :x-joy (argx "joy")
                 :x-md5-cmd md5-cmd
@@ -274,6 +272,7 @@
             "joy"   {:kind :flag    :short "j" :default false :help "Joy backend. Default: false"}
             "css"   {:kind :flag    :short "s" :default false :help "Generate css file. Default: false"}
             "spago" {:kind :flag    :short "g" :default false :help "Generate ps file. Default: false"}
+            "quiet" {:kind :flag    :short "q" :default false :help "Show only errors on build. Default: false"}
             "build" {:kind :flag    :short "b" :default false :help "Build project(s). Default: false"})]
     (if (not= argx nil)
       (run argx))))

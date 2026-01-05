@@ -12,7 +12,7 @@ import Effect.Aff (Aff)
 import HarborView.Common (HarborViewError)
 import HarborView.Util.HttpUtil as HU
 import Rapanui.Common (OptionTicker(..))
-import Rapanui.Nordnet.CoreJson (CritterResponse, DefaultResponse, StockOptionResponse)
+import Rapanui.Nordnet.CoreJson (CritterResponse, DefaultResponse, StockOptionPayload)
 import Rapanui.Nordnet.CoreJson as CoreJson
 
 fetchCritters :: Aff (Either HarborViewError CritterResponse)
@@ -21,7 +21,7 @@ fetchCritters =
     "http://localhost:8082/critter/purchase/11"
     CoreJson.critterResponseDecoder
 
-fetchStockOption :: OptionTicker -> Aff (Either HarborViewError StockOptionResponse) 
+fetchStockOption :: OptionTicker -> Aff (Either HarborViewError StockOptionPayload)
 fetchStockOption (OptionTicker ticker) =
   HU.get
     ("http://localhost:8082/rapanui/stockoption/" <> ticker)
@@ -32,4 +32,3 @@ toggleAccActive oid isChecked =
   HU.get
     ("http://localhost:8082/rapanui/toggleAccrule/" <> show oid <> "/" <> show isChecked)
     CoreJson.defaultResponseDecoder
-

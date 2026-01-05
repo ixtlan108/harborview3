@@ -5,6 +5,7 @@ module Rapanui.Nordnet.CoreJson
   , JsonCritter
   , JsonPayload
   , StockOptionResponse
+  , StockOptionPayload
   , JsonStockOptionItem
   , PayloadResponse
   , critterResponseDecoder
@@ -73,10 +74,12 @@ type StockOptionResponse =
   { spot :: Number
   , option :: JsonStockOptionItem
   , optionStatus :: Int
-  , msg :: String
+  , msg :: Maybe String
   }
 
-stockOptionDecoder :: Json -> Either JsonDecodeError StockOptionResponse
+type StockOptionPayload = PayloadResponse StockOptionResponse
+
+stockOptionDecoder :: Json -> Either JsonDecodeError StockOptionPayload
 stockOptionDecoder = Decode.decodeJson
 
 {-
