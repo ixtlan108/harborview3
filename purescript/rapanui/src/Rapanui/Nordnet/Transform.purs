@@ -50,7 +50,7 @@ mapCritter :: JsonCritter -> Critter
 mapCritter jc =
   { oid: Oid jc.oid
   , vol: jc.vol
-  , status: mapStatusCode jc.status
+  , status: jc.status -- mapStatusCode jc.status
   , accRules: map mapAccRule jc.accRules
   }
 

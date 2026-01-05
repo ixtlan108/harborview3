@@ -35,7 +35,7 @@ c1 :: Critter
 c1 =
   { oid: Oid 12
     , vol: 10
-    , status: CRITTER_ACTIVE
+    , status: 7 -- CRITTER_ACTIVE
     , accRules: []
   }
 
