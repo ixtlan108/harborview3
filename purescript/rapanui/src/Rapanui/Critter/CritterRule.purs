@@ -3,11 +3,13 @@ module Rapanui.Critter.CritterRule
 
 import Prelude
 
-import Data.Array as AR
-import Rapanui.Common (Ask)
-import Rapanui.Critter.AcceptRule as A
+import Data.Maybe (Maybe(..))
+import Data.Array as A
+---import Rapanui.Common (Ask)
+import Rapanui.Common (Ask, Cid(..), Bid(..))
+import Rapanui.Critter.AcceptRule as Acc
 import Rapanui.Critter.Rules (Critter)
-import Rapanui.StockMarket.OptionSaleItem (OptionSale(..), validOptionSales)
+import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
 import Rapanui.StockMarket.StockOption (StockOption)
 
 
@@ -40,24 +42,29 @@ saleHit s =
 
 hasSale :: Array OptionSale -> Boolean
 hasSale sales =
-  AR.any saleHit sales
+  A.any saleHit sales
 
-applyCritter :: Ask -> StockOption -> Critter -> Array OptionSale
+applyCritter :: Ask -> StockOption -> Critter -> OptionSale
 applyCritter s o c =
   case c.status of
     7 -> -- CRITTER_ACTIVE
       let
-        result = validOptionSales $ map (A.applyAcc s o) c.accRules
-        _ = if hasSale result then
-              setStatus c 9
-            else
-              unit
+        result = map (Acc.applyAcc s o) c.accRules
+        hit = A.find saleHit result
       in
-        result
+        case hit of
+          Just hit1 ->
+            hit1
+          Nothing ->
+            NoSale
     9 -> -- CRITTER_SOLD
-      [NoSale]
+      NoSale
     _ ->
-      [NotActive]
+      NotActive
+
+-- demo :: Array OptionSale
+-- demo =
+--   [NoSale,NoSale,Sale {critterId: Cid 1, price: Bid 12.9}]
 
 {-
   if status c == 7

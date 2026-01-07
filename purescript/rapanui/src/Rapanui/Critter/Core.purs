@@ -25,7 +25,7 @@ applyPurchase_ opx purchase =
     ask = opx.option.ask
     fn = Critter.applyCritter ask opx
   in
-    Ar.concat $ map fn purchase.critters
+    map fn purchase.critters
 
 applyPurchase :: StockOptionPurchase -> Aff (Array OptionSale)
 applyPurchase purchase =
