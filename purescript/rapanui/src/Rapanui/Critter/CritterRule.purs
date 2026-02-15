@@ -5,8 +5,8 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Array as A
----import Rapanui.Common (Ask)
-import Rapanui.Common (Ask, Cid(..), Bid(..))
+import Rapanui.Common (Ask)
+--import Rapanui.Common (Ask, Cid(..), Bid(..))
 import Rapanui.Critter.AcceptRule as Acc
 import Rapanui.Critter.Rules (Critter)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
@@ -40,9 +40,9 @@ saleHit s =
     Sale _ -> true
     _ -> false
 
-hasSale :: Array OptionSale -> Boolean
-hasSale sales =
-  A.any saleHit sales
+-- hasSale :: Array OptionSale -> Boolean
+-- hasSale sales =
+--   A.any saleHit sales
 
 applyCritter :: Ask -> StockOption -> Critter -> OptionSale
 applyCritter s o c =
@@ -54,7 +54,10 @@ applyCritter s o c =
       in
         case hit of
           Just hit1 ->
-            hit1
+            let
+              _ = setStatus c 9
+            in
+              hit1
           Nothing ->
             NoSale
     9 -> -- CRITTER_SOLD
@@ -65,9 +68,3 @@ applyCritter s o c =
 -- demo :: Array OptionSale
 -- demo =
 --   [NoSale,NoSale,Sale {critterId: Cid 1, price: Bid 12.9}]
-
-{-
-  if status c == 7
-    then extractSale $ map (A.apply s o) (accRules c)
-    else NotActive
--}

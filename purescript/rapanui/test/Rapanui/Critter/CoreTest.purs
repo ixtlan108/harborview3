@@ -31,25 +31,33 @@ a1 =
     , active: true
   }
 
-c1 :: Critter
-c1 =
+crCritter :: Int -> Critter
+crCritter status =
   { oid: Oid 12
     , vol: 10
-    , status: 7 -- CRITTER_ACTIVE
-    , accRules: []
+    , status: status -- CRITTER_ACTIVE
+    , accRules: [a1]
   }
 
-p1 :: StockOptionPurchase
-p1 =
+crPurchase :: Array Critter -> StockOptionPurchase
+crPurchase critters =
   { ticker: OptionTicker "YAR"
     , oid: Oid 100
     , price: Ask 12.0
-    , critters: [] -- Array Critter
+    , critters: critters
     , isSold: false
   }
 
 testCoreSuite :: TestSuite
 testCoreSuite =
   suite "TestCoreSuite" do
-    test "NoSale" do
+    test "is100PctSold == false" do
+      let c1 = [crCritter 7, crCritter 9]
+      let p1 = crPurchase c1
+      Assert.equal (Core.is100PctSold p1) false
+    test "is100PctSold == true" do
+      let c2 = [crCritter 9, crCritter 9]
+      let p2 = crPurchase c2
+      Assert.equal (Core.is100PctSold p2) true
+    test "Critter setStatus" do
       Assert.equal 1 1
