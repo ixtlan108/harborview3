@@ -15,17 +15,13 @@ import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
-import HarborView.ModalDialog as DLG
-import HarborView.UI.Button (ButtonParams, mkButton)
+--import HarborView.ModalDialog as DLG
 import HarborView.UI.Checkbox as CB
-import HarborView.UI.Common (InputWrapperParams, Title(..), mkInputWrapper)
-import HarborView.UI.Input (InputParams)
-import HarborView.UI.Input as Inp
 import Rapanui.Command (handleAction)
-import Rapanui.Common (MainAction(..), Oid(..), OptionTicker(..), Rtyp(..))
+import Rapanui.Common (MainAction(..), Oid(..), OptionTicker(..))
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
 import Rapanui.State (State, defaultState)
-import Web.UIEvent.MouseEvent (MouseEvent)
+import Rapanui.UI as RU
 
 --noSort ∷ ∀ r i. Array (IProp (class ∷ String | r) i)
 --noSort =
@@ -162,25 +158,6 @@ createTable :: ∀ w. State -> HTML w MainAction
 createTable st =
   HH.div_ $ map details st.stockOptions
 
-defaultButtonParams :: forall i. String -> (MouseEvent -> i) -> ButtonParams i
-defaultButtonParams t curEvt =
-  let
-    clazz =
-      "ps-mr-1 ps-btn btn btn-outline-success"
-  in
-    { title: Title t
-    , evt: curEvt
-    , btnClazz: [ ClassName clazz ]
-    , disabled: false
-    }
-
-defaultInputParams :: forall i. (String -> i) -> InputParams i
-defaultInputParams curEvt =
-    { evt: curEvt
-    , disabled: false
-    , clazz: [ ClassName "form-control ps-input" ]
-    , placeholder: Nothing
-    }
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
 component =
@@ -191,33 +168,25 @@ component =
     , eval: H.mkEval H.defaultEval { handleAction = handleAction }
     }
 
-wrapperParams :: String -> InputWrapperParams
-wrapperParams t =
-  { title: Title t
-  , lblClazz: [ ClassName "ps-label" ]
-  , spanClazz: [ ClassName "form-group ps-mr-1" ]
-  }
-
 render :: ∀ s m. MonadAff m => State -> H.ComponentHTML MainAction s m
 render st =
   let
     interval =
-      (mkInputWrapper (wrapperParams "Interval")
-        (Inp.mkInputNum st.interval $ (defaultInputParams $ IntervalChange))) -- { style = Just $ isDoneStyle phs.isDone }))
+      RU.inpInterval st.interval
 
     tick =
-      (mkInputWrapper (wrapperParams "Tick")
-        (Inp.mkInputInt (Just st.tickCounter) $ (defaultInputParams $ Noop))) -- { style = Just $ isDoneStyle phs.isDone }))
+      RU.inpTick (Just st.tickCounter)
+
     buttons =
-      [ mkButton $ defaultButtonParams "Fetch Purchases" FetchPurchases
-      , mkButton $ defaultButtonParams "Start Timer" (Timer true)
-      , mkButton $ defaultButtonParams "Stop Timer" (Timer false)
+      [ RU.fetchPurchases
+      , RU.startTimer
+      , RU.stopTimer
       ]
   in
   HH.div [ HP.classes [ ClassName "containerx" ] ]
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
-      , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick]
-      , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st]
+      , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
+      , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
       -- , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 

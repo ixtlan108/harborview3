@@ -7,7 +7,7 @@ import Prelude
 
 import Rapanui.Common (Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), OptionTicker(..), Pid(..), Rtyp(..), Spot(..), Status(..), StatusCode(..))
 import Rapanui.Critter.Rules (AcceptRule, Critter, StockOptionPurchase)
-import Rapanui.Nordnet.CoreJson (JsonCritter, JsonPayload, JsonAccRule, StockOptionResponse)
+import Rapanui.Nordnet.CoreJson (JsonCritter, JsonPayload, JsonAccRule, StockOptionPayload)
 import Rapanui.StockMarket.StockOption (StockOption)
 
 --import Rapanui.State (State)
@@ -71,18 +71,19 @@ mapPayloads :: Array JsonPayload -> Array StockOptionPurchase
 mapPayloads payloads =
   map mapPayload payloads
 
-mapStockOptionResponse :: StockOptionResponse -> StockOption
+mapStockOptionResponse :: StockOptionPayload -> StockOption
 mapStockOptionResponse response =
   let
+    pl = response.payload
     item =
-      { bid: Bid response.option.bid
-      , ask: Ask response.option.ask
+      { bid: Bid pl.option.bid
+      , ask: Ask pl.option.ask
       }
   in
-    { spot: Spot response.spot
+    { spot: Spot pl.spot
     , option: item
-    , optionStatus: Status response.optionStatus
-    , msg: Msg response.msg
+    , optionStatus: Status pl.optionStatus
+    , msg: Msg <$> pl.msg
     }
 
 {-

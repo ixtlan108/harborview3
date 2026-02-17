@@ -4,10 +4,11 @@ module Test.Rapanui.Critter.AcceptRuleTest
 
 import Prelude
 
+import Data.Maybe (Maybe(..))
 import Rapanui.Common (AccVal(..), Ask(..), Bid(..), Cid(..), Msg(..), Oid(..), Pid(..), Rtyp(..), Spot(..), Status(..))
 import Rapanui.Critter.AcceptRule as Acc
 import Rapanui.Critter.Rules (AcceptRule)
-import Rapanui.Nordnet.CoreJson (StockOptionResponse)
+import Rapanui.Nordnet.CoreJson (StockOptionPayload)
 import Rapanui.Nordnet.Transform as Transform
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
 import Rapanui.StockMarket.StockOption (StockOption)
@@ -29,19 +30,22 @@ s1 =
   { spot: Spot 120.0
   , option: { bid: Bid 9.0, ask: Ask 11.0 }
   , optionStatus: Status 7
-  , msg: Msg ""
+  , msg: Nothing
   }
 
 
 c1 :: Cid
 c1 = Cid 47
 
-createResponse :: Number -> Number -> Int -> StockOptionResponse
+createResponse :: Number -> Number -> Int -> StockOptionPayload
 createResponse bid ask status =
-  { spot: 120.0
-  , option: { bid: bid, ask: ask }
-  , optionStatus: status
-  , msg: ""
+  { appstatus : 0
+    , payload: { spot: 120.0
+                 , option: { bid: bid, ask: ask }
+                 , optionStatus: status
+                 , msg: Nothing
+                 }
+    , msg: Just "-"
   }
 
 testAccRuleSuite :: TestSuite

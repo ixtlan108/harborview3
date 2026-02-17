@@ -257,6 +257,7 @@
         spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
     (with-dyns [:x-css (argx "css")
                 :x-spago (argx "spago")
+                :x-quiet (argx "quiet")
                 :x-elm (argx "elm")
                 :x-joy (argx "joy")
                 :x-md5-cmd md5-cmd
@@ -274,6 +275,7 @@
             "joy"   {:kind :flag    :short "j" :default false :help "Joy backend. Default: false"}
             "css"   {:kind :flag    :short "s" :default false :help "Generate css file. Default: false"}
             "spago" {:kind :flag    :short "g" :default false :help "Generate ps file. Default: false"}
+            "quiet" {:kind :flag    :short "q" :default false :help "Show only errors on build. Default: false"}
             "build" {:kind :flag    :short "b" :default false :help "Build project(s). Default: false"})]
     (if (not= argx nil)
       (run argx))))

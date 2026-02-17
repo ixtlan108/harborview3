@@ -31,9 +31,26 @@
 
 (joy/route :get "/critter/purchase/:purchasetype" purchase)
 
+(var stock-opt-counter 0)
+
+(defn option [spot bid ask]
+  { :spot spot :option {:bid bid :ask ask} :optionStatus 0 :msg nil})
+
+(defn inc-counter []
+  (set stock-opt-counter (inc stock-opt-counter)))
+
+(defn get-stock-opt []
+  (case stock-opt-counter
+    1 (option 100.0 10.0 11.0)
+    2 (option 102.0 10.5 11.5)
+    3 (option 104.0 12.5 14.5)
+    4 (option 103.0 11.5 13.5)
+    (option 200.0 20.0 24.0)))
+
 (defn stock-option [req]
   (printf "%q" req)
-  (let (response {:appstatus 0 :msg nil :payload [(ticker-payload)]})
+  (inc-counter)
+  (let (response {:appstatus 0 :msg nil :payload (get-stock-opt)})
     (r/respond :json (j/encode response))))
 
 (joy/route :get "/rapanui/stockoption/:ticker" stock-option)

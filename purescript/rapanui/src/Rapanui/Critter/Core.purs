@@ -6,7 +6,7 @@ import Data.Array as A
 import Data.Either (Either(..))
 import Data.Traversable (traverse)
 import Effect.Aff (Aff)
-import Effect (Effect)
+--import Effect (Effect)
 --import Effect.Class (liftEffect)
 import HarborView.Common (errToString)
 
@@ -17,12 +17,10 @@ import Rapanui.Nordnet.Transform as Transform
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
 import Rapanui.StockMarket.StockOption (StockOption)
 
-foreign import setIsSold :: StockOptionPurchase -> Effect Unit
-
 applyPurchase_ :: StockOption -> StockOptionPurchase -> Array OptionSale
 applyPurchase_ opx purchase =
   let
-    ask = opx.option.ask
+    ask = purchase.price
     fn = Critter.applyCritter ask opx
   in
     map fn purchase.critters
