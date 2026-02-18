@@ -58,7 +58,7 @@ critterResponseDecoder :: Json -> Either JsonDecodeError CritterResponse
 critterResponseDecoder = Decode.decodeJson
 
 type DefaultResponse =
-  { appStatusCode :: Int
+  { appstatus :: Int
   , msg :: String
   }
 

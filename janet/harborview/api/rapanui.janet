@@ -56,6 +56,13 @@
 
 (joy/route :get "/rapanui/stockoption/:ticker" stock-option)
 
+(defn option-sales [req]
+  (printf "%q" req)
+  (let (response {:appstatus 0 :msg nil})
+    (r/respond :json (j/encode response))))
+
+(joy/route :put "/rapanui/optionsales" option-sales)
+
 # {"appStatusCode": 1,
 #  "error": null,
 #  "payload":

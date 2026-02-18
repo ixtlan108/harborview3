@@ -127,7 +127,8 @@ handleTickResult items =
     if A.null vs then
       pure unit
     else
-      pure unit
+      H.liftAff (Nordnet.registerSales items) *>
+        pure unit
 
 handleTick
   :: forall m
