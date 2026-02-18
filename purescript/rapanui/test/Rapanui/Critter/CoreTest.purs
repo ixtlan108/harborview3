@@ -94,7 +94,7 @@ testCoreSuite =
       let p4 = crPurchase [c5]
       let actual = Core.applyPurchase_ so2 p4
       Assert.equal [Sale { critterId: Cid 12, price: Bid 9.0 }] actual
-    test "Core.applyPurchase_ Multiple Critters [Sale Bid 9.0]" do
+    test "Core.applyPurchase_ Multiple Critters, only one sale [Sale Bid 9.0]" do
       let so3 = crStockOption (Bid 9.0)
       let c6_1 = critWithAcc (Oid 10) 7 2.0
       let c6_2 = critWithAcc (Oid 11) 7 5.0
@@ -103,4 +103,16 @@ testCoreSuite =
       let actual = Core.applyPurchase_ so3 p5
       Assert.equal [Sale { critterId: Cid 10, price: Bid 9.0 },NoSale,NoSale] actual
       let actual2 = Core.applyPurchase_ so3 p5
+      Assert.equal [NoSale,NoSale,NoSale] actual2
+    test "Core.applyPurchase_ Multiple Critters, multiple sales [2 x Sale Bid 9.0]" do
+      let so4 = crStockOption (Bid 9.0)
+      let c7_1 = critWithAcc (Oid 10) 7 2.0
+      let c7_2 = critWithAcc (Oid 11) 7 1.0
+      let c7_3 = critWithAcc (Oid 12) 9 2.0
+      let p6 = crPurchase [c7_1,c7_2,c7_3]
+      let actual = Core.applyPurchase_ so4 p6
+      Assert.equal [ Sale { critterId: Cid 10, price: Bid 9.0 }
+                    , Sale { critterId: Cid 11, price: Bid 9.0 }
+                    , NoSale] actual
+      let actual2 = Core.applyPurchase_ so4 p6
       Assert.equal [NoSale,NoSale,NoSale] actual2

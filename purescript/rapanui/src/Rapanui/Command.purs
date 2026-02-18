@@ -5,6 +5,7 @@ module Rapanui.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
+import Data.Array as A
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Number (fromString)
@@ -19,11 +20,13 @@ import HarborView.Common (handleError)
 import HarborView.HalogenCommon (timer)
 import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
+import Rapanui.Critter.Core as Core
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
 import Rapanui.Nordnet.Transform as Transform
 import Rapanui.State (State)
-import Rapanui.Critter.Core as Core
+import Rapanui.StockMarket.OptionSaleItem (OptionSale)
+import Rapanui.StockMarket.OptionSaleItem as OSI
 
 
 mapJsonResult
@@ -109,6 +112,23 @@ handleFetchCritters =
       _ ->
         pure unit
 
+handleTickResult
+  :: forall m
+   . MonadAff m
+  => Array OptionSale
+  -> m Unit
+handleTickResult items =
+  if A.null items then
+    pure unit
+  else
+    let
+      vs = OSI.validOptionSales items
+    in
+    if A.null vs then
+      pure unit
+    else
+      pure unit
+
 handleTick
   :: forall m
    . MonadState State m
@@ -118,9 +138,10 @@ handleTick =
   H.get >>= \st ->
     H.liftAff (Core.applyPurchases st.stockOptions) >>= \result ->
       (liftEffect $ logShow $ result) *>
-      H.modify_
+      (H.modify_
         \stx ->
-          stx { tickCounter = stx.tickCounter + 1, optionSales = result }
+          stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>
+      handleTickResult result
 
 handleAction
   :: forall cs o m
