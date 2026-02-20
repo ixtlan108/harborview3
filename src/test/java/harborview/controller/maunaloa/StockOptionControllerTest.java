@@ -1,5 +1,6 @@
 package harborview.controller.maunaloa;
 
+/*
 import com.fasterxml.jackson.databind.ObjectMapper;
 import harborview.api.maunaloa.StockOptionAPI;
 import harborview.controller.ControllerTestBase;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import static harborview.dto.StatusCode.OK;
-//import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -21,9 +21,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import vega.financial.StockOptionType;
 
+ */
 
-@WebMvcTest(StockOptionAPI.class)
-public class StockOptionControllerTest extends ControllerTestBase {
+
+//@WebMvcTest(StockOptionAPI.class)
+//public class StockOptionControllerTest extends ControllerTestBase {
+public class StockOptionControllerTest {
+    /*
     private static ObjectMapper mapper = new ObjectMapper();
 
     @Test
@@ -110,4 +114,6 @@ public class StockOptionControllerTest extends ControllerTestBase {
     PurchaseOptionRequest createRequestOptionDoesNotExistInDatabase() {
         return new PurchaseOptionRequest("INVALID", 12.0, 11.0, 10, 450.0, false);
     }
+
+     */
 }

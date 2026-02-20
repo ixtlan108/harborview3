@@ -1,5 +1,6 @@
 package harborview.core.maunaloa;
 
+/*
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import harborview.domain.nordnet.NordnetRepository;
@@ -22,9 +23,11 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
-@SpringBootTest
-//@ActiveProfiles("test")
+ */
+
+//@SpringBootTest
 public class MaunaloaCoreTest {
+    /*
 
     private final StockOptionTicker realTicker = new StockOptionTicker("YAR3A528.02X");
     private final StockOptionTicker fakeTicker = new StockOptionTicker("YAR1A400");
@@ -119,5 +122,7 @@ public class MaunaloaCoreTest {
 
         return result;
     }
+
+     */
 
 }

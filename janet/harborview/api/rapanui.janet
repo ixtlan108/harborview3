@@ -37,7 +37,9 @@
   { :spot spot :option {:bid bid :ask ask} :optionStatus 0 :msg nil})
 
 (defn inc-counter []
-  (set stock-opt-counter (inc stock-opt-counter)))
+  (if (> stock-opt-counter 5)
+    (set stock-opt-counter 1) 
+    (++ stock-opt-counter)))
 
 (defn get-stock-opt []
   (case stock-opt-counter
