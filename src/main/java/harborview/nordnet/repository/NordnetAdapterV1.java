@@ -6,10 +6,7 @@ import harborview.adapter.RedisAdapter;
 import harborview.nordnet.*;
 import harborview.nordnet.downloader.Downloader;
 import harborview.nordnet.downloader.PageInfo;
-import harborview.nordnet.stockmarket.StockOption;
-import harborview.nordnet.stockmarket.StockOptionTicker;
-import harborview.nordnet.stockmarket.StockPrice;
-import harborview.nordnet.stockmarket.StockTicker;
+import harborview.nordnet.stockmarket.*;
 import harborview.nordnet.util.ListUtil;
 import harborview.nordnet.util.StockOptionUtil;
 import org.jsoup.Jsoup;
@@ -87,23 +84,55 @@ public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepos
 
     @Override
     public List<StockOption> getPuts(StockTicker ticker) {
-        return List.of();
+        return getOptions(ticker, StockOptionType.PUT);
     }
 
     @Override
     public StockPrice getStockPrice(StockTicker ticker) {
-        return null;
+        var result = parse(ticker);
+        return result.first();
     }
 
     @Override
     public Tuple2<StockPrice, StockOption> findOption(StockOptionTicker ticker) {
-        return null;
+        var info = StockOptionUtil.stockOptionInfoFromTicker(ticker);
+
+        var key = keyFor(info);
+
+        var hit = cacheStockOption.getIfPresent(key);
+
+        if (hit == null) {
+
+            PageInfo page = getDownloader().download(info);
+
+            Tuple2<StockPrice, List<StockOption>> options = parse(info.getStockTicker(), page);
+
+            cacheStockOption.put(key, options);
+
+            hit = options;
+        }
+
+        var tickerS = ticker.value();
+
+        var opt = hit.second().stream().filter(s -> s.getTicker().value().equals(tickerS)).findFirst();
+
+        if (opt.isPresent()) {
+            return new Tuple2<>(hit.first(), opt.get());
+        }
+        else {
+            return null;
+        }
+
     }
 
     @Override
     public void resetCaffeine() {
         cacheStockOption.invalidateAll();
         cacheStockOptions.invalidateAll();
+    }
+
+    private String keyFor(StockOptionInfo info) {
+        return String.format("%d:%d", info.getStockTicker().oid(), info.getNordnetMillis());
     }
 
     private List<StockOption> getOptions(StockTicker ticker, StockOptionType ot) {

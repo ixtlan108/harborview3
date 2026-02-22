@@ -16,8 +16,6 @@ public class IntegrationDownloaderAdapter implements  Downloader<PageInfo> {
 
     private List<PageInfo> result = null;
 
-    private final String jsoupUurl = "file:///home/rcs/opt/java/harborview3/src/integration/resources/nordnet/jsoup.html";
-
     public IntegrationDownloaderAdapter() {
         this.client = new WebClient();
         this.client.getOptions().setJavaScriptEnabled(false);
@@ -28,7 +26,8 @@ public class IntegrationDownloaderAdapter implements  Downloader<PageInfo> {
         if (result == null) {
 
             try {
-                var page = client.getPage(jsoupUurl);
+                String jsoupUrl = "file:///home/rcs/opt/java/harborview3/src/integration/resources/nordnet/jsoup.html";
+                var page = client.getPage(jsoupUrl);
                 var content = page.getWebResponse().getContentAsString();
                 var info = new PageInfo(content);
 
@@ -44,6 +43,6 @@ public class IntegrationDownloaderAdapter implements  Downloader<PageInfo> {
 
     @Override
     public PageInfo download(StockOptionInfo info) {
-        return null;
+        return download(info.getStockTicker()).getFirst();
     }
 }
