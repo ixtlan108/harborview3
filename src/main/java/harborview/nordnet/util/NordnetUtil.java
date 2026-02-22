@@ -1,5 +1,8 @@
-package harborview.nordnet;
+package harborview.nordnet.util;
 
+
+import harborview.nordnet.stockmarket.StockOptionTicker;
+import harborview.nordnet.stockmarket.StockTicker;
 
 import java.net.MalformedURLException;
 import java.net.URL;

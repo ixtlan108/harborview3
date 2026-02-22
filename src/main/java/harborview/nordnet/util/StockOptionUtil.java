@@ -1,8 +1,8 @@
-package harborview.nordnet;
+package harborview.nordnet.util;
 
-import harborview.nordnet.StockTicker;
-import harborview.nordnet.StockOptionInfo;
-import harborview.nordnet.StockOptionTicker;
+import harborview.nordnet.stockmarket.StockTicker;
+import harborview.nordnet.stockmarket.StockOptionInfo;
+import harborview.nordnet.stockmarket.StockOptionTicker;
 import harborview.nordnet.Tuple2;
 import vega.financial.StockOptionType;
 
@@ -15,7 +15,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static harborview.nordnet.StockOptionInfo.StatusEnum.OK;
+import static harborview.nordnet.stockmarket.StockOptionInfo.StatusEnum.OK;
 import static vega.financial.StockOptionType.CALL;
 import static vega.financial.StockOptionType.PUT;
 

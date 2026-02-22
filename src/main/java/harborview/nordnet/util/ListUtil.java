@@ -1,4 +1,4 @@
-package harborview.nordnet;
+package harborview.nordnet.util;
 
 import java.util.ArrayList;
 import java.util.List;

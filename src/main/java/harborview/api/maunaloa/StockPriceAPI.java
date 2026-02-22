@@ -29,7 +29,7 @@ public class StockPriceAPI {
     }
 
     @GetMapping(value = "/spot/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PayloadResponse<SpotResponse>> getSpot(@PathVariable("oid") int oid) {
+    public ResponseEntity<PayloadResponse<SpotResponse>> getSpot(@PathVariable int oid) {
         var sp = maunaloaCore.getSpot(new StockTicker(oid));
         return ApiUtil.mapWithFn(sp,
                 r -> new SpotResponse(r.getOpn(),r.getHi(),r.getLo(),r.getCls(),r.getUnixTime()));
@@ -41,22 +41,22 @@ public class StockPriceAPI {
     }
 
     @GetMapping(value = "/days/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PayloadResponse<Charts>> days(@PathVariable("oid") int oid) {
+    public ResponseEntity<PayloadResponse<Charts>> days(@PathVariable int oid) {
         return ApiUtil.map(maunaloaCore.days(new StockTicker(oid)));
     }
 
     @GetMapping(value = "/weeks/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PayloadResponse<Charts>> weeks(@PathVariable("oid") int oid) {
+    public ResponseEntity<PayloadResponse<Charts>> weeks(@PathVariable int oid) {
         return ApiUtil.map(maunaloaCore.weeks(new StockTicker(oid)));
     }
 
     @GetMapping(value = "/months/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PayloadResponse<Charts>> months(@PathVariable("oid") int oid) {
+    public ResponseEntity<PayloadResponse<Charts>> months(@PathVariable int oid) {
         return ApiUtil.map(maunaloaCore.months(new StockTicker(oid)));
     }
 
     @PostMapping(value = "/calculate/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PayloadResponse<List<RiscResponse>>> calcRiscStockPrices(@PathVariable("oid") int oid, @RequestBody List<RiscRequest> riscs) {
+    public ResponseEntity<PayloadResponse<List<RiscResponse>>> calcRiscStockPrices(@PathVariable int oid, @RequestBody List<RiscRequest> riscs) {
         return ApiUtil.map(maunaloaCore.calcRiscStockPrices(riscs));
     }
 

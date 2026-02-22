@@ -1,10 +1,13 @@
-package harborview.nordnet;
+package harborview.nordnet.repository;
+
+import harborview.nordnet.downloader.Downloader;
+import harborview.nordnet.PageInfo;
 
 import java.time.LocalDate;
 
 public class NordnetAdapterBase {
 
-    private final Downloader<PageInfo> downloader;
+    private Downloader<PageInfo> downloader;
 
     public NordnetAdapterBase(Downloader<PageInfo> downloader) {
         this.downloader = downloader;

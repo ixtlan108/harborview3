@@ -1,4 +1,4 @@
-package harborview.nordnet;
+package harborview.nordnet.stockmarket;
 
 import vega.exception.BinarySearchException;
 import vega.financial.StockOptionType;

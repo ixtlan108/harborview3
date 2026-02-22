@@ -1,5 +1,6 @@
 package harborview.nordnet;
 
+import harborview.nordnet.util.ListUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
