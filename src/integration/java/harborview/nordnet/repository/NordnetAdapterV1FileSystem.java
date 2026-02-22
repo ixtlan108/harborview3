@@ -11,6 +11,7 @@ import vega.financial.calculator.OptionCalculator;
 @Component("adapter.filesystem")
 public class NordnetAdapterV1FileSystem extends NordnetAdapterV1 {
 
+
     public NordnetAdapterV1FileSystem(@Qualifier("filesystem") Downloader<PageInfo> downloader,
                                       RedisAdapter redisAdapter,
                                       @Qualifier("blackScholes") OptionCalculator blackScholes,

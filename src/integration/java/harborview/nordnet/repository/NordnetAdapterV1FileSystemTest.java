@@ -1,5 +1,6 @@
 package harborview.nordnet.repository;
 
+import harborview.nordnet.stockmarket.StockTicker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +14,7 @@ public class NordnetAdapterV1FileSystemTest {
 
     @Test
     void test_parse_filesystem() {
-        var calls = nordnetAdapter.getCalls(null);
+        var calls = nordnetAdapter.getCalls(new StockTicker("YAR"));
         System.out.println(calls);
     }
 }
