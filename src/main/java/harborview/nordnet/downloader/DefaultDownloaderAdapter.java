@@ -6,6 +6,7 @@ import harborview.nordnet.util.NordnetUtil;
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,7 +17,8 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component("default")
+@Component
+@Primary
 public class DefaultDownloaderAdapter implements  Downloader<PageInfo> {
     private final Logger logger = LoggerFactory.getLogger(DefaultDownloaderAdapter.class);
 

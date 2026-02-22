@@ -17,18 +17,22 @@ public class NordnetCore {
 
     private final NordnetRepository repos;
 
-    public NordnetCore(@Qualifier("v1") NordnetRepository repos) {
+    public NordnetCore(NordnetRepository repos) {
         this.repos = repos;
     }
+
     public Either<ApplicationError, StockPrice> getStockPrice(StockTicker ticker) {
         return ApiUtil.handle(() -> repos.getStockPrice(ticker));
     }
+
     public Either<ApplicationError, List<StockOption>> getCalls(StockTicker ticker) {
         return ApiUtil.handle(() -> repos.getCalls(ticker));
     }
+
     public Either<ApplicationError,List<StockOption>> getPuts(StockTicker ticker) {
         return ApiUtil.handle(() -> repos.getPuts(ticker));
     }
+
     public void resetCaffeine() {
         repos.resetCaffeine();
     }

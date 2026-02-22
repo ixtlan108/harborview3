@@ -8,20 +8,23 @@ import harborview.nordnet.stockmarket.StockOptionTicker;
 import harborview.nordnet.stockmarket.StockPrice;
 import harborview.nordnet.stockmarket.StockTicker;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 
-@Component("adapter.nordnet")
+@Component
+@Primary
 public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepository {
 
-    public NordnetAdapterV1(@Qualifier("default") Downloader<PageInfo> downloader) {
+    public NordnetAdapterV1(Downloader<PageInfo> downloader) {
         super(downloader);
     }
 
     @Override
     public List<StockOption> getCalls(StockTicker ticker) {
+        System.out.println(downloader);
         return List.of();
     }
 

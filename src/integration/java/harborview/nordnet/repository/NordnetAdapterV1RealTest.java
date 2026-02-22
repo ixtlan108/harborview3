@@ -9,10 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class NordnetAdapterV1RealTest {
 
     @Autowired
-    @Qualifier("adapter.nordnet")
     NordnetAdapterV1 nordnetAdapter;
 
     @Test
     void test_parse_real_time() {
+        var calls = nordnetAdapter.getCalls(null);
+        System.out.println(calls);
     }
 }

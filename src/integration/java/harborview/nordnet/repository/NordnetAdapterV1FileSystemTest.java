@@ -12,6 +12,8 @@ public class NordnetAdapterV1FileSystemTest {
     NordnetAdapterV1FileSystem nordnetAdapter;
 
     @Test
-    void test_parse_real_time() {
+    void test_parse_filesystem() {
+        var calls = nordnetAdapter.getCalls(null);
+        System.out.println(calls);
     }
 }

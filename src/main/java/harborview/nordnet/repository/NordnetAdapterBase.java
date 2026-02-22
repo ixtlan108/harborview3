@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class NordnetAdapterBase {
 
-    private final Downloader<PageInfo> downloader;
+    protected final Downloader<PageInfo> downloader;
 
     public NordnetAdapterBase(Downloader<PageInfo> downloader) {
         this.downloader = downloader;
