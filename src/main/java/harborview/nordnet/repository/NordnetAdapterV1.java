@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 
-@Component
+@Component("adapter.nordnet")
 public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepository {
 
     public NordnetAdapterV1(@Qualifier("default") Downloader<PageInfo> downloader) {
