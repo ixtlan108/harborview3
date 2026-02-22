@@ -8,7 +8,7 @@ import Data.Traversable (traverse)
 import Effect.Aff (Aff)
 --import Effect (Effect)
 --import Effect.Class (liftEffect)
-import HarborView.Common (errToString)
+-- import HarborView.Common (errToString)
 
 import Rapanui.Critter.Rules (StockOptionPurchase)
 import Rapanui.Critter.CritterRule as Critter
@@ -35,13 +35,15 @@ applyPurchase purchase =
     Nordnet.fetchStockOption purchase.ticker >>= \response ->
       case response of
         Left err ->
-          pure [SaleError $ errToString err]
+          pure [SaleError { error: show err, oid: purchase.oid }]
         Right result1 ->
-          let
-            currentStock = Transform.mapStockOptionResponse result1
-          in
-          -- (liftEffect $ setIsSold purchase) *>
-          pure $ applyPurchase_ currentStock purchase
+          if result1.status > 0 then
+            pure [SaleError { error: "Payload error: " <> show result1.status, oid: purchase.oid }]
+          else
+            let
+              currentStock = Transform.mapStockOptionResponse result1
+            in
+            pure $ applyPurchase_ currentStock purchase
   else
     pure []
 

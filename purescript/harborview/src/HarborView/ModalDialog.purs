@@ -9,8 +9,7 @@ import Halogen.HTML (HTML, ClassName(..))
 import Halogen.HTML.Properties as HP
 -- import Data.Array ((:))
 
-import HarborView.UI as UI
-import HarborView.UI (Title(..))
+import HarborView.UI.Common (Title(..))
 
 {- data AlertCategory
     = Info
@@ -68,29 +67,47 @@ dlgStateToClass :: DialogState -> ClassName
 dlgStateToClass DialogHidden = ClassName "dlg-hide"
 dlgStateToClass DialogVisible = ClassName "dlg-show"
 
+instance Show DialogState where
+  show DialogHidden = "DialogHidden"
+  show DialogVisible = "DialogVisible"
 
-modalDialog :: forall w i.
-  Title
-  -> DialogState
-  -> (MouseEvent -> i)
-  -> (MouseEvent -> i)
-  -> HTML w i
-  -> HTML w i
-modalDialog (Title header) dlgState ok cancel content =
+okButton :: forall w i. (MouseEvent -> i) -> HTML w i
+okButton evt =
+  HH.button
+    [ HE.onClick evt
+    , HP.disabled false
+    , HP.classes [ ClassName "ps-w-100 btn btn-success ps-mt-1 ps-mr-1" ]
+    ]
+    [ HH.text "Ok" ]
+
+cancelButton :: forall w i. (MouseEvent -> i) -> HTML w i
+cancelButton evt =
+  HH.button
+    [ HE.onClick evt
+    , HP.disabled false
+    , HP.classes [ ClassName "ps-w-100 btn btn-danger ps-mt-1" ]
+    ]
+    [ HH.text "Cancel" ]
+
+modalDialogDiv :: forall w i. Title -> (MouseEvent -> i) -> (MouseEvent -> i) -> HTML w i -> HTML w i
+modalDialogDiv (Title header) ok cancel content =
   let
     headerDiv =
-      HH.h4_ [ HH.text header ]
+      HH.h6_ [ HH.text header ]
   in
   HH.div
-    [ HP.classes
-      [ ClassName "modalDialog"
-      , dlgStateToClass dlgState
-      ]
+    [ HP.classes [ ClassName "modalDialog" ]
     ]
-    [ HH.div_
+    [ HH.div [ HP.classes [ ClassName "modaldialog--div"] ]
       [ headerDiv
       , content
-      , UI.mkButton (Title "OK") ok
-      , UI.mkButton (Title "Cancel") cancel
+      , okButton ok
+      , cancelButton cancel
       ]
     ]
+
+modalDialog :: forall w i. DialogState -> Title -> (MouseEvent -> i) -> (MouseEvent -> i) -> HTML w i -> HTML w i
+modalDialog DialogHidden _ _ _ _ =
+  HH.div [ HP.style "display:none" ] []
+modalDialog DialogVisible title ok cancel content =
+  modalDialogDiv title ok cancel content

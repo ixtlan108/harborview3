@@ -12,5 +12,6 @@
   --menu-bg-color-hover: #ca90c1;
   --navbar-bg-color: #695784;
   --table-td-border-color: #ca90c1;
-  --table-th-background-color: #434f72;
+  --table-th-background-color: #434f72ff;
+  --table-th-nosort-background-color: #424656ff;
 }

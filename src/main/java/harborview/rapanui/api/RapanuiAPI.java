@@ -2,6 +2,7 @@ package harborview.rapanui.api;
 
 import harborview.api.response.AppStatusCode;
 import harborview.api.response.DefaultResponse;
+import harborview.rapanui.RapanuiCore;
 import harborview.rapanui.api.request.OptionSaleRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,17 @@ import java.util.List;
 @RequestMapping("/rapanui")
 public class RapanuiAPI {
 
+    private final RapanuiCore core;
+
+    public RapanuiAPI(RapanuiCore core) {
+        this.core = core;
+    }
+
+
     @PutMapping(value = "/demo", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DefaultResponse> demo(@RequestBody List<OptionSaleRequest> request) {
 
-        return ResponseEntity.ok(new DefaultResponse(AppStatusCode.OK, "HEy ok!"));
+        return ResponseEntity.ok(new DefaultResponse(AppStatusCode.OK.getStatusCode(), "HEy ok!"));
 
     }
 }

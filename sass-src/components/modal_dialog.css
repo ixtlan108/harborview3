@@ -1,0 +1,43 @@
+/* components/_modal_dialog.scss */
+
+.modalDialog {
+  position: fixed;
+  font-family: "Poppins", sans-serif;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(100, 0, 0, 0.0);
+  z-index: 99999;
+}
+
+.modalDialog:target {
+  opacity: 0.0;
+  pointer-events: auto;
+}
+
+.modaldialog--div {
+  opacity: 0.9;
+}
+
+.modaldialog--div > H6 {
+  font-weight:600;
+}
+
+.modalDialog>div {
+  width: 20rem;
+  position: relative;
+  margin: 10% auto;
+  padding: 3rem;
+  border-radius: 25px;
+  background-color: transparent;
+  background: #343D54;
+  /*
+  color: black;
+  background: $light;
+  background: -moz-linear-gradient($light, $dark);
+  background: -webkit-linear-gradient($light, $dark);
+  background: -o-linear-gradient($light, $dark);
+  */
+}
+

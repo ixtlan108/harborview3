@@ -33,12 +33,12 @@ public class CritterAPI {
         return "critter/overlook";
     }
 
-    @GetMapping(value = "/purchases/{ptype}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/purchase/{ptype}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PayloadResponse<List<OptionPurchaseDTO>>> purchases(@PathVariable("ptype") int ptype) {
         return ApiUtil.map(critterCore.activePurchasesWithCritters(ptype));
     }
 
-    @GetMapping(value = "/purchases/toggle/{rulecategory}/{oid}/{active}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/purchase/toggle/{rulecategory}/{oid}/{active}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StatusDTO> toggleRule(@PathVariable("rulecategory") int rulecategory,
                                 @PathVariable("oid") int ruleId,
                                 @PathVariable("active") boolean isActive) {

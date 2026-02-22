@@ -1,4 +1,3 @@
-(import jpm)
 (import jpm/shutil :as shutil)
 (import spork/argparse :as ap)
 (import ./css)
@@ -60,7 +59,6 @@
           sx1 (get sx 1)]
       (string/slice sx1 0 8))))
 
-
 (defn template-app [pkg main stem is-joy-backend]
   (let [spago
           { :pkg pkg
@@ -80,31 +78,32 @@
                 (string/slice (buffer/push-string @"" co/src-java "/static/js/" stem "/" stem "-%s.js")))}
         css 
           { :src co/src-css
-            :pkg stem
-            :scss-file (string/slice (buffer/push-string @"" stem ".scss"))
-            :css-file (string/slice (buffer/push-string @"" stem ".css"))
-            :css-file-2 (string/slice (buffer/push-string @"" co/src-ps "/" pkg "/dist/" stem ".css"))
+            :pkg pkg
+            :stem stem
+            :scss-file (string/format "%s.scss" stem)
+            :css-file (string/format "%s.css" stem)
+            :css-file-2 (string/format "%s/%s/dist/%s.css" co/src-ps pkg stem)
             :css-map-file (string/slice (buffer/push-string @"" co/src-ps "/" pkg "/dist/" stem ".css.map"))
             :css-static 
               (string/slice (buffer/push-string @"" co/src-java "/static/css/" stem))
             :css-map-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"" co/src-harborview "/public/" stem ".css.map"))
+                (string/format "%s/public/%s.css.map" co/src-harborview stem) 
                 (string/slice (buffer/push-string  @"" co/src-java "/static/css/" stem "/" stem ".css.map")))
             :css-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"" co/src-harborview "/public/" stem ".css"))
+                (string/format "%s/public/%s.css" co/src-harborview stem)
                 (string/slice (buffer/push-string @"" co/src-java "/static/css/" stem "/" stem "-%s.css")))}]
     { :spago spago
       :css css
       :tpl (string/slice (buffer/push-string @"" co/src-ps "/" pkg "/tpl/index.html.tpl"))
       :tpl-target (string/slice (buffer/push-string @"" co/src-java "/templates/" stem "/index.html"))}))
 
-(defn clear-static-files [path]
+(comment clear-static-files [path]
  (let (fx (os/dir path))
-  (each i fx 
-    (let (fi (string/slice (buffer/push-string @"" path "/" i)))
-      (os/rm fi)))))
+   (each i fx 
+     (let (fi (string/slice (buffer/push-string @"" path "/" i)))
+       (os/rm fi)))))
 
 (defn run-spago [cfg]
   (print "Enter run-spago..")
@@ -124,14 +123,15 @@
   (print "Enter copy-spago-files..")
   (let [spago-cfg (cfg :spago)
         from-f (spago-cfg :js-file)
-        with-joy (dyn :x-joy)
         to-f (string/format (spago-cfg :js-target) spago-md5)
         from-map-f (spago-cfg :js-map-file)
         to-map-f (spago-cfg :js-map-target)]
-    (if (not with-joy) 
-     (clear-static-files (spago-cfg :js-static)))
-    (shutil/copyfile from-f to-f)
-    (shutil/copyfile from-map-f to-map-f)))
+    (if (dyn :x-joy) 
+      (do
+        (shutil/copyfile from-map-f to-map-f)
+        (shutil/copyfile from-f to-f))
+      (when (not (co/file-exists? to-f))
+        (shutil/copyfile from-f to-f)))))
 
 (defn copy-css-files [cfg css-md5]
   (print "Enter copy-css-files..")
@@ -139,24 +139,24 @@
         from-f (css-cfg :css-file-2)
         with-joy (dyn :x-joy)
         to-f (string/format (css-cfg :css-target) css-md5)]
-    (if (not with-joy) 
-     (clear-static-files (css-cfg :css-static)))
-    (jpm/shutil/copyfile from-f to-f)))
+    (if (dyn :x-joy) 
+      (shutil/copyfile from-f to-f)
+      (when (not (co/file-exists? to-f))
+        (shutil/copyfile from-f to-f)))))
 
-(defn render [cfg spago-md5 sass-md5]
-  (let [is-joy (dyn :x-joy)]
-    (when (not is-joy)
-      (print "Enter render..")
-      (let [tpl (cfg :tpl)
-            f (file/open tpl :r)
-            content (string/slice (file/read f :all))]
-        (file/close f)
-        (print "tpl file: " tpl)
-        (let [result (string/format content spago-md5 sass-md5)
-              result-file (file/open (cfg :tpl-target) :w)]
-          (file/write result-file result)
-          (file/close result-file)
-          (print result))))))
+(defn render [cfg spago-md5 css-md5]
+  (when (not (dyn :x-joy))
+    (print "Enter render..")
+    (let [tpl (cfg :tpl)
+          f (file/open tpl :r)
+          content (string/slice (file/read f :all))]
+      (file/close f)
+      (print "tpl file: " tpl)
+      (let [result (string/format content spago-md5 css-md5)
+            result-file (file/open (cfg :tpl-target) :w)]
+        (file/write result-file result)
+        (file/close result-file)
+        (print result)))))
 
 (defn run [cfg]
   (let [css-md5 (css/run-css cfg)
@@ -172,26 +172,54 @@
     (run (template-app pkg main stem with-joy))))
 
 (defn build-app [pkg]
-  (if (dyn :x-build) 
-    (do
-      (printf "BUILD %s.." pkg)
-      (os/cd co/src-ps)
-      (if (dyn :x-quiet) 
-         (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
-         (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
-      (os/cd co/cud))))
+  (printf "BUILD %s.." pkg)
+  (os/cd co/src-ps)
+  (if (dyn :x-quiet) 
+     (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
+     (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
+  (os/cd co/cud))
+
+(defn run-nvim-pre []
+  (print "run-nvim-pre"))
+
+(defn run-nvim-post []
+  (print "run-nvim-post"))
+
+(defn nvim-pre []
+  (when (dyn :x-nvim) 
+    (run-nvim-pre)))
+
+(defn nvim-post []
+  (when (dyn :x-nvim) 
+    (run-nvim-post)))
 
 (defn run-rapanui []
-  (build-app "rapanui")
-  (run-template-app "rapanui" "RapanuiMain" "rapanui"))
+  (nvim-pre)
+  (if (dyn :x-build) 
+    (build-app "rapanui")
+    (run-template-app "rapanui" "RapanuiMain" "rapanui"))
+  (nvim-post))
 
 (defn run-maunaloa []
-  (build-app "rigaphoto-app")
-  (run-template-app "maunaloa" "Main" "maunaloa"))
+  (nvim-pre)
+  (if (dyn :x-build) 
+    (build-app "maunaloa")
+    (run-template-app "maunaloa" "Main" "maunaloa"))
+  (nvim-post))
 
-(defn run-optionpurchase[]
-  (build-app "rigaphoto-app")
-  (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
+(defn run-optionpurchase []
+  (nvim-pre)
+  (if (dyn :x-build) 
+    (build-app "optionpurchase")
+    (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
+  (nvim-post))
+
+(defn run-derivatives []
+  (nvim-pre)
+  (if (dyn :x-build) 
+    (build-app "derivatives")
+    (run-template-app "derivatives" "DerivativesMain" "derivatives"))
+  (nvim-post))
 
 (def elm-cmd "/usr/local/bin/elm")
 
@@ -244,14 +272,35 @@
 (def PROJ {"1" run-rapanui 
            "2" run-maunaloa 
            "3" run-optionpurchase 
-           "4" run-options 
-           "5" run-critters})
+           "4" run-derivatives
+           "5" run-options 
+           "6" run-critters
+           "97" run-nvim-pre 
+           "98" run-nvim-post})
+
+(defn proj-item [[index desc is-first]] 
+  (if is-first
+    (string/format "\n\n\t%d:\t%s" index desc)
+    (string/format "%d:\t%s" index desc)))
+
+
+(defn proj-help []
+  (let [projs [[1 "rapanui" true] 
+               [2 "maunaloa" false] 
+               [3 "optionpurchase" false] 
+               [4 "derivatives" false] 
+               [5 "options (elm)" false] 
+               [6 "critters (elm)" false]] 
+        projsx (map proj-item projs)]
+    (string/join projsx "\n\t")))
+
+# "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: derivatives, 5: options (elm), 6: critters (elm), 97: nvim on, 98: nvim off" :required true}
 
 (defn run [argx]
   (printf "%q" argx)
   (let [os-linux (= (argx "os") "linux")
         md5-cmd (if os-linux md5-linux md5-macos)
-        spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
+        spago-cmd (if os-linux "/usr/local/bin/spago" "/usr/local/bin/spago")]
     (with-dyns [:x-css (argx "css")
                 :x-spago (argx "spago")
                 :x-quiet (argx "quiet")
@@ -259,20 +308,22 @@
                 :x-joy (argx "joy")
                 :x-md5-cmd md5-cmd
                 :x-spago-cmd spago-cmd
-                :x-build (argx "build")]
+                :x-build (argx "build")
+                :x-nvim (argx "nvim")]
       (let [cmd (PROJ (argx "proj"))]
         (cmd)))))
 
 (defn main [&]
   (let
     [ argx (ap/argparse "Deploy"
-            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: options (elm), 5: critters (elm)" :required true}
+            "proj"  {:kind :option  :short "p" :help (proj-help) :required true}
             "os"    {:kind :option  :short "o" :help "Os: linux, macos. Default: linux" :default "linux"}
             "elm"   {:kind :flag    :short "e" :default false :help "Default: false"}
             "joy"   {:kind :flag    :short "j" :default false :help "Joy backend. Default: false"}
             "css"   {:kind :flag    :short "s" :default false :help "Generate css file. Default: false"}
             "spago" {:kind :flag    :short "g" :default false :help "Generate ps file. Default: false"}
             "quiet" {:kind :flag    :short "q" :default false :help "Show only errors on build. Default: false"}
-            "build" {:kind :flag    :short "b" :default false :help "Build project(s). Default: false"})]
+            "build" {:kind :flag    :short "b" :default false :help "Build project(s). Default: false"}
+            "nvim"  {:kind :flag    :short "n" :default false :help "Nvim. Default: false"})]
     (if (not= argx nil)
       (run argx))))

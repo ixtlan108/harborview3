@@ -17,6 +17,7 @@ module Rapanui.Common
   , Rtyp(..)
   , StatusCode(..)
   , Status(..)
+  , Log
   , rtypDesc
   ) where
 
@@ -34,9 +35,9 @@ data MainAction
   | Timer Boolean MouseEvent
   | IsActive Int Boolean
   | Tick
-  | Noop String
   | IntervalChange String
   | ModalDialogBottomClose MouseEvent
+  | ClearLogs MouseEvent
 
 newtype OptionTicker = OptionTicker String
 
@@ -50,6 +51,8 @@ instance Show OptionTicker where
 newtype Oid = Oid Int
 
 derive instance Generic Oid _
+
+derive instance Eq Oid
 
 instance Show Oid where
   show = genericShow
@@ -155,6 +158,14 @@ newtype Msg = Msg String
 newtype PosixTimeInt = PosixTimeInt Int
 
 newtype Iso8601 = Iso8601 String
+
+type Log =
+  { tick :: Int
+  , tm :: String
+  , oid :: String
+  , cid :: String
+  , log :: String
+  }
 
 --newtype MarketOpen = MarketOpen TimeOfDay deriving (Show)
 

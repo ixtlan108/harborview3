@@ -8,7 +8,7 @@ import Data.Maybe (Maybe(..))
 import Halogen (SubscriptionId)
 import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Critter.Rules (StockOptionPurchase)
-import Rapanui.Common (MainAction)
+import Rapanui.Common (MainAction,Log)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale)
 
 
@@ -22,6 +22,7 @@ type State =
   , emitter :: Maybe (Emitter MainAction)
   , modalStateBottom :: ModalState
   , optionSales :: Array OptionSale
+  , logs :: Array Log
   }
 
 defaultState :: State
@@ -33,6 +34,7 @@ defaultState =
   , emitter: Nothing
   , modalStateBottom: ModalHidden
   , optionSales: []
+  , logs: []
   }
 
 --instance Show State where

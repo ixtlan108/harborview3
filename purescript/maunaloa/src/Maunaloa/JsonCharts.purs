@@ -9,10 +9,9 @@ import Data.Argonaut.Decode.Error (JsonDecodeError)
 import Data.Either (Either)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
-import HarborView.Common (HarborViewError)
+import HarborView.HarborViewError (HarborViewError)
 import HarborView.Maunaloa.Common (ChartType(..), StockTicker(..), ValueRange)
 import HarborView.Util.HttpUtil as HU
-
 
 --foreign import addCharts :: String -> JsonChartResponse -> Effect Unit
 --foreign import getChartsImpl :: (JsonChartResponse -> Maybe JsonChartResponse) -> Maybe JsonChartResponse -> String -> Maybe JsonChartResponse
@@ -21,40 +20,40 @@ import HarborView.Util.HttpUtil as HU
 --getCharts key = getChartsImpl Just Nothing key
 
 type JsonCandlestick =
-    { o :: Number
-    , h :: Number
-    , l :: Number
-    , c :: Number
-    }
+  { o :: Number
+  , h :: Number
+  , l :: Number
+  , c :: Number
+  }
 
 type JsonChart =
-    { lines :: Maybe (Array (Array Number))
-    , bars :: Maybe (Array (Array Number))
-    , candlesticks :: Maybe (Array JsonCandlestick)
-    }
+  { lines :: Maybe (Array (Array Number))
+  , bars :: Maybe (Array (Array Number))
+  , candlesticks :: Maybe (Array JsonCandlestick)
+  }
 
-data JsonChartWindow =
-    JsonChartWindow
-    { lines :: Array (Array Number)
-    , candlesticks :: Array JsonCandlestick
-    , valueRange :: ValueRange
-    , numVlines :: Int
-    }
-    | JsonChartWindowBar
-    { bars :: Array (Array Number)
-    , valueRange :: ValueRange
-    , numVlines :: Int
-    }
-    | JsonChartWindowEmpty
+data JsonChartWindow
+  = JsonChartWindow
+      { lines :: Array (Array Number)
+      , candlesticks :: Array JsonCandlestick
+      , valueRange :: ValueRange
+      , numVlines :: Int
+      }
+  | JsonChartWindowBar
+      { bars :: Array (Array Number)
+      , valueRange :: ValueRange
+      , numVlines :: Int
+      }
+  | JsonChartWindowEmpty
 
 type JsonChartPayload =
-    { ticker :: String
-    , chart :: JsonChart
-    , chart2 :: JsonChart
-    , chart3 :: JsonChart
-    , xAxis :: Array Int
-    , minDx :: Number
-    }
+  { ticker :: String
+  , chart :: JsonChart
+  , chart2 :: JsonChart
+  , chart3 :: JsonChart
+  , xAxis :: Array Int
+  , minDx :: Number
+  }
 
 type JsonChartResponse =
   { payload :: Maybe JsonChartPayload
@@ -64,21 +63,21 @@ type JsonChartResponse =
 
 emptyJsonChart :: JsonChart
 emptyJsonChart =
-    { lines: Nothing
-    , bars: Nothing
-    , candlesticks: Nothing
-    }
+  { lines: Nothing
+  , bars: Nothing
+  , candlesticks: Nothing
+  }
 
 chartsDecoder :: Json -> Either JsonDecodeError JsonChartResponse
 chartsDecoder = Decode.decodeJson
 
 chartUrl :: ChartType -> StockTicker -> URL
 chartUrl DayChart (StockTicker ticker) =
-    "/maunaloa/stockprice/days/" <> ticker
+  "/maunaloa/stockprice/days/" <> ticker
 chartUrl WeekChart (StockTicker ticker) =
-    "/maunaloa/stockprice/weeks/" <> ticker
+  "/maunaloa/stockprice/weeks/" <> ticker
 chartUrl MonthChart (StockTicker ticker) =
-    "/maunaloa/stockprice/months/" <> ticker
+  "/maunaloa/stockprice/months/" <> ticker
 chartUrl EmptyChartType _ = ""
 
 fetchCharts :: StockTicker -> ChartType -> Aff (Either HarborViewError JsonChartResponse)
@@ -87,28 +86,28 @@ fetchCharts ticker chartType =
     (chartUrl chartType ticker)
     chartsDecoder
 
-  -- pure $ Left $ AffjaxError "ahsf"
+-- pure $ Left $ AffjaxError "ahsf"
 
-    -- Affjax.get ResponseFormat.json (chartUrl chartType ticker) >>= \res ->
-    --     let
-    --         result :: Either MaunaloaError JsonChartResponse
-    --         result =
-    --             case res of
-    --                 Left err ->
-    --                     Left $ AffjaxError (Affjax.printError err)
-    --                 Right response ->
-    --                     let
-    --                         charts = chartsFromJson response.body
-    --                     in
-    --                     case charts of
-    --                         Left err ->
-    --                             Left $ JsonError (show err)
-    --                         Right charts1 ->
-    --                             Right charts1
-    --     in
-    --     pure result
+-- Affjax.get ResponseFormat.json (chartUrl chartType ticker) >>= \res ->
+--     let
+--         result :: Either MaunaloaError JsonChartResponse
+--         result =
+--             case res of
+--                 Left err ->
+--                     Left $ AffjaxError (Affjax.printError err)
+--                 Right response ->
+--                     let
+--                         charts = chartsFromJson response.body
+--                     in
+--                     case charts of
+--                         Left err ->
+--                             Left $ JsonError (show err)
+--                         Right charts1 ->
+--                             Right charts1
+--     in
+--     pure result
 
- {-
+{-
 demo :: Effect Unit
 demo =
     launchAff_ $

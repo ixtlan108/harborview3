@@ -39,9 +39,9 @@ c1 = Cid 47
 
 createResponse :: Number -> Number -> Int -> StockOptionPayload
 createResponse bid ask status =
-  { appstatus : 0
+  { status : 0
     , payload: { spot: 120.0
-                 , option: { bid: bid, ask: ask }
+                 , option: {  bid: bid, ask: ask }
                  , optionStatus: status
                  , msg: Nothing
                  }

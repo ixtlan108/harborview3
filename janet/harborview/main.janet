@@ -2,7 +2,8 @@
 (import joy/responder :as r)
 (import json :as j)
 
-(import /api/rapanui :as rapanui)
+(import /api/rapanui)
+(import /api/derivatives)
 
 # Layout
 (defn app-layout [{:body body :request request}]
@@ -14,12 +15,18 @@
       [:meta {:charset "utf-8"}]
       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
       [:meta {:name "csrf-token" :content (joy/csrf-token-value request)}]
-      [:link {:href "https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" :rel "stylesheet"}]
       [:link {:href "https://fonts.googleapis.com" :rel "preconnect"}]
       [:link {:href "https://fonts.gstatic.com" :rel "preconnect" :crossorigin true}]
       [:link {:href "https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" :rel "stylesheet"}]
-      # [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/2.0.15/bootstrap-native-v4.min.js" :defer ""}]
-      [:script {:src "https://cdn.jsdelivr.net/npm/bootstrap.native@5.1.6/dist/bootstrap-native.min.js" :defer ""}]]
+      [:link {:href "https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" 
+              :rel "stylesheet"
+              :integrity "sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" 
+              :crossorigin "anonymous"}]
+      [:script :src "https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+               :integrity "sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+               :crossorigin "anonymous"
+               :defer ""]
+      [:script :src "https://kit.fontawesome.com/54e36e60f6.js" :crossorigin "anonymous" :defer ""]]
 
      [:body
        body]]))
@@ -27,13 +34,27 @@
 
 
 # Routes
-(joy/route :get "/rapanui" :home)
+(joy/route :get "/rapanui" :rapanui-home)
+
+(joy/route :get "/maunaloa/stockoption" :derivatives-home)
+
+(joy/route :get "/" :derivatives-home)
 
 
-(defn home [request]
+(defn rapanui-home [request]
   [:div {:id "rapanui"}
     [ [:link {:href "/rapanui.css" :rel "stylesheet"}]
       [:script {:src "/rapanui.js" :defer ""}]]])
+
+(defn derivatives-home [request]
+  [:div {:id "derivatives"}
+    [ [:link {:href "/derivatives.css" :rel "stylesheet"}]
+      [:script {:src "/derivatives.js" :defer ""}]]])
+
+(defn maunaloa-home [request]
+  [:div {:id "maunaloa"}
+    [ [:link {:href "/derivatives.css" :rel "stylesheet"}]
+      [:script {:src "/derivatives.js" :defer ""}]]])
 
 # Middleware
 (def app (-> (joy/handler)
@@ -52,7 +73,7 @@
 
 # Server
 (defn main [& args]
-  (let [port (get args 1 (os/getenv "PORT" "8082"))
+  (let [port (get args 1 (os/getenv "PORT" "8080"))
         host (get args 2 "localhost")]
     (joy/server app port host)))
 

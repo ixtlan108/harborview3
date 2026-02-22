@@ -1,0 +1,39 @@
+table {
+  border-collapse: collapse;
+  /* make the table borders collapse to each other */
+  width: 100%;
+}
+
+table thead th {
+  position: sticky;
+  /* make the table heads sticky */
+  top: 0;
+  /* table head will be placed from the top of the table and sticks to it */
+}
+
+th,
+td {
+  padding: 8px 16px;
+  border: 1px solid var(--table-td-border-color);
+}
+
+th {
+  background: var(--table-th-background-color);
+}
+
+.sortable thead th:not(.no-sort) {
+  cursor: pointer;
+  background: var(--table-th-background-color);
+}
+.sortable thead th:not(.no-sort)::after {
+  margin-left: 3px;
+  content: "▸";
+}
+.sortable thead th:not(.no-sort)[aria-sort="descending"]::after {
+  color: inherit;
+  content: "▾";
+}
+.sortable thead th:not(.no-sort)[aria-sort="ascending"]::after {
+  color: inherit;
+  content: "▴";
+}

@@ -2,16 +2,13 @@ package harborview.domain.core.maunaloa;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import harborview.api.nordnet.response.FindOptionResponse;
-import harborview.api.util.ApiUtil;
+import harborview.domain.core.Core;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
-import harborview.domain.nordnet.NordnetRepository;
-import harborview.domain.stockmarket.StockMarketRepository;
+import harborview.domain.stockmarket.StockMarketService;
 import harborview.chart.ChartFactory;
 import harborview.chart.ChartMonthFactory;
 import harborview.chart.ChartWeekFactory;
-import harborview.domain.nordnet.*;
 import harborview.domain.stockmarket.StockOptionPurchase;
 import harborview.domain.stockmarket.StockOptionSale;
 import harborview.domain.stockmarket.StockOptionTicker;
@@ -20,7 +17,12 @@ import harborview.domain.stockmarket.StockTicker;
 import harborview.dto.StatusDTO;
 import harborview.dto.html.Charts;
 import harborview.dto.html.SelectItem;
-import harborview.util.StockOptionUtil;
+import harborview.nordnet.api.RLine;
+import harborview.nordnet.api.RiscRequest;
+import harborview.nordnet.api.RiscResponse;
+import harborview.nordnet.api.RiscResponseStatus;
+import harborview.nordnet.repository.NordnetRepository;
+import harborview.nordnet.util.StockOptionUtil;
 import oahu.dto.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import vega.financial.calculator.OptionCalculator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -39,16 +42,11 @@ import java.util.stream.Collectors;
 
 import harborview.dto.StatusCode;
 
-import static vega.financial.StockOptionType.CALL;
-
 @Component
 public class MaunaloaCore {
 
     private Logger logger = LoggerFactory.getLogger(MaunaloaCore.class);
-    //private final YahooRepository yahooAdapter;
-    private final NordnetRepository nordnetAdapter;
-    private final StockMarketRepository stockMarketAdapter;
-    private final OptionCalculator optionCalculator;
+    private final StockMarketService stockMarketAdapter;
     private final ChartFactory chartFactory = new ChartFactory();
     private final ChartWeekFactory chartWeekFactory = new ChartWeekFactory();
     private final ChartMonthFactory chartMonthFactory = new ChartMonthFactory();
@@ -56,25 +54,19 @@ public class MaunaloaCore {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build();
 
-    Cache<Integer, List<RLine>> rlineCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build();
-
     private List<SelectItem> stockTickers;
 
-    public MaunaloaCore(NordnetRepository nordnetAdapter,
-                        StockMarketRepository stockMarketAdapter,
-                        //YahooRepository yahooAdapter,
-                        @Qualifier("blackScholes") OptionCalculator optionCalculator) {
-        this.nordnetAdapter = nordnetAdapter;
+    private final Core core;
+
+    public MaunaloaCore(StockMarketService stockMarketAdapter,
+                        Core core) {
         this.stockMarketAdapter = stockMarketAdapter;
-        this.optionCalculator = optionCalculator;
-        System.out.println(stockMarketAdapter);
+        this.core = core;
     }
 
     //@Cacheable(value="stockTickers")
     public Either<ApplicationError,List<SelectItem>> getStockTickers() {
-        return ApiUtil.handle(() -> {
+        return core.handleSearch(() -> {
             if (stockTickers == null) {
                 logger.info("(getStockTickers) Empty cache");
                 stockTickers = stockMarketAdapter.getStocks().stream().map(
@@ -104,152 +96,28 @@ public class MaunaloaCore {
         return factory.elmCharts(ticker, prices);
     }
     public Either<ApplicationError,Charts> days(StockTicker ticker) {
-        return ApiUtil.handle(() -> charts(ticker, chartFactory));
+        return core.handleSearch(() -> charts(ticker, chartFactory));
     }
     public Either<ApplicationError,Charts> weeks(StockTicker ticker) {
-        return ApiUtil.handle(() -> charts(ticker, chartWeekFactory));
+        return core.handleSearch(() -> charts(ticker, chartWeekFactory));
     }
     public Either<ApplicationError,Charts> months(StockTicker ticker) {
-        return ApiUtil.handle(() -> charts(ticker, chartMonthFactory));
+        return core.handleSearch(() -> charts(ticker, chartMonthFactory));
     }
 
 
-    //----------------------------- Puts, Calls, Spot --------------------------------
-    public String calls(StockTicker stockTicker) {
-        return nordnetAdapter.calls(stockTicker);
-    }
-
-    public String puts(StockTicker stockTicker) {
-        return nordnetAdapter.puts(stockTicker);
-    }
-
-    public String spot(StockTicker stockTicker) {
-        return nordnetAdapter.spot(stockTicker);
-    }
-    //----------------------------- Risc Lines --------------------------------
-    void saveRiscResult(int oid,
-                        String ticker,
-                        double bid,
-                        double ask,
-                        double riscValue,
-                        double riscStockPrice,
-                        double riscOptionPrice,
-                        double breakEven) {
-        var line = new RLine(oid, ticker, bid, ask, riscValue, riscStockPrice, riscOptionPrice, breakEven);
-
-        var lines = rlineCache.getIfPresent(oid);
-        if (lines == null)  {
-            logger.info(String.format("Empty rline cache for oid: %d", oid));
-            var newLines = new ArrayList<RLine>();
-            newLines.add(line);
-            rlineCache.put(oid, newLines);
-        }
-        else {
-            logger.info(String.format("Found rline cache for oid: %d", oid));
-            lines.add(line);
-        }
-    }
-
-    RiscResponse calcRiscStockPrice(RiscRequest request) {
-
-        var info = StockOptionUtil.stockOptionInfoFromTicker(request.getTicker());
-
-        var oid = info.first();
-
-        var optionType = info.third();
-
-        FindOptionResponse hit = nordnetAdapter.findOption(request.getTicker());
-
-        if (hit == null) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.COULD_NOT_FIND_OPTION_ERROR);
-        }
-
-        var payload = hit.payload();
-
-        var riscAdjustedPrice = payload.option().ask() - request.getRiscValue();
-
-        if (riscAdjustedPrice < 0) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.RISC_ADJUSTED_PRICE_LESS_THAN_ZERO);
-        }
-
-        if (payload.option().ivBid() < 0) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.IV_LESS_THAN_ZERO);
-        }
-
-        double curStockPrice = 0.0;
-        double curBreakEven = 0.0;
-        try {
-            curStockPrice = optionCalculator.stockPriceFor2(optionType,
-                    riscAdjustedPrice,
-                    payload.option().x(),
-                    payload.option().days(),
-                    payload.option().ivBid(),
-                    payload.option().close());
-        } catch (BinarySearchException ex) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.CALCULATE_OPTION_PRICE_ERROR);
-        }
-
-        try {
-            curBreakEven = optionCalculator.stockPriceFor2(optionType,
-                    payload.option().ask(),
-                    payload.option().x(),
-                    payload.option().days(),
-                    payload.option().ivBid(),
-                    payload.option().close());
-        } catch (BinarySearchException ex) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.BREAK_EVEN_ERROR);
-        }
-
-        var result = new RiscResponse(request.getTicker(), curStockPrice, RiscResponseStatus.OK);
-
-        saveRiscResult(oid,
-                request.getTicker().ticker(),
-                payload.option().bid(),
-                payload.option().ask(),
-                request.getRiscValue(),
-                curStockPrice,
-                riscAdjustedPrice,
-                curBreakEven);
-
-        return result;
-    }
-
-    public Either<ApplicationError,List<RiscResponse>> calcRiscStockPrices(List<RiscRequest> request) {
-        return ApiUtil.handle(() -> {
-            var result = new ArrayList<RiscResponse>();
-            for (var risc : request) {
-                result.add(calcRiscStockPrice(risc));
-            }
-            return result;
-        });
-    }
 
     public Either<ApplicationError, StockPrice> getSpot(StockTicker stockTicker) {
-        return ApiUtil.handle(() -> stockMarketAdapter.getSpot(stockTicker));
+        return core.handleSearch(() -> stockMarketAdapter.getSpot(stockTicker));
     }
 
-    public List<RLine> getRiscLines(StockTicker ticker) {
-        var lines = rlineCache.getIfPresent(ticker.oid());
-        if (lines == null) {
-            return Collections.emptyList();
-        }
-        else {
-            return lines;
-        }
-    }
-    public StatusDTO deleteAllRiscLines(StockTicker ticker) {
-        rlineCache.invalidate(ticker.oid());
-        return new StatusDTO(true, String.format("Deleted risc lines for %s ok", ticker.ticker()), StatusCode.OK.getStatus());
-    }
 
-    public void invalidateRiscLineCache() {
-        rlineCache.invalidateAll();
-    }
     public void invalidateStockPriceCache() {
         stockPriceCache.invalidateAll();
     }
 
     public double optionPriceFor(StockOptionTicker ticker, double stockPrice) {
+        /*
         var info = StockOptionUtil.stockOptionInfoFromTicker(ticker);
         try {
             //var option = nordnetAdapter.findOption(ticker).getStockOption();
@@ -265,17 +133,31 @@ public class MaunaloaCore {
             logger.error(ex.getMessage());
             return -1.0;
         }
+
+         */
+        return 0.0;
     }
 
 
+    public ApplicationError purchaseOption(StockOptionTicker ticker, int volume) {
+        return core.handleSave(() -> {
+            stockMarketAdapter.insertPurchase(null);
+        },null);
+    }
+
     public StatusDTO purchaseOption(StockOptionPurchase purchase) {
+        /*
         var mh = new MyErrorHandler(StatusCode.PURCHASE_STOCK_OPTION_ERROR);
         stockMarketAdapter.insertPurchase(purchase, mh);
         if (mh.get() != null) {
             return mh.get();
         }
         return new StatusDTO(true, String.format("Purchased %s ok", purchase.getTicker()), StatusCode.OK.getStatus());
+
+         */
+        return null;
     }
+    /*
     public StatusDTO sellOption(StockOptionSale sale) {
         var mh = new MyErrorHandler(StatusCode.SELL_STOCK_OPTION_ERROR);
         stockMarketAdapter.insertSale(sale, mh);
@@ -285,10 +167,14 @@ public class MaunaloaCore {
         return new StatusDTO(true, String.format("Sale for purchase id %d ok", sale.getPurchaseOid()), StatusCode.OK.getStatus());
     }
 
+     */
+
     private String insertSuccessMsg(String ticker, int oid) {
         return String.format("Inserted stockOption purchase ticker: %s, oid: %d", ticker, oid);
     }
     public StatusDTO registerAndPurchaseOption(Tuple2<harborview.domain.stockmarket.StockOption,StockOptionPurchase> purchase) {
+        return null;
+        /*
         try {
             var mh = new MyErrorHandler(StatusCode.INSERT_STOCK_OPTION_ERROR);
             stockMarketAdapter.insertStockOption(purchase.first(), mh);
@@ -298,7 +184,7 @@ public class MaunaloaCore {
             logger.info(String.format("Inserted stockOption: %s", purchase.first().getTicker()));
 
             purchase.second().setOptionId(purchase.first().getOid());
-            stockMarketAdapter.insertPurchase(purchase.second(), null);
+            stockMarketAdapter.insertPurchase(purchase.second());
             var msg = insertSuccessMsg(purchase.first().getTicker(), purchase.second().getOid());
             logger.info(msg);
 
@@ -308,6 +194,8 @@ public class MaunaloaCore {
             logger.error(String.format("%s for stockOption purchase ticker: %s", ex.getMessage(), purchase.first().getTicker()));
             return new StatusDTO(false, ex.getMessage(), StatusCode.INSERT_DB_ERROR.getStatus());
         }
+
+         */
     }
 
     static class MyErrorHandler implements Consumer<Exception> {

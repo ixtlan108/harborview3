@@ -13,7 +13,7 @@ public class HomeController {
 
     @RequestMapping(method =  RequestMethod.GET)
     public String index(Locale locale, Model model) {
-        return "maunaloa/charts";
+        return "maunaloa/index";
     }
 
     @RequestMapping(method =  RequestMethod.GET, path = "rapanui")

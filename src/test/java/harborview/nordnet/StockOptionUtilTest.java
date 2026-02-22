@@ -1,5 +1,9 @@
 package harborview.nordnet;
 
+import harborview.nordnet.stockmarket.StockOptionInfo;
+import harborview.nordnet.stockmarket.StockOptionTicker;
+import harborview.nordnet.stockmarket.StockTicker;
+import harborview.nordnet.util.StockOptionUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -8,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-import static harborview.nordnet.StockOptionInfo.StatusEnum.OK;
+import static harborview.nordnet.stockmarket.StockOptionInfo.StatusEnum.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static vega.financial.StockOptionType.CALL;
 import static vega.financial.StockOptionType.PUT;

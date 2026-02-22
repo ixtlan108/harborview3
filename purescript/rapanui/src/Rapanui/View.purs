@@ -15,13 +15,18 @@ import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
+import HarborView.ModalDialog as DLG
 --import HarborView.ModalDialog as DLG
-import HarborView.UI.Checkbox as CB
+--import HarborView.UI.Checkbox as CB
 import Rapanui.Command (handleAction)
-import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc)
+import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc, Log)
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
 import Rapanui.State (State, defaultState)
 import Rapanui.UI as RU
+import Rapanui.LogTable as LogTable
+--import Rapanui.StockMarket.OptionSaleItem (OptionSale)
+
+--foreign import curTime :: String
 
 --noSort ∷ ∀ r i. Array (IProp (class ∷ String | r) i)
 --noSort =
@@ -33,7 +38,7 @@ tableHeader =
   HH.thead []
     [ HH.tr
         []
-        [ HH.th [] [ HH.text "Oid" ]
+        [ HH.th [] [ HH.text "Cid" ]
         , HH.th [] [ HH.text "Ask" ]
         , HH.th [] [ HH.text "Status" ]
         , HH.th [] [ HH.text "-" ]
@@ -87,15 +92,15 @@ accPart acc =
       let
         Oid oid = curAcc.oid
         -- Rtyp rtyp = curAcc.rtyp
-        cbActive =
-          CB.mkCheckboxSimple (CB.defaultSimpleChecboxParam $ IsActive oid)
+        -- cbActive =
+        --   CB.mkCheckboxSimple (CB.defaultSimpleChecboxParam $ IsActive oid)
       in
         [ HH.td [] [ HH.text (Common.fromInt oid) ]
         , HH.td [] [ HH.text (show curAcc.rtyp) ]
         , HH.td [] [ HH.text $ rtypDesc curAcc.rtyp ]
         --, HH.td [] [ HH.text (rtypDesc curAcc.rtyp) ]
         , HH.td [] [ HH.text (Common.numToString curAcc.value) ]
-        , HH.td [] [ cbActive ]
+        --, HH.td [] [ cbActive ]
         --, HH.td [] [ H.a [ A.href "#", A.class "newdnyrule href-td", E.onClick (DenyRuleMsgFor (NewDenyRule <| Oid curAcc.oid)) ] [ HH.text "New Deny" ] ]
         ]
 
@@ -186,13 +191,15 @@ render st =
       [ RU.fetchPurchases
       , RU.startTimer
       , RU.stopTimer
+      , RU.clearLogs
       ]
   in
-  HH.div [ HP.classes [ ClassName "containerx" ] ]
+  HH.div [ HP.class_ $  ClassName "containerx" ]
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
-      -- , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
+      , HH.div [ HP.classes [ ClassName "logs" ]] [ LogTable.createTable st.logs ]
+      , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 
 {-

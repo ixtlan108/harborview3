@@ -13,29 +13,14 @@ package:
     - argonaut-codecs
     - argonaut-core
     - arrays
-    - canvas
     - console
-    - dom-indexed
     - effect
-    - either
-    - foldable-traversable
-    - foreign
-    - functions
+    - foreign 
     - halogen
-    - integers
-    - lists
-    - maybe
-    - numbers
-    - partial
-    - prelude
-    - test-unit
-    - transformers
-    - tuples
-    - web-dom
-    - web-events
-    - web-html
-    - web-uievents
   test:
     main: Test.Main
     dependencies:
       - spec
+# workspace:
+#   packageSet:
+#     registry: 50.11.0
