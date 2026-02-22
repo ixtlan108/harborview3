@@ -2,10 +2,12 @@ package harborview.nordnet.repository;
 
 import harborview.nordnet.*;
 import harborview.nordnet.downloader.Downloader;
+import harborview.nordnet.downloader.PageInfo;
 import harborview.nordnet.stockmarket.StockOption;
 import harborview.nordnet.stockmarket.StockOptionTicker;
 import harborview.nordnet.stockmarket.StockPrice;
 import harborview.nordnet.stockmarket.StockTicker;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
 @Component
 public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepository {
 
-    public NordnetAdapterV1(Downloader<PageInfo> downloader) {
+    public NordnetAdapterV1(@Qualifier("default") Downloader<PageInfo> downloader) {
         super(downloader);
     }
 
