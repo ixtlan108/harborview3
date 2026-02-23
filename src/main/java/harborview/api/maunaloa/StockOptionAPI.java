@@ -40,12 +40,15 @@ public class StockOptionAPI {
 
     @GetMapping(value = "/calls/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> calls(@PathVariable("oid") int oid) {
-        return ResponseEntity.ok(maunaloaCore.calls(new StockTicker(oid)));
+        //return ResponseEntity.ok(maunaloaCore.calls(new StockTicker(oid)));
+        return null;
     }
 
     @GetMapping(value = "/puts/{oid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> puts(@PathVariable("oid") int oid) {
-        return ResponseEntity.ok(maunaloaCore.puts(new StockTicker(oid)));
+        //return ResponseEntity.ok(maunaloaCore.puts(new StockTicker(oid)));
+
+        return null;
     }
 
     @GetMapping(value = "/price/{ticker}/{stockPrice}", produces = MediaType.APPLICATION_JSON_VALUE)

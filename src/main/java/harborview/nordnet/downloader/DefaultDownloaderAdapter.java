@@ -48,7 +48,7 @@ public class DefaultDownloaderAdapter implements  Downloader<PageInfo> {
          */
         var result = new ArrayList<PageInfo>();
         try {
-            var page = download(ticker, 1781820000000L);
+            var page = download(ticker,1797548400000L);
             result.add(page);
         }
         catch (DownloadException e) {

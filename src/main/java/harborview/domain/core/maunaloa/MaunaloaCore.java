@@ -46,7 +46,6 @@ public class MaunaloaCore {
 
     private Logger logger = LoggerFactory.getLogger(MaunaloaCore.class);
     //private final YahooRepository yahooAdapter;
-    private final NordnetRepository nordnetAdapter;
     private final StockMarketRepository stockMarketAdapter;
     private final OptionCalculator optionCalculator;
     private final ChartFactory chartFactory = new ChartFactory();
@@ -62,11 +61,9 @@ public class MaunaloaCore {
 
     private List<SelectItem> stockTickers;
 
-    public MaunaloaCore(NordnetRepository nordnetAdapter,
-                        StockMarketRepository stockMarketAdapter,
+    public MaunaloaCore(StockMarketRepository stockMarketAdapter,
                         //YahooRepository yahooAdapter,
                         @Qualifier("blackScholes") OptionCalculator optionCalculator) {
-        this.nordnetAdapter = nordnetAdapter;
         this.stockMarketAdapter = stockMarketAdapter;
         this.optionCalculator = optionCalculator;
         System.out.println(stockMarketAdapter);
@@ -114,18 +111,6 @@ public class MaunaloaCore {
     }
 
 
-    //----------------------------- Puts, Calls, Spot --------------------------------
-    public String calls(StockTicker stockTicker) {
-        return nordnetAdapter.calls(stockTicker);
-    }
-
-    public String puts(StockTicker stockTicker) {
-        return nordnetAdapter.puts(stockTicker);
-    }
-
-    public String spot(StockTicker stockTicker) {
-        return nordnetAdapter.spot(stockTicker);
-    }
     //----------------------------- Risc Lines --------------------------------
     void saveRiscResult(int oid,
                         String ticker,
@@ -152,6 +137,7 @@ public class MaunaloaCore {
 
     RiscResponse calcRiscStockPrice(RiscRequest request) {
 
+        /*
         var info = StockOptionUtil.stockOptionInfoFromTicker(request.getTicker());
 
         var oid = info.first();
@@ -212,6 +198,9 @@ public class MaunaloaCore {
                 curBreakEven);
 
         return result;
+
+         */
+        return null;
     }
 
     public Either<ApplicationError,List<RiscResponse>> calcRiscStockPrices(List<RiscRequest> request) {
@@ -250,6 +239,7 @@ public class MaunaloaCore {
     }
 
     public double optionPriceFor(StockOptionTicker ticker, double stockPrice) {
+        /*
         var info = StockOptionUtil.stockOptionInfoFromTicker(ticker);
         try {
             //var option = nordnetAdapter.findOption(ticker).getStockOption();
@@ -265,6 +255,9 @@ public class MaunaloaCore {
             logger.error(ex.getMessage());
             return -1.0;
         }
+
+         */
+        return 0.0;
     }
 
 

@@ -192,7 +192,7 @@ public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepos
         } catch (IOException e) {
             log.warn("Could not write Jsoup to file");
         }
-         */
+        //*/
         var roleTable = soup.select("[role=table]");
         var sp = parseStockPrice(ticker, roleTable.get(0));
         var options = parseOptions(sp, roleTable.get(1));
@@ -296,7 +296,7 @@ public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepos
     private void writeJsoupToFile(String content)
             throws IOException {
         BufferedWriter writer =
-                new BufferedWriter(new FileWriter("/home/rcs/opt/java/harborview3/src/test/resources/nordnetservice/jsoup.html"));
+                new BufferedWriter(new FileWriter("/home/rcs/opt/java/harborview3/src/integration/resources/nordnet/jsoup-1797548400.html"));
         writer.write(content);
         writer.close();
     }

@@ -36,7 +36,8 @@ public class RiscLineAPI {
 
     @GetMapping(value = "/spot/{ticker}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> spot(@PathVariable("ticker") int ticker) {
-        var stockTicker = new StockTicker(ticker);
-        return ResponseEntity.ok(maunaloaCore.spot(stockTicker));
+        //var stockTicker = new StockTicker(ticker);
+        //return ResponseEntity.ok(maunaloaCore.spot(stockTicker));
+        return null;
     }
 }

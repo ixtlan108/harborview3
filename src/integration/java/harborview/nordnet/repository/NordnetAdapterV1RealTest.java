@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
+//@Disabled
 @SpringBootTest
 public class NordnetAdapterV1RealTest {
 
