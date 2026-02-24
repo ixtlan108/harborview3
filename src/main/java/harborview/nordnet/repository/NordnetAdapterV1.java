@@ -137,9 +137,6 @@ public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepos
 
     private List<StockOption> getOptions(StockTicker ticker, StockOptionType ot) {
         var result = parse(ticker);
-        if (result == null) {
-            return Collections.emptyList();
-        }
         return result.second().stream().filter(x -> x.getOpType() == ot).toList();
     }
     private Tuple2<StockPrice,List<StockOption>> parse(StockTicker ticker) {
@@ -211,7 +208,7 @@ public class NordnetAdapterV1 extends NordnetAdapterBase implements NordnetRepos
         var rows = el.children();
         var stockPriceRow = rows.get(1);
         var rc = stockPriceRow.children();
-        var opn = 0.0; //fetchOpeningPrice ? redisAdapter.openingPrice(ticker) : 0;
+        var opn = fetchOpeningPrice ? redisAdapter.openingPrice(ticker) : 0;
         var hi = el2double(rc.get(SP_HI));
         var lo = el2double(rc.get(SP_LO));
         var cls = el2double(rc.get(SP_CLS));

@@ -7,7 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 
 @Component
 public class RedisAdapter {
@@ -21,15 +20,8 @@ public class RedisAdapter {
     private double getPrice(StockTicker ticker, String redisKey) {
         var result = (String) redisTemplate.opsForHash().get(redisKey,
                 String.format("%d", ticker.oid()));
-        return Double.parseDouble(result);
+        return result == null ? 0.0 : Double.parseDouble(result);
     }
-
-    /*
-    public long getUnixTime() {
-        return LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
-    }
-
-     */
 
     public StockPrice getSpot(StockTicker ticker) {
         var opn = getPrice(ticker, "stockprice:open");
@@ -37,6 +29,12 @@ public class RedisAdapter {
         var lo = getPrice(ticker, "stockprice:lo");
         var cls = getPrice(ticker, "stockprice:close");
         return new StockPrice(LocalDate.now(), opn, hi, lo, cls, 1000);
+    }
+
+    public Double openingPrice(harborview.nordnet.stockmarket.StockTicker ticker) {
+        var result = (String)redisTemplate.opsForHash().get("stockprice:open",
+                String.format("%d",ticker.oid()));
+        return result == null ? null : Double.parseDouble(result);
     }
 }
 

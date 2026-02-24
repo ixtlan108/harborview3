@@ -67,7 +67,7 @@ public class NordnetAdapterV1FileSystemTest {
      */
 
     private void checkStockPrice(StockPrice stockPrice) {
-        //assertEquals(403.0, stockPrice.opn(), 0.1);
+        assertEquals(462.7, stockPrice.opn(), 0.1);
         assertEquals(466.7, stockPrice.hi(), 0.1);
         assertEquals(460.3, stockPrice.lo(), 0.1);
         assertEquals(463.7, stockPrice.cls(), 0.1);
