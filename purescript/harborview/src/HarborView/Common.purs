@@ -2,17 +2,32 @@ module HarborView.Common where
 
 import Prelude
 
+import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype, unwrap)
 import Data.Either (Either(..))
 import Data.Number.Format as Format
+import Data.Int as DI
+import Data.Number as DN
+import Data.String as S
 import Effect (Effect)
 import Effect.Console (logShow)
 import Web.Event.Event as Event
 
 foreign import alert :: String -> Effect Unit
 
+
+--------------- StockTicker ---------------
+
+newtype StockTicker = StockTicker Int
+
+instance Show StockTicker where show (StockTicker s) = show s
+
+--------------- Amount ---------------
+
 newtype Amount =
   Amount Int
+
+--------------- Price ---------------
 
 newtype Price =
   Price Number
@@ -86,3 +101,34 @@ instance ordUnixTime :: Ord UnixTime where
   ------------------------- Diverse -------------------------
 mapx :: forall f a b. Functor f => Newtype a b => f a -> f b
 mapx x = map (\v -> unwrap v) x
+
+toSelect :: forall a. Show a => Maybe a -> String
+toSelect (Just x) = show x
+toSelect Nothing = "-"
+
+isStringEmpty :: String -> Boolean
+isStringEmpty s =
+  S.null $ S.trim s
+
+fromSelectI :: forall a. (Int -> a) -> String -> Maybe a
+fromSelectI f s =
+  if s == "-" then
+    Nothing
+  else
+    f <$> DI.fromString s
+
+
+smap :: forall a. (String -> a) -> String -> Maybe a
+smap f s =
+  if isStringEmpty s then
+    Nothing
+  else
+    Just $ f s
+
+imap :: forall a. (Int -> a) -> String -> Maybe a
+imap f s =
+  f <$> DI.fromString s
+
+umap :: forall a. (Number -> a) -> String -> Maybe a
+umap f s =
+  f <$> DN.fromString s

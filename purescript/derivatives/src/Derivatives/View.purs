@@ -1,27 +1,36 @@
-module Options.View where
+module Derivatives.View where
 
 import Prelude
 
+import Derivatives.Actions (MainAction(..))
+import Derivatives.Command (handleAction)
+import Derivatives.State (State, defaultState)
+import Derivatives.UI as UI
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
-import Halogen.HTML.Properties as HP
+import Halogen.HTML (HTML, ClassName(..))
 import Halogen.HTML as HH
-import Halogen.HTML
-  ( HTML
-  , ClassName(..)
-  )
 import Halogen.HTML.Events as HE
-import HarborView.UI as UI
-import HarborView.UI (SelectItems)
+import Halogen.HTML.Properties as HP
+import HarborView.Common as HC
 
-type State =
-  { tickers :: SelectItems
-  }
+component :: forall q i o m. MonadAff m => H.Component q i o m
+component =
+  H.mkComponent
+    { initialState: \_ ->
+        defaultState
+    , render
+    , eval: H.mkEval H.defaultEval { handleAction = handleAction }
+    }
 
-data Action = SelectChange String
 
-render :: forall cs m. State -> H.ComponentHTML Action cs m
+render :: forall cs m. State -> H.ComponentHTML MainAction cs m
 render st =
-  let
-    tickers = UI.mkSelect_ st.tickers SelectChange
-  in
-    HH.div [] []
+  HH.div [ HP.classes [ ClassName "containerx" ]]
+    [ HH.div [ HP.classes [ ClassName "inputs" ]]
+      [ (UI.pageSelect $ show st.page)
+        , UI.tickerSelect (HC.toSelect st.ticker)
+        , UI.calcRisc
+        , UI.inpRisc st.risc
+      ]
+    ]

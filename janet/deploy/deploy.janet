@@ -186,12 +186,16 @@
   (run-template-app "rapanui" "RapanuiMain" "rapanui"))
 
 (defn run-maunaloa []
-  (build-app "rigaphoto-app")
+  (build-app "maunaloa")
   (run-template-app "maunaloa" "Main" "maunaloa"))
 
-(defn run-optionpurchase[]
-  (build-app "rigaphoto-app")
+(defn run-optionpurchase []
+  (build-app "optionpurchase")
   (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
+
+(defn run-derivatives []
+  (build-app "derivatives")
+  (run-template-app "derivatives" "DerivativesMain" "derivatives"))
 
 (def elm-cmd "/usr/local/bin/elm")
 
@@ -244,8 +248,9 @@
 (def PROJ {"1" run-rapanui 
            "2" run-maunaloa 
            "3" run-optionpurchase 
-           "4" run-options 
-           "5" run-critters})
+           "4" run-derivatives
+           "5" run-options 
+           "6" run-critters})
 
 (defn run [argx]
   (printf "%q" argx)
@@ -266,7 +271,7 @@
 (defn main [&]
   (let
     [ argx (ap/argparse "Deploy"
-            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: options (elm), 5: critters (elm)" :required true}
+            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: derivatives, 5: options (elm), 6: critters (elm)" :required true}
             "os"    {:kind :option  :short "o" :help "Os: linux, macos. Default: linux" :default "linux"}
             "elm"   {:kind :flag    :short "e" :default false :help "Default: false"}
             "joy"   {:kind :flag    :short "j" :default false :help "Joy backend. Default: false"}

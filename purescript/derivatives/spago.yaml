@@ -1,5 +1,5 @@
 package:
-  name: options
+  name: derivatives
   publish:
     version: 0.9.0
     license: BSD-3-Clause

@@ -18,6 +18,11 @@ public class MaunaloaAPI {
 
     @GetMapping(value = "/stockoption")
     public String stockOption() {
+        return "derivatives/index";
+    }
+
+    @GetMapping(value = "/oldstockoption")
+    public String oldstockOption() {
         return "maunaloa/options";
     }
 

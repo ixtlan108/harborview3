@@ -1,0 +1,2 @@
+module Derivatives.Adapter
+  where
