@@ -2,18 +2,18 @@ module Derivatives.State
   where
 
 import Data.Maybe (Maybe(..))
-import HarborView.Common (StockTicker)
-import Derivatives.Types (Page(..))
+import HarborView.Common (StockTicker(..))
+import Derivatives.Types (Page(..), Risc)
 
 type State =
   { page :: Page
     , ticker :: Maybe StockTicker
-    , risc :: Maybe Number
+    , risc :: Maybe Risc
   }
 
 defaultState :: State
 defaultState =
-  { page: Calls
-    , ticker: Nothing
+  { page: Puts
+    , ticker: Just (StockTicker 28)
     , risc: Nothing
   }

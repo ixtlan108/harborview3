@@ -3,6 +3,8 @@ module Derivatives.Types
 
 import Prelude
 
+--------------- Page ---------------
+
 data Page =
   Calls
   | Puts
@@ -14,3 +16,7 @@ fromString _ = Puts
 instance Show Page where
   show Calls = "calls"
   show Puts = "puts"
+
+--------------- Risc ---------------
+
+newtype Risc = Risc Number

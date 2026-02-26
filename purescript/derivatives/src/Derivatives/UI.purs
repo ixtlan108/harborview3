@@ -11,6 +11,13 @@ import Halogen.HTML (HTML, ClassName(..))
 import Derivatives.Actions (MainAction(..))
 
 
+ivCheck :: forall w. Boolean -> HTML w MainAction
+ivCheck isChecked = 
+  HH.div [ HP.classes [ ClassName "form-check form-switch ps-mt-auto" ]]
+    [ HH.input [HP.type_ InputCheckbox, HP.id "htmlid", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onValueChange IvChecked ]
+    , HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "htmlid"] [ HH.text "Im a demo"]
+    ]
+
 inpRisc :: forall w. Maybe Number -> HTML w MainAction
 inpRisc val =
   HH.span [ HP.classes [ ClassName "form-group" ]]

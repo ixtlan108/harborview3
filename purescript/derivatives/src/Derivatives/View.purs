@@ -2,15 +2,15 @@ module Derivatives.View where
 
 import Prelude
 
-import Derivatives.Actions (MainAction(..))
+import Data.Maybe (Maybe(..))
+import Derivatives.Actions (MainAction)
 import Derivatives.Command (handleAction)
 import Derivatives.State (State, defaultState)
 import Derivatives.UI as UI
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
-import Halogen.HTML (HTML, ClassName(..))
+import Halogen.HTML (ClassName(..))
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import HarborView.Common as HC
 
@@ -31,6 +31,8 @@ render st =
       [ (UI.pageSelect $ show st.page)
         , UI.tickerSelect (HC.toSelect st.ticker)
         , UI.calcRisc
-        , UI.inpRisc st.risc
+        , UI.inpRisc Nothing
+        --, UI.inpRisc st.risc
+        , UI.ivCheck true
       ]
     ]

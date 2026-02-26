@@ -9,3 +9,4 @@ data MainAction
   | FetchDerivatives String
   | CalcRisc MouseEvent
   | RiscChange String
+  | IvChecked String

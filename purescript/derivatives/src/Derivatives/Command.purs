@@ -8,7 +8,7 @@ import Halogen as H
 import HarborView.Common (StockTicker(..))
 import Derivatives.State (State)
 import Derivatives.Actions (MainAction(..))
---import Derivatives.Types (Page(..))
+import Derivatives.Types (Risc(..))
 import Derivatives.Types as T
 import HarborView.Common as HC
 
@@ -21,10 +21,25 @@ handleTickerChange
   => Maybe StockTicker
   -> m Unit
 handleTickerChange ticker =
+  (H.modify_ \stx -> stx { ticker = ticker }) *>
   case ticker of
     Nothing ->
       pure unit
     Just ticker1 ->
+      pure unit
+
+handleRiscChange
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => Maybe Risc
+  -> m Unit
+handleRiscChange risc =
+  (H.modify_ \stx -> stx { risc = risc }) *>
+  case risc of
+    Nothing ->
+      pure unit
+    Just risc1 ->
       pure unit
 
 handleAction
@@ -34,18 +49,14 @@ handleAction
   -> H.HalogenM State MainAction cs o m Unit
 handleAction = case _ of
   PageChange s ->
-    let
-      page = T.fromString s
-    in
-    pure unit
+    H.modify_ \stx -> stx { page = (T.fromString s) }
   TickerChange s ->
-    let
-      ticker = HC.fromSelectI StockTicker s
-    in
-    handleTickerChange ticker
+    handleTickerChange $ HC.fromSelectI StockTicker s
   FetchDerivatives s ->
     pure unit
   CalcRisc _ ->
     pure unit
   RiscChange s ->
+    handleRiscChange $ HC.umap Risc s
+  IvChecked b ->
     pure unit
