@@ -20,7 +20,7 @@ import Affjax.RequestBody (RequestBody)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Error (JsonDecodeError)
 
-import HarborView.Common (HarborViewError(..))
+import HarborView.HarborViewError (HarborViewError(..))
 
 getTransform :: forall r v. URL -> (Json -> Either JsonDecodeError r) -> (r -> v) -> Aff (Either HarborViewError v)
 getTransform url f fv =

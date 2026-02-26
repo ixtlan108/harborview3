@@ -60,3 +60,5 @@ handleAction = case _ of
     handleRiscChange $ HC.umap Risc s
   IvChecked b ->
     pure unit
+  TableSort sf _ ->
+    pure unit

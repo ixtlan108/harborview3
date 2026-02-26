@@ -2,6 +2,7 @@ module Derivatives.Actions
   where
 
 import Web.UIEvent.MouseEvent (MouseEvent)
+import Derivatives.Table.SortField (SortField)
 
 data MainAction
   = PageChange String
@@ -10,3 +11,4 @@ data MainAction
   | CalcRisc MouseEvent
   | RiscChange String
   | IvChecked String
+  | TableSort SortField MouseEvent

@@ -12,6 +12,7 @@ import Data.String as S
 import Effect (Effect)
 import Effect.Console (logShow)
 import Web.Event.Event as Event
+import HarborView.HarborViewError (err2string, HarborViewError (..))
 
 foreign import alert :: String -> Effect Unit
 
@@ -38,21 +39,21 @@ newtype Oid =
 newtype Url =
   Url String
 
-data HarborViewError
-  = AffjaxError String
-  | JsonError String
+-- data HarborViewError
+--   = AffjaxError String
+--   | JsonError String
 
-handleError :: HarborViewError -> Effect Unit
-handleError (AffjaxError err) =
-  logShow $ "AffjaxError: " <> err
-handleError (JsonError err) =
-  logShow $ "JsonError: " <> err
+-- handleError :: HarborViewError -> Effect Unit
+-- handleError (AffjaxError err) =
+--   logShow $ "AffjaxError: " <> err
+-- handleError (JsonError err) =
+--   logShow $ "JsonError: " <> err
 
-errToString :: HarborViewError -> String
-errToString (AffjaxError err) =
-  "AffjaxError: " <> err
-errToString (JsonError err) =
-  "JsonError: " <> err
+-- errToString :: HarborViewError -> String
+-- errToString (AffjaxError err) =
+--   "AffjaxError: " <> err
+-- errToString (JsonError err) =
+--   "JsonError: " <> err
 
 numToString :: Number -> String
 numToString num =
@@ -75,7 +76,7 @@ jsonResultToString :: Either HarborViewError JsonResult -> String
 jsonResultToString result =
   case result of
     Left err ->
-      errToString err
+      err2string err
     Right result1 ->
       result1.msg
 

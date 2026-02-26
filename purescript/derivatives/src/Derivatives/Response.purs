@@ -1,7 +1,41 @@
 module Derivatives.Response
   where
 
-import HarborView.CommonJson (PayloadResponse(..))
+import Data.Either(Either)
+import Data.Argonaut.Core (Json)
+import Data.Argonaut.Decode as Decode
+import Data.Argonaut.Decode.Error (JsonDecodeError)
+import HarborView.CommonJson (PayloadResponse)
+
+type Derivative =
+  { ticker :: String
+    , x :: Number
+    , days :: Int
+    , bid :: Number
+    , ask :: Number
+    , ivBid :: Number
+    , ivAsk :: Number
+    , brEven :: Number
+    , expiry :: Number
+  }
+
+type Stock =
+  { unixtime :: Int
+    , o :: Number
+    , h :: Number
+    , l :: Number
+    , c :: Number
+  }
+
+type StockAndOptionsResponse =
+  { stockprice :: Stock
+    , opx :: Array Derivative
+  }
+
+type StockAndOptionsPayload = PayloadResponse (StockAndOptionsResponse)
+
+stockAndOptionsDecoder :: Json -> Either JsonDecodeError StockAndOptionsPayload
+stockAndOptionsDecoder = Decode.decodeJson
 
 {-
   optionDecoder : JD.Decoder Option

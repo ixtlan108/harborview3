@@ -37,9 +37,8 @@ public class NordnetAPI {
     public ResponseEntity<PayloadResponse<CallsResponse>> calls(@PathVariable int oid) {
         var ticker = new StockTicker(oid);
         var result= core.getStockPrice(ticker).andThen(stockPrice ->
-                core.getCalls(ticker).andThen(opx -> {
-                    return Either.right(new CallsResponse(new StockPriceDTO(stockPrice), map(opx)));
-                }));
+                core.getCalls(ticker).andThen(
+                        opx -> Either.right(new CallsResponse(new StockPriceDTO(stockPrice), map(opx)))));
         return ApiUtil.map(result);
     }
 
@@ -47,9 +46,8 @@ public class NordnetAPI {
     public ResponseEntity<PayloadResponse<CallsResponse>> puts(@PathVariable int oid) {
         var ticker = new StockTicker(oid);
         var result= core.getStockPrice(ticker).andThen(stockPrice ->
-                core.getPuts(ticker).andThen(opx -> {
-                    return Either.right(new CallsResponse(new StockPriceDTO(stockPrice), map(opx)));
-                }));
+                core.getPuts(ticker).andThen(
+                        opx -> Either.right(new CallsResponse(new StockPriceDTO(stockPrice), map(opx)))));
         return ApiUtil.map(result);
     }
 
