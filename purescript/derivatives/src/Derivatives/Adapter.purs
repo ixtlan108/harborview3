@@ -14,12 +14,16 @@ import HarborView.HarborViewError (err2string, HarborViewError)
 import HarborView.AppStatus (AppStatus(..), AppStatusResponse)
 import HarborView.Common (StockTicker(..))
 import HarborView.Util.HttpUtil as HU
+import HarborView.Util.HttpUtil2 as HU2
 
 mainUrl :: String
 mainUrl = "/nordnet"
 
-fetchDerivatives_ :: StockTicker -> Page -> Aff (Either HarborViewError StockAndOptionsPayload)
-fetchDerivatives_ (StockTicker ticker) page =
+fetchDerivatives :: forall m. MonadAff m
+  => StockTicker
+  -> Page
+  -> m (Either AppStatus StockAndOptionsPayload)
+fetchDerivatives (StockTicker ticker) page =
   let
     url =
       if page == Calls then
@@ -27,17 +31,5 @@ fetchDerivatives_ (StockTicker ticker) page =
       else
         mainUrl <> "/puts/" <> show ticker
   in
-  HU.get url R.stockAndOptionsDecoder
-
-fetchDerivatives :: forall m. MonadAff m
-  => StockTicker
-  -> Page
-  -> m (Either AppStatusResponse StockAndOptionsPayload)
-fetchDerivatives ticker isCalls =
-  H.liftAff (fetchDerivatives_ ticker isCalls) >>= \result ->
-    case result of
-      Left err ->
-        pure $ Left $ { appStatus: HarborViewErr, msg: err2string err }
-      Right result1 ->
-        pure $ Right result1
-        --  pure $ Right tbl --$ transformShelfPayload tbl
+  H.liftAff (HU2.get url R.stockAndOptionsDecoder) >>= \result ->
+    pure $ result

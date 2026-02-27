@@ -15,23 +15,24 @@ import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import HarborView.Common (StockTicker(..))
 import HarborView.Common as HC
-import HarborView.AppStatus (AppStatusResponse)
+import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
 
 
-handleAppStatus
-  :: forall m.
-     MonadState State m
-  => AppStatusResponse
-  -> m Unit
+-- handleAppStatus
+--   :: forall m.
+--      MonadState State m
+--   => AppStatus
+--   -> m Unit
+
 handleAppStatus s =
   let
-    myModal = AppStat.modalStateFor s.appStatus s.msg
+    myModal = AppStat.modalStateFor s "msg"
   in
-  pure unit
-  -- H.modify_
-  --   \stx ->
-  --     stx { modalStateBottom = myModal }
+  (H.modify_
+    \stx ->
+      stx { risc = Just (T.Risc 12.3) }
+  ) *> pure unit
 
 handleTickerChange
   :: forall m
@@ -52,6 +53,7 @@ handleTickerChange ticker =
               handleAppStatus err
             Right result1 ->
               pure unit
+
 
 handleRiscChange
   :: forall m
