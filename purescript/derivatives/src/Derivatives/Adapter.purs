@@ -3,34 +3,41 @@ module Derivatives.Adapter
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
 import Data.Either (Either(..))
 import Derivatives.Response (StockAndOptionsPayload)
 import Derivatives.Response as R
+import Derivatives.Types (Page(..))
 import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import HarborView.HarborViewError (err2string, HarborViewError)
-import HarborView.AppStatus (AppStatus(..),AppStatusResponse(..),fromInt)
-import HarborView.Common (Oid(..))
+import HarborView.AppStatus (AppStatus(..), AppStatusResponse)
+import HarborView.Common (StockTicker(..))
 import HarborView.Util.HttpUtil as HU
 
 mainUrl :: String
 mainUrl = "/nordnet"
 
-fetchDerivatives_ :: Oid -> Boolean -> Aff (Either HarborViewError StockAndOptionsPayload)
-fetchDerivatives_ (Oid oid) isCalls =
+fetchDerivatives_ :: StockTicker -> Page -> Aff (Either HarborViewError StockAndOptionsPayload)
+fetchDerivatives_ (StockTicker ticker) page =
   let
-    url = mainUrl -- <> "/prints/" <> show shelf <> "/" <> show stack
+    url =
+      if page == Calls then
+        mainUrl <> "/calls/" <> show ticker
+      else
+        mainUrl <> "/puts/" <> show ticker
   in
   HU.get url R.stockAndOptionsDecoder
 
-fetchDerivatives :: forall m. MonadAff m => Oid -> Boolean -> m (Either AppStatusResponse (Array Int))
-fetchDerivatives oid isCalls =
-  H.liftAff (fetchDerivatives_ oid isCalls) >>= \result ->
+fetchDerivatives :: forall m. MonadAff m
+  => StockTicker
+  -> Page
+  -> m (Either AppStatusResponse StockAndOptionsPayload)
+fetchDerivatives ticker isCalls =
+  H.liftAff (fetchDerivatives_ ticker isCalls) >>= \result ->
     case result of
       Left err ->
         pure $ Left $ { appStatus: HarborViewErr, msg: err2string err }
       Right result1 ->
-        pure $ Left $ { appStatus: HarborViewErr, msg: "err2string err" }
+        pure $ Right result1
         --  pure $ Right tbl --$ transformShelfPayload tbl

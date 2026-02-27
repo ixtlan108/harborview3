@@ -9,6 +9,9 @@ data Page =
   Calls
   | Puts
 
+
+derive instance Eq Page
+
 fromString :: String -> Page
 fromString "calls" = Calls
 fromString _ = Puts
