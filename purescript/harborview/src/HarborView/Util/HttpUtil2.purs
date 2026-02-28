@@ -1,5 +1,8 @@
 module HarborView.Util.HttpUtil2
   ( get
+    , put
+    , post
+    , delete
   ) where
 
 import Prelude
@@ -48,28 +51,28 @@ get url f =
   Affjax.get ResponseFormat.json url >>= \res ->
     pure $ parseResult res f
 
--- post
---   :: forall r
---   . URL
---   -> RequestBody
---   -> (Json -> Either JsonDecodeError r)
---   -> Aff (Either HarborViewError r)
--- post url requestBody f =
---   Affjax.post ResponseFormat.json url (Just requestBody) >>= \res ->
---     pure $ parseResult res f
+post
+  :: forall r
+  . URL
+  -> RequestBody
+  -> (Json -> Either JsonDecodeError r)
+  -> Aff (Either AppStatus r)
+post url requestBody f =
+  Affjax.post ResponseFormat.json url (Just requestBody) >>= \res ->
+    pure $ parseResult res f
 
 
--- put
---   :: forall r
---   . URL
---   -> RequestBody
---   -> (Json -> Either JsonDecodeError r)
---   -> Aff (Either HarborViewError r)
--- put url requestBody f =
---   Affjax.put ResponseFormat.json url (Just requestBody) >>= \res ->
---     pure $ parseResult res f
+put
+  :: forall r
+  . URL
+  -> RequestBody
+  -> (Json -> Either JsonDecodeError r)
+  -> Aff (Either AppStatus r)
+put url requestBody f =
+  Affjax.put ResponseFormat.json url (Just requestBody) >>= \res ->
+    pure $ parseResult res f
 
--- delete :: forall r. URL -> (Json -> Either JsonDecodeError r) -> Aff (Either HarborViewError r)
--- delete url f =
---   Affjax.delete ResponseFormat.json url >>= \res ->
---     pure $ parseResult res f
+delete :: forall r. URL -> (Json -> Either JsonDecodeError r) -> Aff (Either AppStatus r)
+delete url f =
+  Affjax.delete ResponseFormat.json url >>= \res ->
+    pure $ parseResult res f

@@ -20,7 +20,7 @@ import Foreign.Object (fromFoldable)
 import HarborView.Common as HC
 
 type PayloadResponse a =
-  { appstatus :: Int
+  { appStatusCode :: Int
   , msg :: Maybe String
   , payload :: a
   }

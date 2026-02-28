@@ -16,11 +16,11 @@ type Derivative =
     , ivBid :: Number
     , ivAsk :: Number
     , brEven :: Number
-    , expiry :: Number
+    , expiry :: String
   }
 
 type Stock =
-  { unixtime :: Int
+  { unixtime :: Number
     , o :: Number
     , h :: Number
     , l :: Number

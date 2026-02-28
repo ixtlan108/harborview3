@@ -9,14 +9,18 @@ import Data.Maybe (Maybe(..))
 import Derivatives.Actions (MainAction(..))
 import Derivatives.Adapter as Adapter
 import Derivatives.State (State)
+import Derivatives.Table.SortField (SortField)
+import Derivatives.Table.TableSort as TableSort
+import Derivatives.Transform as Transform
 import Derivatives.Types (Risc(..))
 import Derivatives.Types as T
 import Effect.Aff.Class (class MonadAff)
+import Effect.Console (logShow)
 import Halogen as H
-import HarborView.Common (StockTicker(..))
-import HarborView.Common as HC
 import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
+import HarborView.Common (StockTicker(..))
+import HarborView.Common as HC
 
 
 -- handleAppStatus
@@ -25,6 +29,11 @@ import HarborView.AppStatus as AppStat
 --   => AppStatus
 --   -> m Unit
 
+handleAppStatus
+  :: forall m
+   . MonadState State m
+  => AppStatus
+  -> m Unit
 handleAppStatus s =
   let
     myModal = AppStat.modalStateFor s "msg"
@@ -41,17 +50,23 @@ handleTickerChange
   => Maybe StockTicker
   -> m Unit
 handleTickerChange ticker =
-  (H.modify_ \stx -> stx { ticker = ticker }) *>
   case ticker of
     Nothing ->
+      (H.modify_ \stx -> stx { ticker = ticker }) *>
       pure unit
     Just ticker1 ->
       H.get >>= \st ->
         Adapter.fetchDerivatives ticker1 st.page >>= \result ->
           case result of
             Left err ->
+              H.liftEffect (logShow err) *>
               handleAppStatus err
             Right result1 ->
+              let
+                tableItems = Transform.transform result1.payload
+              in
+              H.liftEffect (logShow tableItems) *>
+              (H.modify_ \stx -> stx { ticker = ticker, opx = tableItems }) *>
               pure unit
 
 
@@ -69,9 +84,22 @@ handleRiscChange risc =
     Just risc1 ->
       pure unit
 
--- handleFetchDerivatives s =
---   A.fetchDerivatives (StockTicker 3) true >>= \result ->
---     pure unit
+
+handleTableSort
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => SortField
+  -> m Unit
+handleTableSort sf =
+  H.get >>= \st ->
+    let
+      so = not st.sortOrderAsc
+      sortedItems = TableSort.sortResponse sf so st.opx
+    in
+    H.modify_ \stx -> stx { opx = sortedItems, sortOrderAsc = so, sortField = sf }
+
+  -- (H.modify_ \stx -> stx { risc = risc }) *>
 
 handleAction
   :: forall cs o m
@@ -92,4 +120,4 @@ handleAction = case _ of
   IvChecked b ->
     pure unit
   TableSort sf _ ->
-    pure unit
+    handleTableSort sf

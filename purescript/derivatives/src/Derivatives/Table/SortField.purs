@@ -7,6 +7,7 @@ data SortField
   = SfTicker
   | SfIvBid
   | SfIvAsk
+  | SfNone
 
 derive instance Eq SortField
 

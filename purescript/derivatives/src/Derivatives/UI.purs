@@ -15,7 +15,7 @@ ivCheck :: forall w. Boolean -> HTML w MainAction
 ivCheck isChecked =
   HH.div [ HP.classes [ ClassName "form-check form-switch ps-mt-auto" ]]
     [ HH.input [HP.type_ InputCheckbox, HP.id "htmlid", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onValueChange IvChecked ]
-    , HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "htmlid"] [ HH.text "Only iv > 0.0"]
+    --, HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "htmlid"] [ HH.text "Only iv > 0.0"]
     ]
 
 inpRisc :: forall w. Maybe Number -> HTML w MainAction

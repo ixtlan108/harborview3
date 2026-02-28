@@ -6,6 +6,8 @@ import Data.Maybe (Maybe(..))
 import Derivatives.Actions (MainAction)
 import Derivatives.Command (handleAction)
 import Derivatives.State (State, defaultState)
+import Derivatives.Table.SortField (SortField(..))
+import Derivatives.Table.Table as Table
 import Derivatives.UI as UI
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
@@ -13,6 +15,7 @@ import Halogen.HTML (ClassName(..))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as HC
+
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
 component =
@@ -35,4 +38,6 @@ render st =
         --, UI.inpRisc st.risc
         , UI.ivCheck true
       ]
+    , HH.div [ HP.classes [ ClassName "derivatives" ]]
+      [ Table.createTable st.opx st.sortField true ]
     ]

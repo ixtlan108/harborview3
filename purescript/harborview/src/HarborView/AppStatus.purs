@@ -14,10 +14,19 @@ data AppStatus
   | HttpError Int
   | JsonError String
 
-type AppStatusResponse =
-  { appStatus :: AppStatus
-  , msg :: String
-  }
+instance Show AppStatus where
+  show Ok = "Ok"
+  show (GeneralError i) = "GeneralError " <> show i
+  show (SqlError i) = "SqlError " <> show i
+  show (ApplicationWarning i) = "ApplicationWarning " <> show i
+  show (AffjaxError s) = "AffjaxError " <> s
+  show (HttpError i) = "HttpError " <> show i
+  show (JsonError s) = "JsonError " <> s
+
+-- type AppStatusResponse =
+--   { appStatus :: AppStatus
+--   , msg :: String
+--   }
 
 modalStateFor :: AppStatus -> String -> ModalState
 modalStateFor st msg =
@@ -43,6 +52,6 @@ modalStateFor st msg =
     AffjaxError s ->
       ModalError msg
     HttpError statusCode  ->
-        ModalError msg
+      ModalError msg
     JsonError s ->
       ModalError msg
