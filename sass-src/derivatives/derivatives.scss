@@ -9,31 +9,40 @@ body {
   color: var(--color-1);
   font-family: "Poppins", sans-serif;
   /*font-family: "Tangerine", sans-serif;*/
-  font-size: 1.2rem;
+  font-size: 1rem;
+  /*font-weight: var(--font-weight);*/
 }
 
 .containerx {  
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 10fr 1fr;
-  grid-template-rows: 20px 65px auto;
+  grid-template-rows: 120px auto;
   gap: 5px 5px;
   grid-auto-flow: row;
   grid-template-areas:
-    ". . ."
     ". inputs ."
     ". derivatives .";
 }
-
 .inputs { 
   grid-area: inputs; 
   display: flex;
   flex-direction: row;
+  position:sticky;
+  top:0px;
+  z-index: 2000;
+  background-color: var(--bg-color);
+  padding-top:20px;
+  padding-bottom:20px;
 }
 
 .derivatives { 
   grid-area: derivatives; 
 }
+
+// table {
+//   margin-top: 3rem;
+// }
 
 .ps-input {
   width: 8rem;
@@ -41,14 +50,25 @@ body {
 
 .ps-label {
   font-size: 1.1rem;
-  color: $color-2;
+  color: var(--color-2);
   font-weight: 400;
 }
 
-.ps-btn {
+.ps-btn,
+.ps-btn-150,
+.ps-btn-200,
+.ps-btn-250 {
+  --bs-btn-disabled-color: #ff6df5;
+  --bs-btn-disabled-border-color: #ff6df5;
+  --bs-btn-disabled-opacity: 0.6;
+  --bs-btn-border-color: #ff6df5;
+  --bs-btn-border-radius: 0px;
+  --bs-btn-color: #ff6df5;
+  --bs-btn-hover-color: #122342;
+  --bs-btn-hover-border-color: #ff6df5;
+  --bs-btn-hover-bg: #ff6df5;
   height: 40px;
   width: 150px;
-  --bs-btn-border-radius: 0px;
 }
 
 .ps-select {

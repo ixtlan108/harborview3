@@ -10,7 +10,6 @@
     <div class="logo"></div>
     <div id="derivatives"></div>
     <div th:replace="~{head.html :: scripts}"></div>
-    <div th:replace="~{footer.html :: footer}"></div>
 
     <script type="text/javascript" src="/js/derivatives/derivatives-%s.js"></script>
     <link rel="stylesheet" href="/css/derivatives/derivatives-%s.css">

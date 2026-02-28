@@ -7,8 +7,10 @@ table {
 table thead th {
   position: sticky;
   /* make the table heads sticky */
-  top: 0px;
+  top: 119px;
+  z-index: 1000;
   /* table head will be placed from the top of the table and sticks to it */
+  background: var(--table-th-nosort-background-color);
 }
 
 th,
