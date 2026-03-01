@@ -36,7 +36,7 @@ render st =
         , UI.calcRisc
         , UI.inpRisc Nothing
         --, UI.inpRisc st.risc
-        , UI.ivCheck true
+        , UI.ivCheck st.ivNotZero
       ]
     , HH.div [ HP.classes [ ClassName "derivatives" ]]
       [ Table.createTable st.opx st.sortField true ]

@@ -15,14 +15,16 @@ type State =
     , opx :: Array TableItem
     , sortField :: SortField
     , sortOrderAsc :: Boolean
+    , ivNotZero :: Boolean
   }
 
 defaultState :: State
 defaultState =
-  { page: Puts
+  { page: Calls
     , ticker: Just (StockTicker 28)
     , risc: Nothing
     , opx: []
     , sortField: SfNone
     , sortOrderAsc: false
+    , ivNotZero: false
   }

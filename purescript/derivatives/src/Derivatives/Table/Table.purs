@@ -3,6 +3,8 @@ module Derivatives.Table.Table
 
 import Prelude
 
+import Effect (Effect)
+import DOM.HTML.Indexed.InputType (InputType(..))
 import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -142,18 +144,22 @@ type TableItem =
     , spAtRisc :: Number
   }
 
--- mkSelectedCheck :: forall w. Boolean -> HTML w MainAction
--- mkSelectedCheck vCheck isChecked =
---   HH.div [ HP.classes [ ClassName "form-check ps-mt-auto" ]]
---     [ HH.input [HP.type_ InputCheckbox, HP.id "htmlid", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onValueChange IvChecked ]
---     --, HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "htmlid"] [ HH.text "Only iv > 0.0"]
---     ]
+foreign import setTableItemSelected :: TableItem -> Boolean -> Effect Unit
+
+tableItemCheck :: forall w. Int -> Boolean -> HTML w MainAction
+tableItemCheck lnr isChecked =
+  HH.div [ HP.classes [ ClassName "form-check form-switch" ]]
+    [ HH.input [ HP.type_ InputCheckbox
+                , HP.classes [ ClassName "form-check-input" ]
+                , HP.checked isChecked
+                , HE.onChecked (TableItemChecked lnr)]
+    ]
 
 createRow :: forall w. TableItem -> HTML w MainAction
 createRow item =
   HH.tr_
     [ HH.td_ [ HH.text $ show item.lnr ]
-    , HH.td_ [ HH.text "Selected" ]
+    , HH.td_ [ tableItemCheck item.lnr item.selected ]
     , HH.td_ [ HH.text "Purchase" ]
     , HH.td_ [ HH.text item.ticker ]
     , HH.td_ [ HH.text $ show item.days ]
@@ -182,67 +188,3 @@ createTable items sf isAsc =
       [ tableHead sf isAsc
       , HH.tbody_ rows
       ]
-
-
-    {-
-createRow
-  :: forall w r
-   .  { loc :: String
-      , gps :: Int
-      , edn :: Maybe String
-      , edt :: Maybe Int
-      , photo :: Int
-      , pwf :: Maybe String
-      , gpo :: Maybe Int
-      , stdFrame :: Maybe String
-      , shootDate :: Maybe String
-      , ata :: Maybe String
-      , atd :: Maybe String
-      | r
-      }
-   -> HTML w MainAction
-createRow item =
-  HH.tr_
-    [ HH.td_ [ HH.text $ item.loc ]
-    , HH.td_ [ HH.text $ show item.gps ]
-    , HH.td_ [ HH.text $ fromMaybe "" item.edn ]
-    , HH.td_ [ HH.text $ W.maybeInt2Str item.edt ""]
-    , HH.td [ tdAlign false ] [ HH.text $ show item.photo ]
-    , HH.td_ [ HH.text $ fromMaybe "" item.pwf ]
-    , HH.td [ tdAlign false ] [ HH.text $ W.maybeInt2Str item.gpo "" ]
-    , HH.td_ [ HH.text $ fromMaybe "" item.stdFrame ]
-    , HH.td_ [ HH.text $ fromMaybe "" item.shootDate ]
-    , HH.td_ [ HH.text $ fromMaybe "" item.ata ]
-    , HH.td_ [ HH.text $ fromMaybe "" item.atd ]
-    ]
-
-createTable
-  :: forall w r
-  . Array
-      { loc :: String
-      , gps :: Int
-      , edn :: Maybe String
-      , edt :: Maybe Int
-      , photo :: Int
-      , pwf :: Maybe String
-      , gpo :: Maybe Int
-      , stdFrame :: Maybe String
-      , shootDate :: Maybe String
-      , ata :: Maybe String
-      , atd :: Maybe String
-      | r
-      }
-  -> SortField
-  -> Boolean
-  -> HTML w MainAction
-createTable items sf isAsc =
-  let
-    rows = map createRow items
-  in
-    HH.table
-      [ HP.classes [ ClassName "sortable ps-mt-1" ] ]
-      [ tableHead sf isAsc
-      , HH.tbody_ rows
-      ]
-
--}

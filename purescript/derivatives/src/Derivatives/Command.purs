@@ -4,12 +4,14 @@ module Derivatives.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
+import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Derivatives.Actions (MainAction(..))
 import Derivatives.Adapter as Adapter
 import Derivatives.State (State)
 import Derivatives.Table.SortField (SortField)
+import Derivatives.Table.Table as Table
 import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
 import Derivatives.Types (Risc(..))
@@ -101,6 +103,30 @@ handleTableSort sf =
 
   -- (H.modify_ \stx -> stx { risc = risc }) *>
 
+
+handleTableItemChecked
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => Int
+  -> Boolean
+  -> m Unit
+handleTableItemChecked lnr isChecked =
+  H.get >>= \st ->
+    let
+      curOpx = Array.find (\x -> x.lnr == lnr) st.opx
+    in
+    case curOpx of
+      Nothing ->
+        pure unit
+      Just curOpx1 ->
+        let
+          items = st.opx
+          _ =  Table.setTableItemSelected curOpx1 isChecked
+        in
+        (H.modify_ \stx -> stx { opx = [] }) *>
+        (H.modify_ \stx -> stx { opx = items })
+
 handleAction
   :: forall cs o m
     . MonadAff m
@@ -119,5 +145,7 @@ handleAction = case _ of
     handleRiscChange $ HC.umap Risc s
   IvChecked b ->
     pure unit
+  TableItemChecked lnr b ->
+    handleTableItemChecked lnr b
   TableSort sf _ ->
     handleTableSort sf

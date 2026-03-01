@@ -9,7 +9,11 @@ import Derivatives.Table.Table (TableItem)
 
 mapOption :: Int -> Derivative -> TableItem
 mapOption index d =
-  { lnr: index + 1
+  let
+    curLnr = index + 1
+    --selected = if curLnr == 4 || curLnr == 7 || curLnr == 10 then true else false
+  in
+  { lnr: curLnr
     , selected: false
     , ticker: d.ticker
     , days: d.days

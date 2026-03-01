@@ -61,7 +61,7 @@
 
 (def payload  
   {:stockprice stock-price
-   :opx (opx 6)}) 
+   :opx (opx 1)}) 
         
 
 (defn stock-options [req]

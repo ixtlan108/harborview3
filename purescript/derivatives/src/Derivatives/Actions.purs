@@ -11,4 +11,5 @@ data MainAction
   | CalcRisc MouseEvent
   | RiscChange String
   | IvChecked String
+  | TableItemChecked Int Boolean
   | TableSort SortField MouseEvent

@@ -57,7 +57,7 @@
       :lc label-class
       :disabled "false"}])
 
-(def btn-class "ps-mr-1 ps-mt-auto ps-btn btn btn-outline-success")
+(def btn-class "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success")
 
 (def buttons 
   @[{ :evt "CalcRisc"
@@ -77,7 +77,7 @@
       :p1 ["val" "Maybe Number"]}])
 
 (def checkbox
-  @[{ :name "ivCheck" :id "htmlid" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-auto"}])
+  @[{ :name "ivCheck" :id "htmlid" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-24"}])
 
 (def main-action "MainAction")
 
