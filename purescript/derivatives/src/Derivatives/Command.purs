@@ -12,6 +12,7 @@ import Derivatives.Adapter as Adapter
 import Derivatives.State (State)
 import Derivatives.Table.SortField (SortField)
 import Derivatives.Table.Table as Table
+import Derivatives.Table.Table (TableItem)
 import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
 import Derivatives.Types (Risc(..))
@@ -124,7 +125,7 @@ handleTableItemChecked lnr isChecked =
           items = st.opx
           _ =  Table.setTableItemSelected curOpx1 isChecked
         in
-        (H.modify_ \stx -> stx { opx = [] }) *>
+        -- (H.modify_ \stx -> stx { opx = [] }) *>
         (H.modify_ \stx -> stx { opx = items })
 
 handleAction
