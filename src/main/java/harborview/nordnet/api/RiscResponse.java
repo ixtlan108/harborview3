@@ -1,4 +1,4 @@
-package harborview.domain.nordnet;
+package harborview.nordnet.api;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

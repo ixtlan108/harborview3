@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import vega.financial.calculator.OptionCalculator;
 
-@Component
+@Component("adapter.demo")
 @Profile("demo")
 public class NordnetAdapterV1Demo extends NordnetAdapterV1 {
 
@@ -22,6 +22,7 @@ public class NordnetAdapterV1Demo extends NordnetAdapterV1 {
                                 @Value("${cache.option.expiry}") int optionExpiry,
                                 @Value("${redis.fetchOpeningPrice}") boolean fetchOpeningPrice) {
         super(downloader,redisAdapter,blackScholes,curDateStr,optionsExpiry,optionExpiry,fetchOpeningPrice);
+        System.out.println("HI, I AM THE ACTIVE ONE: " + this);
     }
 
 }

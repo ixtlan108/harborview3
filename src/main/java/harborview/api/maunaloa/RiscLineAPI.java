@@ -1,7 +1,7 @@
 package harborview.api.maunaloa;
 
 import harborview.domain.core.maunaloa.MaunaloaCore;
-import harborview.domain.nordnet.RLine;
+import harborview.nordnet.api.RLine;
 import harborview.domain.stockmarket.StockTicker;
 import harborview.dto.StatusDTO;
 import org.springframework.http.MediaType;

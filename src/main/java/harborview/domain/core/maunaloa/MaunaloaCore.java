@@ -2,7 +2,6 @@ package harborview.domain.core.maunaloa;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import harborview.api.nordnet.response.FindOptionResponse;
 import harborview.api.util.ApiUtil;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
@@ -19,14 +18,13 @@ import harborview.domain.stockmarket.StockTicker;
 import harborview.dto.StatusDTO;
 import harborview.dto.html.Charts;
 import harborview.dto.html.SelectItem;
+import harborview.nordnet.api.RLine;
 import harborview.nordnet.repository.NordnetRepository;
-import harborview.util.StockOptionUtil;
 import oahu.dto.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import vega.exception.BinarySearchException;
 import vega.financial.calculator.OptionCalculator;
 
 import java.util.ArrayList;
@@ -38,8 +36,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import harborview.dto.StatusCode;
-
-import static vega.financial.StockOptionType.CALL;
 
 @Component
 public class MaunaloaCore {
@@ -62,13 +58,14 @@ public class MaunaloaCore {
 
     private final NordnetRepository nordnetRepository;
 
-    public MaunaloaCore(StockMarketRepository stockMarketAdapter,
-                        NordnetRepository nordnetRepository,
+    public MaunaloaCore(@Qualifier("adapter.demo") NordnetRepository nordnetRepository,
+    //public MaunaloaCore(NordnetRepository nordnetRepository,
+                        StockMarketRepository stockMarketAdapter,
                         @Qualifier("blackScholes") OptionCalculator optionCalculator) {
         this.nordnetRepository = nordnetRepository;
         this.stockMarketAdapter = stockMarketAdapter;
         this.optionCalculator = optionCalculator;
-        System.out.println(stockMarketAdapter);
+        System.out.println("MaunaloaCore: " + nordnetRepository);
     }
 
     //@Cacheable(value="stockTickers")
@@ -146,7 +143,7 @@ public class MaunaloaCore {
 
         var optionType = info.third();
 
-        FindOptionResponse hit = nordnetAdapter.findOption(request.getTicker());
+        FindOptionResponse hit = nordnetRepository.findOption(request.getTicker());
 
         if (hit == null) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.COULD_NOT_FIND_OPTION_ERROR);
@@ -201,7 +198,7 @@ public class MaunaloaCore {
 
         return result;
 
-         */
+        //*/
         return null;
     }
 

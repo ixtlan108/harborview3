@@ -7,6 +7,7 @@ import harborview.nordnet.repository.NordnetRepository;
 import harborview.nordnet.stockmarket.StockOption;
 import harborview.nordnet.stockmarket.StockPrice;
 import harborview.nordnet.stockmarket.StockTicker;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,8 +17,10 @@ public class NordnetCore {
 
     private final NordnetRepository repos;
 
-    public NordnetCore(NordnetRepository repos) {
+    public NordnetCore(@Qualifier("adapter.demo") NordnetRepository repos) {
+    //public NordnetCore(NordnetRepository repos) {
         this.repos = repos;
+        System.out.println("NordnetCore: " + repos);
     }
 
     public Either<ApplicationError, StockPrice> getStockPrice(StockTicker ticker) {

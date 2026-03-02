@@ -1,8 +1,8 @@
 package harborview.controller;
 
-import harborview.domain.nordnet.NordnetRepository;
 import harborview.domain.stockmarket.StockMarketRepository;
 import harborview.mybatis.MyBatisUtil;
+import harborview.nordnet.repository.NordnetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
