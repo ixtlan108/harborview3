@@ -2,6 +2,7 @@ package harborview.domain.core.maunaloa;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import harborview.api.nordnet.response.FindOptionResponse;
 import harborview.api.util.ApiUtil;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
@@ -9,7 +10,6 @@ import harborview.domain.stockmarket.StockMarketRepository;
 import harborview.chart.ChartFactory;
 import harborview.chart.ChartMonthFactory;
 import harborview.chart.ChartWeekFactory;
-import harborview.domain.nordnet.*;
 import harborview.domain.stockmarket.StockOptionPurchase;
 import harborview.domain.stockmarket.StockOptionSale;
 import harborview.domain.stockmarket.StockOptionTicker;
@@ -21,12 +21,15 @@ import harborview.dto.html.SelectItem;
 import harborview.nordnet.api.RLine;
 import harborview.nordnet.api.RiscRequest;
 import harborview.nordnet.api.RiscResponse;
+import harborview.nordnet.api.RiscResponseStatus;
 import harborview.nordnet.repository.NordnetRepository;
+import harborview.nordnet.util.StockOptionUtil;
 import oahu.dto.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import vega.exception.BinarySearchException;
 import vega.financial.calculator.OptionCalculator;
 
 import java.util.ArrayList;
@@ -138,51 +141,52 @@ public class MaunaloaCore {
 
     RiscResponse calcRiscStockPrice(RiscRequest request) {
 
-        /*
+        //*
         var info = StockOptionUtil.stockOptionInfoFromTicker(request.getTicker());
 
-        var oid = info.first();
+        var oid = info.getStockTicker().oid(); //info.first();
 
-        var optionType = info.third();
+        var optionType = info.getStockOptionType(); //info.third();
 
-        FindOptionResponse hit = nordnetRepository.findOption(request.getTicker());
+        var hit = nordnetRepository.findOption(request.getTicker());
 
         if (hit == null) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.COULD_NOT_FIND_OPTION_ERROR);
         }
 
-        var payload = hit.payload();
+        var option = hit.second();
 
-        var riscAdjustedPrice = payload.option().ask() - request.getRiscValue();
+        var riscAdjustedPrice = option.getAsk() - request.getRiscValue();
 
         if (riscAdjustedPrice < 0) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.RISC_ADJUSTED_PRICE_LESS_THAN_ZERO);
         }
 
-        if (payload.option().ivBid() < 0) {
+        if (option.getIvBid() < 0) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.IV_LESS_THAN_ZERO);
         }
 
         double curStockPrice = 0.0;
         double curBreakEven = 0.0;
+        var stockPrice = hit.first();
         try {
             curStockPrice = optionCalculator.stockPriceFor2(optionType,
                     riscAdjustedPrice,
-                    payload.option().x(),
-                    payload.option().days(),
-                    payload.option().ivBid(),
-                    payload.option().close());
+                    option.getX(),
+                    option.getDays(),
+                    option.getIvBid(),
+                    stockPrice.cls());
         } catch (BinarySearchException ex) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.CALCULATE_OPTION_PRICE_ERROR);
         }
 
         try {
             curBreakEven = optionCalculator.stockPriceFor2(optionType,
-                    payload.option().ask(),
-                    payload.option().x(),
-                    payload.option().days(),
-                    payload.option().ivBid(),
-                    payload.option().close());
+                    option.getAsk(),
+                    option.getX(),
+                    option.getDays(),
+                    option.getIvBid(),
+                    stockPrice.cls());
         } catch (BinarySearchException ex) {
             return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.BREAK_EVEN_ERROR);
         }
@@ -190,9 +194,9 @@ public class MaunaloaCore {
         var result = new RiscResponse(request.getTicker(), curStockPrice, RiscResponseStatus.OK);
 
         saveRiscResult(oid,
-                request.getTicker().ticker(),
-                payload.option().bid(),
-                payload.option().ask(),
+                request.getTicker().value(),
+                option.getBid(),
+                option.getAsk(),
                 request.getRiscValue(),
                 curStockPrice,
                 riscAdjustedPrice,
@@ -201,7 +205,6 @@ public class MaunaloaCore {
         return result;
 
         //*/
-        return null;
     }
 
     public Either<ApplicationError,List<RiscResponse>> calcRiscStockPrices(List<RiscRequest> request) {
