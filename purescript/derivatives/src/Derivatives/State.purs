@@ -16,6 +16,7 @@ type State =
     , sortField :: SortField
     , sortOrderAsc :: Boolean
     , ivNotZero :: Boolean
+    , calcRiscSelected :: Boolean
   }
 
 defaultState :: State
@@ -27,4 +28,5 @@ defaultState =
     , sortField: SfNone
     , sortOrderAsc: false
     , ivNotZero: false
+    , calcRiscSelected: false
   }

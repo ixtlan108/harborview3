@@ -11,8 +11,8 @@ import Derivatives.Actions (MainAction(..))
 import Derivatives.Adapter as Adapter
 import Derivatives.State (State)
 import Derivatives.Table.SortField (SortField)
-import Derivatives.Table.Table as Table
 import Derivatives.Table.Table (TableItem)
+import Derivatives.Table.Table as Table
 import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
 import Derivatives.Types (Risc(..))
@@ -72,7 +72,6 @@ handleTickerChange ticker =
               (H.modify_ \stx -> stx { ticker = ticker, opx = tableItems }) *>
               pure unit
 
-
 handleRiscChange
   :: forall m
    . MonadState State m
@@ -104,6 +103,25 @@ handleTableSort sf =
 
   -- (H.modify_ \stx -> stx { risc = risc }) *>
 
+calcRiscSingle
+  :: forall  m
+   . MonadState State m
+  => MonadAff m
+  => TableItem
+  -> m Unit
+calcRiscSingle item =
+  if item.selected == false then
+    pure unit
+  else
+    H.get >>= \st ->
+      case st.risc of
+        Nothing ->
+          pure unit
+        Just (Risc risc) ->
+          let
+            _ = Table.setRisc item risc
+          in
+          pure unit
 
 handleTableItemChecked
   :: forall m
@@ -123,10 +141,12 @@ handleTableItemChecked lnr isChecked =
       Just curOpx1 ->
         let
           items = st.opx
-          _ =  Table.setTableItemSelected curOpx1 isChecked
+          _ =  Table.setSelected curOpx1 isChecked
         in
         -- (H.modify_ \stx -> stx { opx = [] }) *>
+        calcRiscSingle curOpx1 *>
         (H.modify_ \stx -> stx { opx = items })
+
 
 handleAction
   :: forall cs o m
@@ -145,7 +165,9 @@ handleAction = case _ of
   RiscChange s ->
     handleRiscChange $ HC.umap Risc s
   IvChecked b ->
-    pure unit
+    H.modify_ \stx -> stx { ivNotZero = b }
+  CalcRiscSelectedChecked b ->
+    H.modify_ \stx -> stx { calcRiscSelected = b }
   TableItemChecked lnr b ->
     handleTableItemChecked lnr b
   TableSort sf _ ->

@@ -10,6 +10,7 @@ data MainAction
   | FetchDerivatives String
   | CalcRisc MouseEvent
   | RiscChange String
-  | IvChecked String
+  | IvChecked Boolean
+  | CalcRiscSelectedChecked Boolean
   | TableItemChecked Int Boolean
   | TableSort SortField MouseEvent

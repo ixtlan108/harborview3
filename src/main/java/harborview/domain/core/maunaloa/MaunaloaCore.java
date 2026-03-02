@@ -6,7 +6,6 @@ import harborview.api.nordnet.response.FindOptionResponse;
 import harborview.api.util.ApiUtil;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
-import harborview.domain.nordnet.NordnetRepository;
 import harborview.domain.stockmarket.StockMarketRepository;
 import harborview.chart.ChartFactory;
 import harborview.chart.ChartMonthFactory;
@@ -20,6 +19,7 @@ import harborview.domain.stockmarket.StockTicker;
 import harborview.dto.StatusDTO;
 import harborview.dto.html.Charts;
 import harborview.dto.html.SelectItem;
+import harborview.nordnet.repository.NordnetRepository;
 import harborview.util.StockOptionUtil;
 import oahu.dto.Tuple2;
 import org.slf4j.Logger;
@@ -45,7 +45,6 @@ import static vega.financial.StockOptionType.CALL;
 public class MaunaloaCore {
 
     private Logger logger = LoggerFactory.getLogger(MaunaloaCore.class);
-    //private final YahooRepository yahooAdapter;
     private final StockMarketRepository stockMarketAdapter;
     private final OptionCalculator optionCalculator;
     private final ChartFactory chartFactory = new ChartFactory();
@@ -61,9 +60,12 @@ public class MaunaloaCore {
 
     private List<SelectItem> stockTickers;
 
+    private final NordnetRepository nordnetRepository;
+
     public MaunaloaCore(StockMarketRepository stockMarketAdapter,
-                        //YahooRepository yahooAdapter,
+                        NordnetRepository nordnetRepository,
                         @Qualifier("blackScholes") OptionCalculator optionCalculator) {
+        this.nordnetRepository = nordnetRepository;
         this.stockMarketAdapter = stockMarketAdapter;
         this.optionCalculator = optionCalculator;
         System.out.println(stockMarketAdapter);

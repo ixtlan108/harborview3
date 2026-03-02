@@ -77,7 +77,8 @@
       :p1 ["val" "Maybe Number"]}])
 
 (def checkbox
-  @[{ :name "ivCheck" :id "htmlid" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-24"}])
+  @[{ :name "ivCheck" :id "ivcheck" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-24 ps-mr-1"}
+    { :name "calcRiscOnSelectedCheck" :id "calcriscselected" :evt "CalcRiscSelectedChecked" :title "Calc risc on selected" :cl-div "form-check form-switch ps-mt-24"}])
 
 (def main-action "MainAction")
 

@@ -144,7 +144,9 @@ type TableItem =
     , spAtRisc :: Number
   }
 
-foreign import setTableItemSelected :: TableItem -> Boolean -> Unit
+foreign import setSelected :: TableItem -> Boolean -> Unit
+
+foreign import setRisc :: TableItem -> Number -> Unit
 
 tableItemCheck :: forall w. Int -> Boolean -> HTML w MainAction
 tableItemCheck lnr isChecked =
