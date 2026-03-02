@@ -19,6 +19,8 @@ import harborview.dto.StatusDTO;
 import harborview.dto.html.Charts;
 import harborview.dto.html.SelectItem;
 import harborview.nordnet.api.RLine;
+import harborview.nordnet.api.RiscRequest;
+import harborview.nordnet.api.RiscResponse;
 import harborview.nordnet.repository.NordnetRepository;
 import oahu.dto.Tuple2;
 import org.slf4j.Logger;
