@@ -4,6 +4,9 @@ module Derivatives.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
+import Data.Function.Uncurried (runFn2)
+import Data.Foldable as Foldable
+import Data.Traversable as Traversable
 import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
@@ -79,12 +82,22 @@ handleRiscChange
   => Maybe Risc
   -> m Unit
 handleRiscChange risc =
-  (H.modify_ \stx -> stx { risc = risc }) *>
-  case risc of
-    Nothing ->
-      pure unit
-    Just risc1 ->
-      pure unit
+  H.get >>= \st ->
+  --(H.modify_ \stx -> stx { risc = risc }) *>
+    let
+      curRisc =
+        case risc of
+          Nothing ->
+            0.0
+          Just (Risc risc1) ->
+            risc1
+      items = Array.filter (\x -> x.selected == true) st.opx
+      -- _ = Traversable.traverse_ logShow items
+      riscFn = (\x -> Table.setRisc x curRisc)
+    in
+    H.liftEffect (Traversable.traverse_ riscFn items) *>
+    pure unit
+    --H.liftEffect (logShow items) *>
 
 
 handleTableSort
@@ -118,10 +131,12 @@ calcRiscSingle item =
         Nothing ->
           pure unit
         Just (Risc risc) ->
-          let
-            _ = Table.setRisc item risc
-          in
-          pure unit
+          H.liftEffect (Table.setRisc item risc)
+
+          -- let
+          --   _ = Table.setRisc item risc
+          -- in
+          -- pure unit
 
 handleTableItemChecked
   :: forall m
@@ -141,12 +156,27 @@ handleTableItemChecked lnr isChecked =
       Just curOpx1 ->
         let
           items = st.opx
-          _ =  Table.setSelected curOpx1 isChecked
         in
-        -- (H.modify_ \stx -> stx { opx = [] }) *>
+        --H.liftEffect (runFn2 Table.setSelected curOpx1 isChecked) *>
+        H.liftEffect (Table.setSelected curOpx1 isChecked) *>
         calcRiscSingle curOpx1 *>
         (H.modify_ \stx -> stx { opx = items })
 
+
+handleCalcRisc
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => m Unit
+handleCalcRisc =
+  let
+    riscItems = [ { ticker: "YAR6L320", risc: 4.0 }
+                  , { ticker: "YAR6L300", risc: 5.0 }
+                ]
+  in
+  Adapter.calcRisc riscItems >>= \result ->
+    H.liftEffect (logShow result) *>
+    pure unit
 
 handleAction
   :: forall cs o m
@@ -161,7 +191,7 @@ handleAction = case _ of
   FetchDerivatives s ->
     pure unit
   CalcRisc _ ->
-    pure unit
+    handleCalcRisc
   RiscChange s ->
     handleRiscChange $ HC.umap Risc s
   IvChecked b ->

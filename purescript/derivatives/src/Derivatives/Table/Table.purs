@@ -4,6 +4,7 @@ module Derivatives.Table.Table
 import Prelude
 
 import Effect (Effect)
+import Data.Function.Uncurried (Fn2,runFn2)
 import DOM.HTML.Indexed.InputType (InputType(..))
 import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
@@ -144,9 +145,18 @@ type TableItem =
     , spAtRisc :: Number
   }
 
-foreign import setSelected :: TableItem -> Boolean -> Unit
 
-foreign import setRisc :: TableItem -> Number -> Unit
+foreign import setRisc_ :: Fn2 TableItem Number (Effect Unit)
+
+setRisc :: TableItem -> Number -> (Effect Unit)
+setRisc =
+  runFn2 setRisc_
+
+foreign import setSelected_ :: Fn2 TableItem Boolean (Effect Unit)
+
+setSelected :: TableItem -> Boolean -> Effect Unit
+setSelected =
+  runFn2 setSelected_
 
 tableItemCheck :: forall w. Int -> Boolean -> HTML w MainAction
 tableItemCheck lnr isChecked =

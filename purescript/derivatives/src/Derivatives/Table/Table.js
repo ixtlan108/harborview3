@@ -8,10 +8,14 @@ export const setTableItemSelected = (item) => (isSelected) => {
 };
 */
 
-export const setSelected = (item) => (isSelected) => {
-  item.selected = isSelected;
+export const setSelected_ = (item, isSelected) => {
+  return function () {
+    item.selected = isSelected;
+  };
 };
 
-export const setRisc = (item) => (risc) => {
-  item.risc = risc;
+export const setRisc_ = (item, risc) => {
+  return function () {
+    item.risc = risc;
+  };
 };

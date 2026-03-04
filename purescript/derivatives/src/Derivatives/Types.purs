@@ -3,6 +3,10 @@ module Derivatives.Types
 
 import Prelude
 
+import Data.Tuple (Tuple)
+import Data.Argonaut.Core (Json)
+import HarborView.CommonJson as CJ
+
 --------------- Page ---------------
 
 data Page =
@@ -23,3 +27,15 @@ instance Show Page where
 --------------- Risc ---------------
 
 newtype Risc = Risc Number
+
+--------------- Risc Request ---------------
+type RiscRequest =
+  { ticker :: String
+    , risc :: Number
+  }
+
+toJson :: RiscRequest -> Array (Tuple String Json)
+toJson risc =
+  [ CJ.fromString "ticker" risc.ticker
+   , CJ.fromNumber "risc" risc.risc
+  ]

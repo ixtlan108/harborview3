@@ -2,7 +2,7 @@ module Derivatives.State
   where
 
 import Data.Maybe (Maybe(..))
-import HarborView.Common (StockTicker(..))
+import HarborView.Common (StockTicker)
 import Derivatives.Types (Page(..), Risc)
 import Derivatives.Table.Table (TableItem)
 import Derivatives.Table.SortField (SortField(..))
@@ -22,7 +22,7 @@ type State =
 defaultState :: State
 defaultState =
   { page: Calls
-    , ticker: Just (StockTicker 28)
+    , ticker: Nothing
     , risc: Nothing
     , opx: []
     , sortField: SfNone
