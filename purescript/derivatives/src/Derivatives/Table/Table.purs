@@ -4,6 +4,7 @@ module Derivatives.Table.Table
 import Prelude
 
 import Effect (Effect)
+import Data.Maybe (Maybe(..))
 import Data.Function.Uncurried (Fn2,runFn2)
 import DOM.HTML.Indexed.InputType (InputType(..))
 import Halogen.HTML (ClassName(..), HTML)
@@ -13,6 +14,7 @@ import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as HP
 import Derivatives.Actions (MainAction(..))
 import Derivatives.Table.SortField (SortField(..))
+import Derivatives.Types (Risc(..))
 --import Report.Report1.Types (Report1Action(..))
 --import Waimea.Common as W
 --import Oahu.SortField (SortField(..))
@@ -148,9 +150,14 @@ type TableItem =
 
 foreign import setRisc_ :: Fn2 TableItem Number (Effect Unit)
 
-setRisc :: TableItem -> Number -> (Effect Unit)
-setRisc =
-  runFn2 setRisc_
+setRisc :: TableItem -> Maybe Risc -> (Effect Unit)
+setRisc item risc =
+  let
+    risc1 = case risc of
+              Nothing -> 0.0
+              Just (Risc risc2) -> risc2
+  in
+  runFn2 setRisc_ item risc1
 
 foreign import setSelected_ :: Fn2 TableItem Boolean (Effect Unit)
 

@@ -83,21 +83,14 @@ handleRiscChange
   -> m Unit
 handleRiscChange risc =
   H.get >>= \st ->
-  --(H.modify_ \stx -> stx { risc = risc }) *>
     let
-      curRisc =
-        case risc of
-          Nothing ->
-            0.0
-          Just (Risc risc1) ->
-            risc1
       items = Array.filter (\x -> x.selected == true) st.opx
-      -- _ = Traversable.traverse_ logShow items
-      riscFn = (\x -> Table.setRisc x curRisc)
+      riscFn = (\x -> Table.setRisc x risc)
+      origOpx = st.opx
     in
     H.liftEffect (Traversable.traverse_ riscFn items) *>
+    (H.modify_ \stx -> stx { opx = origOpx, risc = risc }) *>
     pure unit
-    --H.liftEffect (logShow items) *>
 
 
 handleTableSort
@@ -123,20 +116,7 @@ calcRiscSingle
   => TableItem
   -> m Unit
 calcRiscSingle item =
-  if item.selected == false then
-    pure unit
-  else
-    H.get >>= \st ->
-      case st.risc of
-        Nothing ->
-          pure unit
-        Just (Risc risc) ->
-          H.liftEffect (Table.setRisc item risc)
-
-          -- let
-          --   _ = Table.setRisc item risc
-          -- in
-          -- pure unit
+  pure unit
 
 handleTableItemChecked
   :: forall m
@@ -157,9 +137,9 @@ handleTableItemChecked lnr isChecked =
         let
           items = st.opx
         in
-        --H.liftEffect (runFn2 Table.setSelected curOpx1 isChecked) *>
-        H.liftEffect (Table.setSelected curOpx1 isChecked) *>
-        calcRiscSingle curOpx1 *>
+        H.liftEffect
+          (Table.setSelected curOpx1 isChecked *>
+           Table.setRisc curOpx1 st.risc) *>
         (H.modify_ \stx -> stx { opx = items })
 
 
