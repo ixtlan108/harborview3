@@ -19,3 +19,9 @@ export const setRisc_ = (item, risc) => {
     item.risc = risc;
   };
 };
+
+export const setCalcRiscResult_ = (item, sp) => {
+  return function () {
+    item.spAtRisc = sp;
+  };
+};

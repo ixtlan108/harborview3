@@ -18,7 +18,7 @@ import Derivatives.Table.Table (TableItem)
 import Derivatives.Table.Table as Table
 import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
-import Derivatives.Types (Risc(..))
+import Derivatives.Types (RiscRequest(..),Risc(..))
 import Derivatives.Types as T
 import Effect.Aff.Class (class MonadAff)
 import Effect.Console (logShow)
@@ -143,20 +143,24 @@ handleTableItemChecked lnr isChecked =
         (H.modify_ \stx -> stx { opx = items })
 
 
+toRiscRequest :: TableItem -> RiscRequest
+toRiscRequest item =
+  { ticker: item.ticker, risc: item.risc }
+
+
 handleCalcRisc
   :: forall m
    . MonadState State m
   => MonadAff m
   => m Unit
 handleCalcRisc =
-  let
-    riscItems = [ { ticker: "YAR6L320", risc: 4.0 }
-                  , { ticker: "YAR6L300", risc: 5.0 }
-                ]
-  in
-  Adapter.calcRisc riscItems >>= \result ->
-    H.liftEffect (logShow result) *>
-    pure unit
+  H.get >>= \st ->
+    let
+      riscItems = map toRiscRequest $ Array.filter (\x -> x.selected == true) st.opx
+    in
+    Adapter.calcRisc riscItems >>= \result ->
+      H.liftEffect (logShow result) *>
+      pure unit
 
 handleAction
   :: forall cs o m

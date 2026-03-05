@@ -165,6 +165,12 @@ setSelected :: TableItem -> Boolean -> Effect Unit
 setSelected =
   runFn2 setSelected_
 
+foreign import setCalcRiscResult_ :: Fn2 TableItem Number (Effect Unit)
+
+setCalcRiscResult :: TableItem -> Number -> Effect Unit
+setCalcRiscResult =
+  runFn2 setCalcRiscResult_
+
 tableItemCheck :: forall w. Int -> Boolean -> HTML w MainAction
 tableItemCheck lnr isChecked =
   HH.div [ HP.classes [ ClassName "form-check form-switch" ]]
