@@ -40,6 +40,7 @@ stockAndOptionsDecoder = Decode.decodeJson
 type RiscResponse =
   { ticker :: String
     , stockprice :: Number
+    , optionprice :: Number
     , status :: Int
   }
 

@@ -20,8 +20,9 @@ export const setRisc_ = (item, risc) => {
   };
 };
 
-export const setCalcRiscResult_ = (item, sp) => {
+export const setCalcRiscResult_ = (item, sp, op) => {
   return function () {
     item.spAtRisc = sp;
+    item.opAtRisc = op;
   };
 };

@@ -23,9 +23,9 @@ mapOption index d =
     , ivBid: d.ivBid
     , ivAsk: d.ivAsk
     , breakEven: d.brEven
-    , risc: 3.0
-    , opAtRisc: 1.0
-    , spAtRisc: 432.0
+    , risc: 0.0
+    , opAtRisc: 0.0
+    , spAtRisc: 0.0
   }
 
 transform :: StockAndOptionsResponse -> Array TableItem

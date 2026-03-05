@@ -4,21 +4,21 @@ module Derivatives.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
-import Data.Function.Uncurried (runFn2)
-import Data.Foldable as Foldable
-import Data.Traversable as Traversable
+import Effect (Effect)
 import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
+import Data.Traversable as Traversable
 import Derivatives.Actions (MainAction(..))
 import Derivatives.Adapter as Adapter
+import Derivatives.Response (RiscResponse)
 import Derivatives.State (State)
 import Derivatives.Table.SortField (SortField)
 import Derivatives.Table.Table (TableItem)
 import Derivatives.Table.Table as Table
 import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
-import Derivatives.Types (RiscRequest(..),Risc(..))
+import Derivatives.Types (RiscRequest, Risc(..))
 import Derivatives.Types as T
 import Effect.Aff.Class (class MonadAff)
 import Effect.Console (logShow)
@@ -148,6 +148,30 @@ toRiscRequest item =
   { ticker: item.ticker, risc: item.risc }
 
 
+setRiscResult :: Array TableItem -> RiscResponse -> Effect Unit
+setRiscResult items response =
+  let
+    curOpx = Array.find (\x -> x.ticker == response.ticker) items
+  in
+  case curOpx of
+    Nothing ->
+      pure unit
+    Just curOpx1 ->
+      Table.setCalcRiscResult curOpx1 response.stockprice response.optionprice
+
+setRiscResults
+  :: forall m
+   . MonadAff m
+  => Array TableItem
+  -> Array RiscResponse
+  -> m Unit
+setRiscResults items responses =
+  let
+    riscFn = setRiscResult items
+  in
+  H.liftEffect (Traversable.traverse_ riscFn responses)
+
+
 handleCalcRisc
   :: forall m
    . MonadState State m
@@ -159,8 +183,17 @@ handleCalcRisc =
       riscItems = map toRiscRequest $ Array.filter (\x -> x.selected == true) st.opx
     in
     Adapter.calcRisc riscItems >>= \result ->
-      H.liftEffect (logShow result) *>
-      pure unit
+      case result of
+        Left err ->
+          H.liftEffect (logShow err) *>
+          handleAppStatus err
+        Right result1 ->
+          let
+            origItems = st.opx
+          in
+          setRiscResults st.opx result1.payload *>
+          H.liftEffect (logShow result1.payload) *>
+          (H.modify_ \stx -> stx { opx = origItems })
 
 handleAction
   :: forall cs o m

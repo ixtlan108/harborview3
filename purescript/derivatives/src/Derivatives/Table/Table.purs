@@ -5,7 +5,7 @@ import Prelude
 
 import Effect (Effect)
 import Data.Maybe (Maybe(..))
-import Data.Function.Uncurried (Fn2,runFn2)
+import Data.Function.Uncurried (Fn3, Fn2, runFn2, runFn3)
 import DOM.HTML.Indexed.InputType (InputType(..))
 import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
@@ -165,11 +165,11 @@ setSelected :: TableItem -> Boolean -> Effect Unit
 setSelected =
   runFn2 setSelected_
 
-foreign import setCalcRiscResult_ :: Fn2 TableItem Number (Effect Unit)
+foreign import setCalcRiscResult_ :: Fn3 TableItem Number Number (Effect Unit)
 
-setCalcRiscResult :: TableItem -> Number -> Effect Unit
+setCalcRiscResult :: TableItem -> Number -> Number -> Effect Unit
 setCalcRiscResult =
-  runFn2 setCalcRiscResult_
+  runFn3 setCalcRiscResult_
 
 tableItemCheck :: forall w. Int -> Boolean -> HTML w MainAction
 tableItemCheck lnr isChecked =

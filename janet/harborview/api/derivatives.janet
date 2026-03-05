@@ -81,7 +81,7 @@
         adjusted-bid (- (hit :ask) r)
         sp-at-risc (calc-risc-2 adjusted-bid)]
     (printf "HIT %q, adjusted bid %f, sp-at-risc: %f" hit adjusted-bid sp-at-risc)
-    {:ticker t :stockprice sp-at-risc :status 1}))
+    {:ticker t :stockprice sp-at-risc :optionprice adjusted-bid :status 1}))
 
 (defn stock-options [req]
   (printf "%q" req)
