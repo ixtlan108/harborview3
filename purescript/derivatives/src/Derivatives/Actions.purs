@@ -4,6 +4,11 @@ module Derivatives.Actions
 import Web.UIEvent.MouseEvent (MouseEvent)
 import Derivatives.Table.SortField (SortField)
 
+data PurchaseDlgAction
+  = XOk MouseEvent
+  | XCancel MouseEvent
+  | XOpen MouseEvent
+
 data MainAction
   = PageChange String
   | TickerChange String
@@ -14,3 +19,4 @@ data MainAction
   | CalcRiscSelectedChecked Boolean
   | TableItemChecked Int Boolean
   | TableSort SortField MouseEvent
+  | PDA PurchaseDlgAction

@@ -4,12 +4,11 @@ module Derivatives.Command
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
-import Effect (Effect)
 import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Traversable as Traversable
-import Derivatives.Actions (MainAction(..))
+import Derivatives.Actions (MainAction(..), PurchaseDlgAction(..))
 import Derivatives.Adapter as Adapter
 import Derivatives.Response (RiscResponse)
 import Derivatives.State (State)
@@ -20,13 +19,16 @@ import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
 import Derivatives.Types (RiscRequest, Risc(..))
 import Derivatives.Types as T
+import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Console (logShow)
 import Halogen as H
+import Halogen.HTML.Elements (p)
 import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
 import HarborView.Common (StockTicker(..))
 import HarborView.Common as HC
+import HarborView.ModalDialog (DialogState(..))
 
 
 -- handleAppStatus
@@ -195,6 +197,21 @@ handleCalcRisc =
           H.liftEffect (logShow result1.payload) *>
           (H.modify_ \stx -> stx { opx = origItems })
 
+
+handlePurchaseAction
+  :: forall m.
+      MonadState State m
+  => MonadAff m
+  => PurchaseDlgAction
+  -> m Unit
+handlePurchaseAction = case _ of
+  XOk _ ->
+    H.modify_ \stx -> stx { modalPurchase = DialogHidden }
+  XCancel _ ->
+    H.modify_ \stx -> stx { modalPurchase = DialogHidden }
+  XOpen _ ->
+      H.modify_ \stx -> stx { modalPurchase = DialogVisible }
+
 handleAction
   :: forall cs o m
     . MonadAff m
@@ -219,3 +236,5 @@ handleAction = case _ of
     handleTableItemChecked lnr b
   TableSort sf _ ->
     handleTableSort sf
+  PDA act ->
+    handlePurchaseAction act

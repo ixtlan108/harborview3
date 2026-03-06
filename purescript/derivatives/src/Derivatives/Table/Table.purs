@@ -180,6 +180,10 @@ tableItemCheck lnr isChecked =
                 , HE.onChecked (TableItemChecked lnr)]
     ]
 
+purchase :: forall w. HTML w MainAction
+purchase =
+  HH.button [HE.onClick CalcRisc, HP.classes [ ClassName "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success"]] [HH.text "Calc Risc"]
+
 createRow :: forall w. TableItem -> HTML w MainAction
 createRow item =
   HH.tr_
