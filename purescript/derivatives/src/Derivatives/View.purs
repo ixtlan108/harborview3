@@ -44,11 +44,10 @@ render st =
       ]
     , HH.div [ HP.classes [ ClassName "derivatives" ]]
       [ Table.createTable st.opx st.sortField true ]
-    , DLG.modalDialog
+    , DLG.modalDialog st.modalPurchase
         (Title "Purchase Option")
-        st.modalPurchase
         (PDA <<< XOk)
-        (PDA <<< XCancel) $
+        (PDA <<< XCancel)
         modalContent
     ]
 
