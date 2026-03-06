@@ -8,7 +8,7 @@ import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Traversable as Traversable
-import Derivatives.Actions (MainAction(..), PurchaseDlgAction(..))
+import Derivatives.Actions (MainAction(..), PurchaseAction(..))
 import Derivatives.Adapter as Adapter
 import Derivatives.Response (RiscResponse)
 import Derivatives.State (State)
@@ -202,15 +202,15 @@ handlePurchaseAction
   :: forall m.
       MonadState State m
   => MonadAff m
-  => PurchaseDlgAction
+  => PurchaseAction
   -> m Unit
 handlePurchaseAction = case _ of
   XOk _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
   XCancel _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
-  XOpen _ ->
-      H.modify_ \stx -> stx { modalPurchase = DialogVisible }
+  XOpen s _ ->
+    H.modify_ \stx -> stx { modalPurchase = DialogVisible }
 
 handleAction
   :: forall cs o m

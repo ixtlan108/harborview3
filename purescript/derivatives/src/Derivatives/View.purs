@@ -3,7 +3,7 @@ module Derivatives.View where
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Derivatives.Actions (MainAction(..),PurchaseDlgAction(..))
+import Derivatives.Actions (MainAction(..),PurchaseAction(..))
 import Derivatives.Command (handleAction)
 import Derivatives.State (State, defaultState)
 import Derivatives.Table.SortField (SortField(..))

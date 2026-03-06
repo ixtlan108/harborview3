@@ -12,7 +12,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as HP
-import Derivatives.Actions (MainAction(..))
+import Derivatives.Actions (MainAction(..),PurchaseAction(..))
 import Derivatives.Table.SortField (SortField(..))
 import Derivatives.Types (Risc(..))
 --import Report.Report1.Types (Report1Action(..))
@@ -180,16 +180,16 @@ tableItemCheck lnr isChecked =
                 , HE.onChecked (TableItemChecked lnr)]
     ]
 
-purchase :: forall w. HTML w MainAction
-purchase =
-  HH.button [HE.onClick CalcRisc, HP.classes [ ClassName "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success"]] [HH.text "Calc Risc"]
+purchase :: forall w. String -> HTML w MainAction
+purchase s =
+  HH.button [HE.onClick (PDA <<< XOpen s), HP.classes [ ClassName "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success"]] [HH.text "Calc Risc"]
 
 createRow :: forall w. TableItem -> HTML w MainAction
 createRow item =
   HH.tr_
     [ HH.td_ [ HH.text $ show item.lnr ]
     , HH.td_ [ tableItemCheck item.lnr item.selected ]
-    , HH.td_ [ HH.text "Purchase" ]
+    , HH.td_ [ purchase item.ticker ]
     , HH.td_ [ HH.text item.ticker ]
     , HH.td_ [ HH.text $ show item.days ]
     , HH.td_ [ HH.text $ show item.bid ]
