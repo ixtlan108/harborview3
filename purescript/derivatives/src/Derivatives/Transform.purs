@@ -5,7 +5,7 @@ import Prelude
 
 import Data.FunctorWithIndex (mapWithIndex)
 import Derivatives.Response (StockAndOptionsResponse, Derivative)
-import Derivatives.Table.Table (TableItem)
+import Derivatives.Table.TableItem (TableItem)
 
 mapOption :: Int -> Derivative -> TableItem
 mapOption index d =

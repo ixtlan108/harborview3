@@ -13,7 +13,7 @@ import Derivatives.Adapter as Adapter
 import Derivatives.Response (RiscResponse)
 import Derivatives.State (State)
 import Derivatives.Table.SortField (SortField)
-import Derivatives.Table.Table (TableItem)
+import Derivatives.Table.TableItem (TableItem)
 import Derivatives.Table.Table as Table
 import Derivatives.Table.TableSort as TableSort
 import Derivatives.Transform as Transform
@@ -210,14 +210,8 @@ handlePurchaseAction = case _ of
   XCancel _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
   XOpen s _ ->
-    H.modify_ \stx -> stx { purchaseTicker = s, modalPurchase = DialogVisible }
-  XAsk s ->
-    pure unit
-  XBid s ->
-    pure unit
+    H.modify_ \stx -> stx { modalPurchase = DialogVisible }
   XVolume s ->
-    pure unit
-  XSpot s ->
     pure unit
 
 handleAction

@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Array as Array
 import Derivatives.Table.SortField (SortField(..))
-import Derivatives.Table.Table (TableItem)
+import Derivatives.Table.TableItem (TableItem)
 --import Report.Report1.Types (Report1Table)
 --import Waimea.Util as WU
 

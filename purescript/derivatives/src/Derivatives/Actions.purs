@@ -9,10 +9,7 @@ data PurchaseAction
   = XOk MouseEvent
   | XCancel MouseEvent
   | XOpen TableItem MouseEvent
-  | XAsk String
-  | XBid String
   | XVolume String
-  | XSpot String
 
 data MainAction
   = PageChange String

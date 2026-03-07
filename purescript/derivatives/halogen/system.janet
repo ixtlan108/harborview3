@@ -80,22 +80,6 @@
       :disabled false 
       :class "form-control ps-input ps-mt-auto"
       :p1 ["val" "Maybe Number"]}
-    { :name "purchaseAsk"
-      :type :num
-      :title "Ask"
-      :evt "(PDA <<< XAsk)" 
-      :lc modal-label-class 
-      :disabled false 
-      :class modal-inp-class  
-      :p1 ["val" "Maybe Number"]}
-    { :name "purchaseBid"
-      :type :num
-      :title "Bid"
-      :evt "(PDA <<< XBid)" 
-      :lc modal-label-class 
-      :disabled false 
-      :class modal-inp-class  
-      :p1 ["val" "Maybe Number"]}
     { :name "purchaseVolume"
       :type :int
       :title "Volume"
@@ -103,15 +87,7 @@
       :lc modal-label-class 
       :disabled false 
       :class modal-inp-class  
-      :p1 ["val" "Maybe Int"]}
-    { :name "purchaseSpot"
-      :type :num
-      :title "Spot"
-      :evt "(PDA <<< XSpot)" 
-      :lc modal-label-class 
-      :disabled false 
-      :class modal-inp-class  
-      :p1 ["val" "Maybe Number"]}])
+      :p1 ["val" "Maybe Int"]}])
 
 (def checkbox
   @[{ :name "ivCheck" :id "ivcheck" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-24 ps-mr-1"}

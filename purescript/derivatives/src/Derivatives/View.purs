@@ -45,7 +45,7 @@ render st =
     , HH.div [ HP.classes [ ClassName "derivatives" ]]
       [ Table.createTable st.opx st.sortField true ]
     , DLG.modalDialog st.modalPurchase
-        (Title $ "Purchase Option: " <> st.purchaseTicker)
+        (Title $ "Purchase Option: " <> "ticker")
         (PDA <<< XOk)
         (PDA <<< XCancel)
         modalContent
@@ -54,8 +54,5 @@ render st =
 modalContent :: forall w. HTML w MainAction
 modalContent =
   HH.div_
-    [ UI.purchaseAsk Nothing
-      , UI.purchaseBid Nothing
-      , UI.purchaseVolume Nothing
-      , UI.purchaseSpot Nothing
+    [ UI.purchaseVolume Nothing
     ]

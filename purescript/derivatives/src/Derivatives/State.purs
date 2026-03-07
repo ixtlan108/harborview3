@@ -5,7 +5,7 @@ import Data.Maybe (Maybe(..))
 import HarborView.Common (StockTicker)
 import HarborView.ModalDialog (DialogState(..), ModalState(..))
 import Derivatives.Types (Page(..), Risc)
-import Derivatives.Table.Table (TableItem)
+import Derivatives.Table.TableItem (TableItem)
 import Derivatives.Table.SortField (SortField(..))
 
 
@@ -19,7 +19,6 @@ type State =
     , ivNotZero :: Boolean
     , calcRiscSelected :: Boolean
     , modalPurchase :: DialogState
-    , selectedPurchase :: TableItem
   }
 
 defaultState :: State
@@ -33,5 +32,4 @@ defaultState =
     , ivNotZero: false
     , calcRiscSelected: false
     , modalPurchase: DialogHidden
-    , purchaseTicker: "-"
   }

@@ -38,32 +38,6 @@ inpRisc val =
       ]
     ]
 
-purchaseAsk :: forall w. Maybe Number -> HTML w MainAction
-purchaseAsk val =
-  HH.span [ HP.classes [ ClassName "form-group" ]]
-    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
-      [ HH.text "Ask",
-        case val of
-          Nothing ->
-            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XAsk)]
-          Just val1 ->
-            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XAsk), HP.value (show val1)]
-      ]
-    ]
-
-purchaseBid :: forall w. Maybe Number -> HTML w MainAction
-purchaseBid val =
-  HH.span [ HP.classes [ ClassName "form-group" ]]
-    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
-      [ HH.text "Bid",
-        case val of
-          Nothing ->
-            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XBid)]
-          Just val1 ->
-            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XBid), HP.value (show val1)]
-      ]
-    ]
-
 purchaseVolume :: forall w. Maybe Int -> HTML w MainAction
 purchaseVolume val =
   HH.span [ HP.classes [ ClassName "form-group" ]]
@@ -74,19 +48,6 @@ purchaseVolume val =
             HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XVolume)]
           Just val1 ->
             HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XVolume), HP.value (show val1)]
-      ]
-    ]
-
-purchaseSpot :: forall w. Maybe Number -> HTML w MainAction
-purchaseSpot val =
-  HH.span [ HP.classes [ ClassName "form-group" ]]
-    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
-      [ HH.text "Spot",
-        case val of
-          Nothing ->
-            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XSpot)]
-          Just val1 ->
-            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XSpot), HP.value (show val1)]
       ]
     ]
 
