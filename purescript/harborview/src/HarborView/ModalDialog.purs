@@ -72,52 +72,29 @@ instance Show DialogState where
   show DialogHidden = "DialogHidden"
   show DialogVisible = "DialogVisible"
 
+okButton :: forall w i. (MouseEvent -> i) -> HTML w i
+okButton evt =
+  HH.button
+    [ HE.onClick evt
+    , HP.disabled false
+    , HP.classes [ ClassName "ps-w-100 btn btn-success ps-mt-1 ps-mr-1" ]
+    ]
+    [ HH.text "Ok" ]
 
-type ButtonParams i =
-  { title :: Title
-  , evt :: MouseEvent -> i
-  , btnClazz :: Array ClassName
-  , disabled :: Boolean
-  }
-
-btnParams :: forall i. Boolean -> Title -> (MouseEvent -> i) -> ButtonParams i
-btnParams isOk t evt =
-  let
-    clazz =
-      if isOk == true then
-        [ ClassName "ps-w-100 btn btn-success ps-mt-1 ps-mr-1" ]
-      else
-        [ ClassName "ps-w-100 btn btn-danger ps-mt-1" ]
-  in
-  { title: t
-  , evt: evt
-  , btnClazz: clazz -- [ ClassName clazz ]
-  , disabled: false
-  }
-
-mkButton :: forall w i. ButtonParams i -> HTML w i
-mkButton p =
-  let
-    Title t = p.title
-    content =
-          [ HE.onClick p.evt
-          , HP.disabled p.disabled
-          , HP.classes p.btnClazz
-          ]
-  in
-    HH.button
-      content
-      [ HH.text t ]
+cancelButton :: forall w i. (MouseEvent -> i) -> HTML w i
+cancelButton evt =
+  HH.button
+    [ HE.onClick evt
+    , HP.disabled false
+    , HP.classes [ ClassName "ps-w-100 btn btn-danger ps-mt-1" ]
+    ]
+    [ HH.text "Cancel" ]
 
 modalDialogDiv :: forall w i. Title -> (MouseEvent -> i) -> (MouseEvent -> i) -> HTML w i -> HTML w i
 modalDialogDiv (Title header) ok cancel content =
   let
     headerDiv =
       HH.h6_ [ HH.text header ]
-    okBtnParams =
-      btnParams true (Title "Ok") ok
-    cancelBtnParams =
-      btnParams false (Title "Cancel") cancel
   in
   HH.div
     [ HP.classes [ ClassName "modalDialog" ]
@@ -125,11 +102,10 @@ modalDialogDiv (Title header) ok cancel content =
     [ HH.div [ HP.classes [ ClassName "modaldialog--div"] ]
       [ headerDiv
       , content
-      , mkButton okBtnParams
-      , mkButton cancelBtnParams
+      , okButton ok
+      , cancelButton cancel
       ]
     ]
-
 
 modalDialog :: forall w i. DialogState -> Title -> (MouseEvent -> i) -> (MouseEvent -> i) -> HTML w i -> HTML w i
 modalDialog DialogHidden _ _ _ _ =

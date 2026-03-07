@@ -14,6 +14,7 @@ import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as HP
 import Derivatives.Actions (MainAction(..),PurchaseAction(..))
 import Derivatives.Table.SortField (SortField(..))
+import Derivatives.Table.TableItem (TableItem)
 import Derivatives.Types (Risc(..))
 --import Report.Report1.Types (Report1Action(..))
 --import Waimea.Common as W
@@ -37,25 +38,6 @@ thSortAsc asc =
 noSort ∷ ∀ r i. Array (IProp (class ∷ String | r) i)
 noSort =
   [ HP.classes [ ClassName "no-sort" ] ]
-
-
-{-
-  [ checkboxColumn
-  , buttonColumn
-  , Table.stringColumn "Ticker" .ticker
-  , Table.floatColumn "Exercise" .x
-  , Table.floatColumn "Days" .days
-  , Table.floatColumn "Bid" .buy
-  , Table.floatColumn "Ask" .sell
-  , Table.floatColumn "Spread" .spread
-  , Table.floatColumn "IvBid" .ivBuy
-  , Table.floatColumn "IvAsk" .ivSell
-  , Table.floatColumn "Break-Even" .breakEven
-  , Table.floatColumn "Risc" .risc
-  , Table.floatColumn "O.P. at Risc" .optionPriceAtRisc
-  , Table.floatColumn "S.P. at Risc" .stockPriceAtRisc
-  ]
--}
 
 sortedTh :: forall w. SortField -> SortField -> String -> Boolean -> HTML w MainAction
 sortedTh curSortField sortField title isAsc =
@@ -93,60 +75,6 @@ tableHead sf isAsc =
           , unSortedTh "S.P. at Risc"
         ]
     ]
-{-
-    optionDecoder : JD.Decoder Option
-    optionDecoder =
-        JD.succeed buildOption
-            |> JP.required "ticker" JD.string
-            |> JP.required "x" JD.float
-            |> JP.required "days" JD.float
-            |> JP.required "bid" JD.float
-            |> JP.required "ask" JD.float
-            |> JP.required "ivBid" JD.float
-            |> JP.required "ivAsk" JD.float
-            |> JP.required "brEven" JD.float
-            |> JP.required "expiry" JD.string
-
-
-    stockDecoder : JD.Decoder Stock
-    stockDecoder =
-        JD.succeed Stock
-            |> JP.required "unixtime" JD.int
-            |> JP.required "o" JD.float
-            |> JP.required "h" JD.float
-            |> JP.required "l" JD.float
-            |> JP.required "c" JD.float
-
-stockAndOptionsDecoder : JD.Decoder StockAndOptions
-stockAndOptionsDecoder =
-    JD.succeed StockAndOptions
-        |> JP.required "stockprice" stockDecoder
-        |> JP.required "opx" (JD.list optionDecoder)
-
-payloadDecoder : JD.Decoder Payload
-payloadDecoder =
-    JD.succeed Payload
-    |> JP.required "payload" stockAndOptionsDecoder
-    |> JP.required "appStatusCode" JD.int
-    |> JP.optional "error" JD.string ""
--}
-
-type TableItem =
-  { lnr :: Int
-    , selected :: Boolean
-    , ticker :: String
-    , days :: Int
-    , bid :: Number
-    , ask :: Number
-    , spread :: Number
-    , ivBid :: Number
-    , ivAsk :: Number
-    , breakEven :: Number
-    , risc :: Number
-    , opAtRisc :: Number
-    , spAtRisc :: Number
-  }
-
 
 foreign import setRisc_ :: Fn2 TableItem Number (Effect Unit)
 
@@ -180,16 +108,16 @@ tableItemCheck lnr isChecked =
                 , HE.onChecked (TableItemChecked lnr)]
     ]
 
-purchase :: forall w. String -> HTML w MainAction
-purchase s =
-  HH.button [HE.onClick (PDA <<< XOpen s), HP.classes [ ClassName "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success"]] [HH.text "Calc Risc"]
+purchase :: forall w. TableItem -> HTML w MainAction
+purchase item =
+  HH.button [HE.onClick (PDA <<< XOpen item), HP.classes [ ClassName "ps-btn btn btn-outline-success"]] [HH.text "Purchase"]
 
 createRow :: forall w. TableItem -> HTML w MainAction
 createRow item =
   HH.tr_
     [ HH.td_ [ HH.text $ show item.lnr ]
     , HH.td_ [ tableItemCheck item.lnr item.selected ]
-    , HH.td_ [ purchase item.ticker ]
+    , HH.td_ [ purchase item ]
     , HH.td_ [ HH.text item.ticker ]
     , HH.td_ [ HH.text $ show item.days ]
     , HH.td_ [ HH.text $ show item.bid ]

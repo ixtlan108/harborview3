@@ -3,16 +3,16 @@ module Derivatives.View where
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Derivatives.Actions (MainAction(..),PurchaseAction(..))
+import Derivatives.Actions (MainAction(..), PurchaseAction(..))
 import Derivatives.Command (handleAction)
 import Derivatives.State (State, defaultState)
 import Derivatives.Table.SortField (SortField(..))
 import Derivatives.Table.Table as Table
 import Derivatives.UI as UI
-import Halogen.HTML (HTML)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML (ClassName(..))
+import Halogen.HTML (HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as HC
@@ -45,7 +45,7 @@ render st =
     , HH.div [ HP.classes [ ClassName "derivatives" ]]
       [ Table.createTable st.opx st.sortField true ]
     , DLG.modalDialog st.modalPurchase
-        (Title "Purchase Option")
+        (Title $ "Purchase Option: " <> st.purchaseTicker)
         (PDA <<< XOk)
         (PDA <<< XCancel)
         modalContent
@@ -53,4 +53,9 @@ render st =
 
 modalContent :: forall w. HTML w MainAction
 modalContent =
-  HH.div_ []
+  HH.div_
+    [ UI.purchaseAsk Nothing
+      , UI.purchaseBid Nothing
+      , UI.purchaseVolume Nothing
+      , UI.purchaseSpot Nothing
+    ]

@@ -210,7 +210,15 @@ handlePurchaseAction = case _ of
   XCancel _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
   XOpen s _ ->
-    H.modify_ \stx -> stx { modalPurchase = DialogVisible }
+    H.modify_ \stx -> stx { purchaseTicker = s, modalPurchase = DialogVisible }
+  XAsk s ->
+    pure unit
+  XBid s ->
+    pure unit
+  XVolume s ->
+    pure unit
+  XSpot s ->
+    pure unit
 
 handleAction
   :: forall cs o m

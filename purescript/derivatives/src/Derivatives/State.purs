@@ -19,6 +19,7 @@ type State =
     , ivNotZero :: Boolean
     , calcRiscSelected :: Boolean
     , modalPurchase :: DialogState
+    , selectedPurchase :: TableItem
   }
 
 defaultState :: State
@@ -32,4 +33,5 @@ defaultState =
     , ivNotZero: false
     , calcRiscSelected: false
     , modalPurchase: DialogHidden
+    , purchaseTicker: "-"
   }

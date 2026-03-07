@@ -8,18 +8,18 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML (HTML, ClassName(..))
-import Derivatives.Actions (MainAction(..))
+import Derivatives.Actions (MainAction(..),PurchaseAction(..))
 
 
 ivCheck :: forall w. Boolean -> HTML w MainAction
-ivCheck isChecked = 
+ivCheck isChecked =
   HH.div [ HP.classes [ ClassName "form-check form-switch ps-mt-24 ps-mr-1" ]]
     [ HH.input [HP.type_ InputCheckbox, HP.id "ivcheck", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onChecked IvChecked ]
     , HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "ivcheck"] [ HH.text "Only iv > 0.0"]
     ]
 
 calcRiscOnSelectedCheck :: forall w. Boolean -> HTML w MainAction
-calcRiscOnSelectedCheck isChecked = 
+calcRiscOnSelectedCheck isChecked =
   HH.div [ HP.classes [ ClassName "form-check form-switch ps-mt-24" ]]
     [ HH.input [HP.type_ InputCheckbox, HP.id "calcriscselected", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onChecked CalcRiscSelectedChecked ]
     , HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "calcriscselected"] [ HH.text "Calc risc on selected"]
@@ -29,7 +29,7 @@ inpRisc :: forall w. Maybe Number -> HTML w MainAction
 inpRisc val =
   HH.span [ HP.classes [ ClassName "form-group" ]]
     [ HH.label [ HP.classes [ ClassName "ps-label ps-mr-1" ]]
-      [ HH.text "Risc", 
+      [ HH.text "Risc",
         case val of
           Nothing ->
             HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control ps-input ps-mt-auto" ], HE.onValueChange RiscChange]
@@ -38,17 +38,69 @@ inpRisc val =
       ]
     ]
 
+purchaseAsk :: forall w. Maybe Number -> HTML w MainAction
+purchaseAsk val =
+  HH.span [ HP.classes [ ClassName "form-group" ]]
+    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
+      [ HH.text "Ask",
+        case val of
+          Nothing ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XAsk)]
+          Just val1 ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XAsk), HP.value (show val1)]
+      ]
+    ]
+
+purchaseBid :: forall w. Maybe Number -> HTML w MainAction
+purchaseBid val =
+  HH.span [ HP.classes [ ClassName "form-group" ]]
+    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
+      [ HH.text "Bid",
+        case val of
+          Nothing ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XBid)]
+          Just val1 ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XBid), HP.value (show val1)]
+      ]
+    ]
+
+purchaseVolume :: forall w. Maybe Int -> HTML w MainAction
+purchaseVolume val =
+  HH.span [ HP.classes [ ClassName "form-group" ]]
+    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
+      [ HH.text "Volume",
+        case val of
+          Nothing ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XVolume)]
+          Just val1 ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XVolume), HP.value (show val1)]
+      ]
+    ]
+
+purchaseSpot :: forall w. Maybe Number -> HTML w MainAction
+purchaseSpot val =
+  HH.span [ HP.classes [ ClassName "form-group" ]]
+    [ HH.label [ HP.classes [ ClassName "ps-label ps-mb-1" ]]
+      [ HH.text "Spot",
+        case val of
+          Nothing ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XSpot)]
+          Just val1 ->
+            HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control" ], HE.onValueChange (PDA <<< XSpot), HP.value (show val1)]
+      ]
+    ]
+
 calcRisc :: forall w. HTML w MainAction
 calcRisc =
   HH.button [HE.onClick CalcRisc, HP.classes [ ClassName "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success"]] [HH.text "Calc Risc"]
 
 pageSelect :: forall w. String -> HTML w MainAction
-pageSelect selected = 
+pageSelect selected =
   HH.span [ HP.classes [ ClassName "form-group" ]]
     [ HH.label [ HP.classes [ ClassName "ps-label ps-mr-1" ]]
-      [ HH.text "Page", 
+      [ HH.text "Page",
         let
-          opts = 
+          opts =
             [
               HH.option
                 [ HP.value "calls"
@@ -69,12 +121,12 @@ pageSelect selected =
     ]
 
 tickerSelect :: forall w. String -> HTML w MainAction
-tickerSelect selected = 
+tickerSelect selected =
   HH.span [ HP.classes [ ClassName "form-group" ]]
     [ HH.label [ HP.classes [ ClassName "ps-label ps-mr-1" ]]
-      [ HH.text "Ticker", 
+      [ HH.text "Ticker",
         let
-          opts = 
+          opts =
             [
               HH.option
                 [ HP.value "-"

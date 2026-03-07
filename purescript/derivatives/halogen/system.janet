@@ -17,7 +17,7 @@
     [1 "import Halogen.HTML.Events as HE"]
     [1 "import Halogen.HTML.Properties as HP"]
     [1 "import Halogen.HTML (HTML, ClassName(..))"]
-    [1 "import Derivatives.Actions (MainAction(..))"]
+    [1 "import Derivatives.Actions (MainAction(..),PurchaseAction(..))"]
     [1 ""]])
 
 (def tickers 
@@ -66,6 +66,11 @@
        :class btn-class
        :name "calcRisc"}])
 
+
+(def modal-inp-class "form-control")
+
+(def modal-label-class "ps-label ps-mb-1")
+
 (def inputs
   @[{ :name "inpRisc"
       :type :num
@@ -74,6 +79,38 @@
       :lc label-class
       :disabled false 
       :class "form-control ps-input ps-mt-auto"
+      :p1 ["val" "Maybe Number"]}
+    { :name "purchaseAsk"
+      :type :num
+      :title "Ask"
+      :evt "(PDA <<< XAsk)" 
+      :lc modal-label-class 
+      :disabled false 
+      :class modal-inp-class  
+      :p1 ["val" "Maybe Number"]}
+    { :name "purchaseBid"
+      :type :num
+      :title "Bid"
+      :evt "(PDA <<< XBid)" 
+      :lc modal-label-class 
+      :disabled false 
+      :class modal-inp-class  
+      :p1 ["val" "Maybe Number"]}
+    { :name "purchaseVolume"
+      :type :int
+      :title "Volume"
+      :evt "(PDA <<< XVolume)" 
+      :lc modal-label-class 
+      :disabled false 
+      :class modal-inp-class  
+      :p1 ["val" "Maybe Int"]}
+    { :name "purchaseSpot"
+      :type :num
+      :title "Spot"
+      :evt "(PDA <<< XSpot)" 
+      :lc modal-label-class 
+      :disabled false 
+      :class modal-inp-class  
       :p1 ["val" "Maybe Number"]}])
 
 (def checkbox

@@ -3,11 +3,16 @@ module Derivatives.Actions
 
 import Web.UIEvent.MouseEvent (MouseEvent)
 import Derivatives.Table.SortField (SortField)
+import Derivatives.Table.TableItem (TableItem)
 
 data PurchaseAction
   = XOk MouseEvent
   | XCancel MouseEvent
-  | XOpen String MouseEvent
+  | XOpen TableItem MouseEvent
+  | XAsk String
+  | XBid String
+  | XVolume String
+  | XSpot String
 
 data MainAction
   = PageChange String
