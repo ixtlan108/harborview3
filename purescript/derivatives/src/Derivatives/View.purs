@@ -38,12 +38,11 @@ render st =
         , UI.tickerSelect (HC.toSelect st.ticker)
         , UI.calcRisc
         , UI.inpRisc Nothing
-        --, UI.inpRisc st.risc
         , UI.ivCheck st.ivNotZero
         , UI.calcRiscOnSelectedCheck st.calcRiscSelected
       ]
     , HH.div [ HP.classes [ ClassName "derivatives" ]]
-      [ Table.createTable st.opx st.sortField true ]
+      [ Table.createTable st.opx st.sortField st.sortOrderAsc ]
     , DLG.modalDialog st.modalPurchase
         (Title $ "Purchase Option: " <> "ticker")
         (PDA <<< XOk)

@@ -2,7 +2,7 @@ module Derivatives.State
   where
 
 import Data.Maybe (Maybe(..))
-import HarborView.Common (StockTicker)
+import HarborView.Common (StockTicker, Amount)
 import HarborView.ModalDialog (DialogState(..), ModalState(..))
 import Derivatives.Types (Page(..), Risc)
 import Derivatives.Table.TableItem (TableItem)
@@ -19,6 +19,8 @@ type State =
     , ivNotZero :: Boolean
     , calcRiscSelected :: Boolean
     , modalPurchase :: DialogState
+    , purchaseItem :: Maybe TableItem
+    , volume :: Maybe Amount
   }
 
 defaultState :: State
@@ -32,4 +34,6 @@ defaultState =
     , ivNotZero: false
     , calcRiscSelected: false
     , modalPurchase: DialogHidden
+    , purchaseItem: Nothing 
+    , volume: Nothing
   }

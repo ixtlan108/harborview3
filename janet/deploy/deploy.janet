@@ -172,30 +172,51 @@
     (run (template-app pkg main stem with-joy))))
 
 (defn build-app [pkg]
-  (if (dyn :x-build) 
-    (do
-      (printf "BUILD %s.." pkg)
-      (os/cd co/src-ps)
-      (if (dyn :x-quiet) 
-         (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
-         (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
-      (os/cd co/cud))))
+  (when (dyn :x-build) 
+    (printf "BUILD %s.." pkg)
+    (os/cd co/src-ps)
+    (if (dyn :x-quiet) 
+       (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
+       (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
+    (os/cd co/cud)))
+
+(defn run-nvim-pre []
+  (print "run-nvim-pre"))
+
+(defn run-nvim-post []
+  (print "run-nvim-post"))
+
+(defn nvim-pre []
+  (when (dyn :x-nvim) 
+    (run-nvim-pre)))
+
+(defn nvim-post []
+  (when (dyn :x-nvim) 
+    (run-nvim-post)))
 
 (defn run-rapanui []
+  (nvim-pre)
   (build-app "rapanui")
-  (run-template-app "rapanui" "RapanuiMain" "rapanui"))
+  (run-template-app "rapanui" "RapanuiMain" "rapanui")
+  (nvim-post))
 
 (defn run-maunaloa []
+  (nvim-pre)
   (build-app "maunaloa")
-  (run-template-app "maunaloa" "Main" "maunaloa"))
+  (run-template-app "maunaloa" "Main" "maunaloa")
+  (nvim-post))
 
 (defn run-optionpurchase []
+  (nvim-pre)
   (build-app "optionpurchase")
-  (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
+  (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase")
+  (nvim-post))
 
 (defn run-derivatives []
+  (nvim-pre)
   (build-app "derivatives")
-  (run-template-app "derivatives" "DerivativesMain" "derivatives"))
+  (run-template-app "derivatives" "DerivativesMain" "derivatives")
+  (nvim-post))
 
 (def elm-cmd "/usr/local/bin/elm")
 
@@ -250,7 +271,9 @@
            "3" run-optionpurchase 
            "4" run-derivatives
            "5" run-options 
-           "6" run-critters})
+           "6" run-critters
+           "97" run-nvim-pre 
+           "98" run-nvim-post})
 
 (defn run [argx]
   (printf "%q" argx)
@@ -264,20 +287,22 @@
                 :x-joy (argx "joy")
                 :x-md5-cmd md5-cmd
                 :x-spago-cmd spago-cmd
-                :x-build (argx "build")]
+                :x-build (argx "build")
+                :x-nvim (argx "nvim")]
       (let [cmd (PROJ (argx "proj"))]
         (cmd)))))
 
 (defn main [&]
   (let
     [ argx (ap/argparse "Deploy"
-            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: derivatives, 5: options (elm), 6: critters (elm)" :required true}
+            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: derivatives, 5: options (elm), 6: critters (elm), 97: nvim on, 98: nvim off" :required true}
             "os"    {:kind :option  :short "o" :help "Os: linux, macos. Default: linux" :default "linux"}
             "elm"   {:kind :flag    :short "e" :default false :help "Default: false"}
             "joy"   {:kind :flag    :short "j" :default false :help "Joy backend. Default: false"}
             "css"   {:kind :flag    :short "s" :default false :help "Generate css file. Default: false"}
             "spago" {:kind :flag    :short "g" :default false :help "Generate ps file. Default: false"}
             "quiet" {:kind :flag    :short "q" :default false :help "Show only errors on build. Default: false"}
-            "build" {:kind :flag    :short "b" :default false :help "Build project(s). Default: false"})]
+            "build" {:kind :flag    :short "b" :default false :help "Build project(s). Default: false"}
+            "nvim"  {:kind :flag    :short "n" :default false :help "Nvim. Default: false"})]
     (if (not= argx nil)
       (run argx))))

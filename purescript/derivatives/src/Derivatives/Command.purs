@@ -1,5 +1,4 @@
-module Derivatives.Command
-  where
+module Derivatives.Command where
 
 import Prelude
 
@@ -26,10 +25,9 @@ import Halogen as H
 import Halogen.HTML.Elements (p)
 import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
-import HarborView.Common (StockTicker(..))
+import HarborView.Common (StockTicker(..),Amount(..))
 import HarborView.Common as HC
 import HarborView.ModalDialog (DialogState(..))
-
 
 -- handleAppStatus
 --   :: forall m.
@@ -41,15 +39,16 @@ handleAppStatus
   :: forall m
    . MonadState State m
   => AppStatus
+  -> String
   -> m Unit
-handleAppStatus s =
+handleAppStatus s msg =
   let
-    myModal = AppStat.modalStateFor s "msg"
+    myModal = AppStat.modalStateFor s msg
   in
-  (H.modify_
-    \stx ->
-      stx { risc = Just (T.Risc 12.3) }
-  ) *> pure unit
+    ( H.modify_
+        \stx ->
+          stx { risc = Just (T.Risc 12.3) }
+    ) *> pure unit
 
 handleTickerChange
   :: forall m
@@ -61,21 +60,22 @@ handleTickerChange ticker =
   case ticker of
     Nothing ->
       (H.modify_ \stx -> stx { ticker = ticker }) *>
-      pure unit
+        pure unit
     Just ticker1 ->
       H.get >>= \st ->
         Adapter.fetchDerivatives ticker1 st.page >>= \result ->
           case result of
             Left err ->
               H.liftEffect (logShow err) *>
-              handleAppStatus err
+                handleAppStatus err "handleTickerChange"
             Right result1 ->
               let
                 tableItems = Transform.transform result1.payload
               in
-              H.liftEffect (logShow tableItems) *>
-              (H.modify_ \stx -> stx { ticker = ticker, opx = tableItems }) *>
-              pure unit
+                H.liftEffect (logShow tableItems)
+                  *> (H.modify_ \stx -> stx { ticker = ticker, opx = tableItems })
+                  *>
+                    pure unit
 
 handleRiscChange
   :: forall m
@@ -90,10 +90,10 @@ handleRiscChange risc =
       riscFn = (\x -> Table.setRisc x risc)
       origOpx = st.opx
     in
-    H.liftEffect (Traversable.traverse_ riscFn items) *>
-    (H.modify_ \stx -> stx { opx = origOpx, risc = risc }) *>
-    pure unit
-
+      H.liftEffect (Traversable.traverse_ riscFn items)
+        *> (H.modify_ \stx -> stx { opx = origOpx, risc = risc })
+        *>
+          pure unit
 
 handleTableSort
   :: forall m
@@ -107,12 +107,12 @@ handleTableSort sf =
       so = not st.sortOrderAsc
       sortedItems = TableSort.sortResponse sf so st.opx
     in
-    H.modify_ \stx -> stx { opx = sortedItems, sortOrderAsc = so, sortField = sf }
+      H.modify_ \stx -> stx { opx = sortedItems, sortOrderAsc = so, sortField = sf }
 
-  -- (H.modify_ \stx -> stx { risc = risc }) *>
+-- (H.modify_ \stx -> stx { risc = risc }) *>
 
 calcRiscSingle
-  :: forall  m
+  :: forall m
    . MonadState State m
   => MonadAff m
   => TableItem
@@ -132,34 +132,33 @@ handleTableItemChecked lnr isChecked =
     let
       curOpx = Array.find (\x -> x.lnr == lnr) st.opx
     in
-    case curOpx of
-      Nothing ->
-        pure unit
-      Just curOpx1 ->
-        let
-          items = st.opx
-        in
-        H.liftEffect
-          (Table.setSelected curOpx1 isChecked *>
-           Table.setRisc curOpx1 st.risc) *>
-        (H.modify_ \stx -> stx { opx = items })
-
+      case curOpx of
+        Nothing ->
+          pure unit
+        Just curOpx1 ->
+          let
+            items = st.opx
+          in
+            H.liftEffect
+              ( Table.setSelected curOpx1 isChecked *>
+                  Table.setRisc curOpx1 st.risc
+              ) *>
+              (H.modify_ \stx -> stx { opx = items })
 
 toRiscRequest :: TableItem -> RiscRequest
 toRiscRequest item =
   { ticker: item.ticker, risc: item.risc }
-
 
 setRiscResult :: Array TableItem -> RiscResponse -> Effect Unit
 setRiscResult items response =
   let
     curOpx = Array.find (\x -> x.ticker == response.ticker) items
   in
-  case curOpx of
-    Nothing ->
-      pure unit
-    Just curOpx1 ->
-      Table.setCalcRiscResult curOpx1 response.stockprice response.optionprice
+    case curOpx of
+      Nothing ->
+        pure unit
+      Just curOpx1 ->
+        Table.setCalcRiscResult curOpx1 response.stockprice response.optionprice
 
 setRiscResults
   :: forall m
@@ -171,8 +170,7 @@ setRiscResults items responses =
   let
     riscFn = setRiscResult items
   in
-  H.liftEffect (Traversable.traverse_ riscFn responses)
-
+    H.liftEffect (Traversable.traverse_ riscFn responses)
 
 handleCalcRisc
   :: forall m
@@ -184,39 +182,45 @@ handleCalcRisc =
     let
       riscItems = map toRiscRequest $ Array.filter (\x -> x.selected == true) st.opx
     in
-    Adapter.calcRisc riscItems >>= \result ->
-      case result of
-        Left err ->
-          H.liftEffect (logShow err) *>
-          handleAppStatus err
-        Right result1 ->
-          let
-            origItems = st.opx
-          in
-          setRiscResults st.opx result1.payload *>
-          H.liftEffect (logShow result1.payload) *>
-          (H.modify_ \stx -> stx { opx = origItems })
-
+      Adapter.calcRisc riscItems >>= \result ->
+        case result of
+          Left err ->
+            H.liftEffect (logShow err) *>
+              handleAppStatus err "handleCalcRisc"
+          Right result1 ->
+            let
+              origItems = st.opx
+            in
+              setRiscResults st.opx result1.payload
+                *> H.liftEffect (logShow result1.payload)
+                *>
+                  (H.modify_ \stx -> stx { opx = origItems })
 
 handlePurchaseAction
-  :: forall m.
-      MonadState State m
+  :: forall m
+   . MonadState State m
   => MonadAff m
   => PurchaseAction
   -> m Unit
 handlePurchaseAction = case _ of
-  XOk _ ->
-    H.modify_ \stx -> stx { modalPurchase = DialogHidden }
+  XOk item ->
+    (H.modify_ \stx -> stx { modalPurchase = DialogHidden }) *>
+      H.get >>= \st -> 
+          case st.volume of 
+            Nothing ->
+              pure  unit
+            Just volume1 ->
+              pure  unit
   XCancel _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
   XOpen s _ ->
-    H.modify_ \stx -> stx { modalPurchase = DialogVisible }
+    H.modify_ \stx -> stx { modalPurchase = DialogVisible, purchaseItem = Just s }
   XVolume s ->
-    pure unit
+    H.modify_ \stx -> stx { volume = HC.imap Amount s }
 
 handleAction
   :: forall cs o m
-    . MonadAff m
+   . MonadAff m
   => MainAction
   -> H.HalogenM State MainAction cs o m Unit
 handleAction = case _ of
