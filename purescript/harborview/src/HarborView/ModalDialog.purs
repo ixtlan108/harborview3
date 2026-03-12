@@ -9,8 +9,7 @@ import Halogen.HTML (HTML, ClassName(..))
 import Halogen.HTML.Properties as HP
 -- import Data.Array ((:))
 
-import HarborView.UI as UI
-import HarborView.UI (Title(..))
+import HarborView.UI.Common (Title(..))
 
 {- data AlertCategory
     = Info
