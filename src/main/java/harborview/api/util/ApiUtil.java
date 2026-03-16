@@ -1,6 +1,7 @@
 package harborview.api.util;
 
 import harborview.api.response.AppStatusCode;
+import harborview.api.response.DefaultResponse;
 import harborview.api.response.PayloadResponse;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.error.GeneralError;
@@ -15,6 +16,19 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ApiUtil {
+    public static <T> ResponseEntity<DefaultResponse> map(@NonNull ApplicationError error, String msg) {
+        if (error != null) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new DefaultResponse(error.getStatus(),error.getMsg()));
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new DefaultResponse(1, msg));
+        }
+    }
+
     public static <T> ResponseEntity<PayloadResponse<T>> map(@NonNull Either<ApplicationError,T> result) {
         return mapWithDefault(result, null);
     }
@@ -79,21 +93,4 @@ public class ApiUtil {
     }
 
      */
-    public static <T> Either<ApplicationError,T> handle(Supplier<T> fn) {
-        try {
-            return Either.right(fn.get());
-        }
-        catch (MyBatisSystemException ex) {
-            if (ex.getMessage() == null) {
-                return Either.left(new SqlError.MybatisSqlError(ex.getCause().getMessage()));
-            }
-            else {
-                return Either.left(new SqlError.MybatisSqlError(ex.getMessage()));
-            }
-        }
-        catch (Exception ex) {
-            return Either.left(new GeneralError.GeneralApplicationError(
-                    String.format("(%s) %s", ex.getClass().getSimpleName(),ex.getMessage())));
-        }
-    }
 }

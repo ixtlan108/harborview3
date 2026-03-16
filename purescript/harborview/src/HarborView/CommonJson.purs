@@ -38,7 +38,7 @@ reqBodyArrayX2 jb =
   REQB.json $ AC.fromArray $ fromArrayX2 jb
 
 type DefaultResponse =
-  { appstatus :: Int
+  { appStatusCode :: Int
   , msg :: Maybe String
   }
 

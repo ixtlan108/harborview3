@@ -2,8 +2,7 @@ package harborview.domain.core.maunaloa;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import harborview.api.nordnet.response.FindOptionResponse;
-import harborview.api.util.ApiUtil;
+import harborview.domain.core.Core;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
 import harborview.domain.stockmarket.StockMarketRepository;
@@ -62,20 +61,23 @@ public class MaunaloaCore {
     private List<SelectItem> stockTickers;
 
     private final NordnetRepository nordnetRepository;
+    private final Core core;
 
     public MaunaloaCore(@Qualifier("adapter.demo") NordnetRepository nordnetRepository,
     //public MaunaloaCore(NordnetRepository nordnetRepository,
                         StockMarketRepository stockMarketAdapter,
+                        Core core,
                         @Qualifier("blackScholes") OptionCalculator optionCalculator) {
         this.nordnetRepository = nordnetRepository;
         this.stockMarketAdapter = stockMarketAdapter;
+        this.core = core;
         this.optionCalculator = optionCalculator;
         System.out.println("MaunaloaCore: " + nordnetRepository);
     }
 
     //@Cacheable(value="stockTickers")
     public Either<ApplicationError,List<SelectItem>> getStockTickers() {
-        return ApiUtil.handle(() -> {
+        return core.handleSearch(() -> {
             if (stockTickers == null) {
                 logger.info("(getStockTickers) Empty cache");
                 stockTickers = stockMarketAdapter.getStocks().stream().map(
@@ -105,13 +107,13 @@ public class MaunaloaCore {
         return factory.elmCharts(ticker, prices);
     }
     public Either<ApplicationError,Charts> days(StockTicker ticker) {
-        return ApiUtil.handle(() -> charts(ticker, chartFactory));
+        return core.handleSearch(() -> charts(ticker, chartFactory));
     }
     public Either<ApplicationError,Charts> weeks(StockTicker ticker) {
-        return ApiUtil.handle(() -> charts(ticker, chartWeekFactory));
+        return core.handleSearch(() -> charts(ticker, chartWeekFactory));
     }
     public Either<ApplicationError,Charts> months(StockTicker ticker) {
-        return ApiUtil.handle(() -> charts(ticker, chartMonthFactory));
+        return core.handleSearch(() -> charts(ticker, chartMonthFactory));
     }
 
 
@@ -208,7 +210,7 @@ public class MaunaloaCore {
     }
 
     public Either<ApplicationError,List<RiscResponse>> calcRiscStockPrices(List<RiscRequest> request) {
-        return ApiUtil.handle(() -> {
+        return core.handleSearch(() -> {
             var result = new ArrayList<RiscResponse>();
             for (var risc : request) {
                 result.add(calcRiscStockPrice(risc));
@@ -218,7 +220,7 @@ public class MaunaloaCore {
     }
 
     public Either<ApplicationError, StockPrice> getSpot(StockTicker stockTicker) {
-        return ApiUtil.handle(() -> stockMarketAdapter.getSpot(stockTicker));
+        return core.handleSearch(() -> stockMarketAdapter.getSpot(stockTicker));
     }
 
     public List<RLine> getRiscLines(StockTicker ticker) {
@@ -264,6 +266,10 @@ public class MaunaloaCore {
         return 0.0;
     }
 
+
+    public ApplicationError purchaseOption(StockOptionTicker ticker, int volume) {
+        return null;
+    }
 
     public StatusDTO purchaseOption(StockOptionPurchase purchase) {
         var mh = new MyErrorHandler(StatusCode.PURCHASE_STOCK_OPTION_ERROR);

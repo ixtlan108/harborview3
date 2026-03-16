@@ -19,7 +19,7 @@ public class RapanuiAPI {
     @PutMapping(value = "/demo", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DefaultResponse> demo(@RequestBody List<OptionSaleRequest> request) {
 
-        return ResponseEntity.ok(new DefaultResponse(AppStatusCode.OK, "HEy ok!"));
+        return ResponseEntity.ok(new DefaultResponse(AppStatusCode.OK.getStatusCode(), "HEy ok!"));
 
     }
 }

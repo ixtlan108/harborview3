@@ -5,7 +5,7 @@ import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode as Decode
 import Data.Argonaut.Decode.Error (JsonDecodeError)
 import Data.Either (Either)
-import HarborView.CommonJson (PayloadResponse)
+import HarborView.CommonJson (PayloadResponse,DefaultResponse)
 
 type Derivative =
   { ticker :: String
@@ -48,6 +48,10 @@ type RiscPayload = PayloadResponse (Array RiscResponse)
 
 riscPayloadDecoder :: Json -> Either JsonDecodeError RiscPayload
 riscPayloadDecoder = Decode.decodeJson
+
+
+purchasedDecoder :: Json -> Either JsonDecodeError DefaultResponse
+purchasedDecoder = Decode.decodeJson
 
 {-
   optionDecoder : JD.Decoder Option

@@ -13,6 +13,7 @@ import Halogen as H
 import HarborView.AppStatus (AppStatus)
 import HarborView.Common (StockTicker(..))
 import HarborView.CommonJson as CJ
+import HarborView.CommonJson (DefaultResponse)
 import HarborView.Util.HttpUtil2 as HU2
 
 fetchDerivatives :: forall m. MonadAff m
@@ -41,3 +42,18 @@ calcRisc riscRequests =
     url = "/maunaloa/stockprice/calculate"
   in
   H.liftAff (HU2.post url reqBody R.riscPayloadDecoder) >>= pure
+
+purchase :: forall m. MonadAff m
+  => String 
+  -> Int
+  -> m (Either AppStatus DefaultResponse)
+purchase ticker volume =
+  let
+    jb =
+      [ CJ.fromString "ticker" ticker
+      , CJ.fromInt "volume" volume 
+      ]
+    pl = CJ.payload jb
+    url = "/maunaloa/stockoption/purchase"
+  in
+  H.liftAff (HU2.post url pl CJ.defaultResponseDecoder) >>= pure

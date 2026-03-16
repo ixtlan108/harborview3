@@ -1,7 +1,9 @@
 package harborview.api.maunaloa;
 
+import harborview.api.response.DefaultResponse;
 import harborview.api.response.stockmarket.StockOptionPurchaseResponse;
 import harborview.api.transform.stockmarket.ResponseTransform;
+import harborview.api.util.ApiUtil;
 import harborview.domain.core.maunaloa.MaunaloaCore;
 import harborview.domain.stockmarket.request.PurchaseOptionRequest;
 import harborview.domain.stockmarket.request.RegpurRequest;
@@ -10,6 +12,7 @@ import harborview.domain.stockmarket.StockTicker;
 import harborview.dto.StatusDTO;
 import harborview.dto.ValueDTO;
 import harborview.transform.maunaloa.RequestTransform;
+import harborview.util.StockOptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -66,21 +69,10 @@ public class StockOptionAPI {
 
 
     @PostMapping(value = "/purchase", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StatusDTO> purchaseOption(@RequestBody PurchaseOptionRequest request) {
-        try {
-            request.validate();
-        }
-        catch (Exception ex) {
-            logger.error(String.format("Request validation error, ticker: %s", request.ticker()));
-            return ResponseEntity.ok(new StatusDTO(false, ex.getMessage(), REQUEST_VALIDATION_ERROR.getStatus()));
-        }
-
-        logger.info(String.format("Purchasing option, ticker: %s", request.ticker()));
-        var purchase = requestTransform.mapPurchaseOptionRequest(request);
-        if (purchase == null) {
-            return ResponseEntity.ok(new StatusDTO(false, "Option was null", RETRY.getStatus()));
-        }
-        return ResponseEntity.ok(maunaloaCore.purchaseOption(purchase));
+    public ResponseEntity<DefaultResponse> purchaseOption(@RequestBody PurchaseOptionRequest request) {
+        var ticker = new StockOptionTicker(request.ticker());
+        var result = maunaloaCore.purchaseOption(ticker,request.volume());
+        return ApiUtil.map(result, "Purchase ok");
     }
 
     @PostMapping(value = "/regpur", produces = MediaType.APPLICATION_JSON_VALUE)
