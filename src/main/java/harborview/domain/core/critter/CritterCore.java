@@ -3,7 +3,7 @@ package harborview.domain.core.critter;
 import harborview.domain.core.Core;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
-import harborview.domain.stockmarket.StockMarketRepository;
+import harborview.domain.stockmarket.StockMarketService;
 import harborview.dto.critter.OptionPurchaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 public class CritterCore {
     private Logger logger = LoggerFactory.getLogger(CritterCore.class);
 
-    private final StockMarketRepository stockMarketAdapter;
+    private final StockMarketService stockMarketAdapter;
     private final Core core;
 
-    public CritterCore(StockMarketRepository stockMarketAdapter,
+    public CritterCore(StockMarketService stockMarketAdapter,
                        Core core) {
         this.stockMarketAdapter = stockMarketAdapter;
         this.core = core;

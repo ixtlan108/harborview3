@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import harborview.domain.core.Core;
 import harborview.domain.error.ApplicationError;
 import harborview.domain.functional.Either;
-import harborview.domain.stockmarket.StockMarketRepository;
+import harborview.domain.stockmarket.StockMarketService;
 import harborview.chart.ChartFactory;
 import harborview.chart.ChartMonthFactory;
 import harborview.chart.ChartWeekFactory;
@@ -34,6 +34,7 @@ import vega.financial.calculator.OptionCalculator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -45,7 +46,7 @@ import harborview.dto.StatusCode;
 public class MaunaloaCore {
 
     private Logger logger = LoggerFactory.getLogger(MaunaloaCore.class);
-    private final StockMarketRepository stockMarketAdapter;
+    private final StockMarketService stockMarketAdapter;
     private final OptionCalculator optionCalculator;
     private final ChartFactory chartFactory = new ChartFactory();
     private final ChartWeekFactory chartWeekFactory = new ChartWeekFactory();
@@ -65,7 +66,7 @@ public class MaunaloaCore {
 
     public MaunaloaCore(@Qualifier("adapter.demo") NordnetRepository nordnetRepository,
     //public MaunaloaCore(NordnetRepository nordnetRepository,
-                        StockMarketRepository stockMarketAdapter,
+                        StockMarketService stockMarketAdapter,
                         Core core,
                         @Qualifier("blackScholes") OptionCalculator optionCalculator) {
         this.nordnetRepository = nordnetRepository;
@@ -225,12 +226,7 @@ public class MaunaloaCore {
 
     public List<RLine> getRiscLines(StockTicker ticker) {
         var lines = rlineCache.getIfPresent(ticker.oid());
-        if (lines == null) {
-            return Collections.emptyList();
-        }
-        else {
-            return lines;
-        }
+        return Objects.requireNonNullElse(lines, Collections.emptyList());
     }
     public StatusDTO deleteAllRiscLines(StockTicker ticker) {
         rlineCache.invalidate(ticker.oid());
@@ -268,17 +264,24 @@ public class MaunaloaCore {
 
 
     public ApplicationError purchaseOption(StockOptionTicker ticker, int volume) {
-        return null;
+        return core.handleSave(() -> {
+            stockMarketAdapter.insertPurchase(null);
+        },null);
     }
 
     public StatusDTO purchaseOption(StockOptionPurchase purchase) {
+        /*
         var mh = new MyErrorHandler(StatusCode.PURCHASE_STOCK_OPTION_ERROR);
         stockMarketAdapter.insertPurchase(purchase, mh);
         if (mh.get() != null) {
             return mh.get();
         }
         return new StatusDTO(true, String.format("Purchased %s ok", purchase.getTicker()), StatusCode.OK.getStatus());
+
+         */
+        return null;
     }
+    /*
     public StatusDTO sellOption(StockOptionSale sale) {
         var mh = new MyErrorHandler(StatusCode.SELL_STOCK_OPTION_ERROR);
         stockMarketAdapter.insertSale(sale, mh);
@@ -288,10 +291,14 @@ public class MaunaloaCore {
         return new StatusDTO(true, String.format("Sale for purchase id %d ok", sale.getPurchaseOid()), StatusCode.OK.getStatus());
     }
 
+     */
+
     private String insertSuccessMsg(String ticker, int oid) {
         return String.format("Inserted stockOption purchase ticker: %s, oid: %d", ticker, oid);
     }
     public StatusDTO registerAndPurchaseOption(Tuple2<harborview.domain.stockmarket.StockOption,StockOptionPurchase> purchase) {
+        return null;
+        /*
         try {
             var mh = new MyErrorHandler(StatusCode.INSERT_STOCK_OPTION_ERROR);
             stockMarketAdapter.insertStockOption(purchase.first(), mh);
@@ -301,7 +308,7 @@ public class MaunaloaCore {
             logger.info(String.format("Inserted stockOption: %s", purchase.first().getTicker()));
 
             purchase.second().setOptionId(purchase.first().getOid());
-            stockMarketAdapter.insertPurchase(purchase.second(), null);
+            stockMarketAdapter.insertPurchase(purchase.second());
             var msg = insertSuccessMsg(purchase.first().getTicker(), purchase.second().getOid());
             logger.info(msg);
 
@@ -311,6 +318,8 @@ public class MaunaloaCore {
             logger.error(String.format("%s for stockOption purchase ticker: %s", ex.getMessage(), purchase.first().getTicker()));
             return new StatusDTO(false, ex.getMessage(), StatusCode.INSERT_DB_ERROR.getStatus());
         }
+
+         */
     }
 
     static class MyErrorHandler implements Consumer<Exception> {

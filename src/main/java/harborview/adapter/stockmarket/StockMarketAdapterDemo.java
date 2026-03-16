@@ -3,6 +3,7 @@ package harborview.adapter.stockmarket;
 import harborview.adapter.RedisAdapter;
 import harborview.domain.stockmarket.*;
 import harborview.mybatis.MyBatisUtil;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -13,10 +14,11 @@ import java.util.function.Consumer;
 @Profile({"demo","cmdline","test"})
 public class StockMarketAdapterDemo extends StockMarketAdapter {
 
-    public StockMarketAdapterDemo(MyBatisUtil myBatisUtil,
+    public StockMarketAdapterDemo(SqlSession sqlSession,
+                                  MyBatisUtil myBatisUtil,
                                   RedisAdapter redisAdapter,
                                   @Value("${adapter.stockmarket.from-date}") String fromDate) {
-        super(myBatisUtil, redisAdapter, fromDate);
+        super(sqlSession, myBatisUtil, redisAdapter, fromDate);
     }
     /*
     @Override
@@ -55,7 +57,7 @@ public class StockMarketAdapterDemo extends StockMarketAdapter {
     }
 
     @Override
-    public void insertPurchase(StockOptionPurchase purchase, Consumer<Exception> errorHandler) {
+    public void insertPurchase(StockOptionPurchase purchase) {
 
     }
 }

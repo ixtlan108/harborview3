@@ -1,6 +1,6 @@
 package harborview.controller;
 
-import harborview.domain.stockmarket.StockMarketRepository;
+import harborview.domain.stockmarket.StockMarketService;
 import harborview.mybatis.MyBatisUtil;
 import harborview.nordnet.repository.NordnetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public abstract class ControllerTestBase {
     protected NordnetRepository nordnetAdapter;
 
     @MockBean
-    protected StockMarketRepository stockMarketAdapter;
+    protected StockMarketService stockMarketAdapter;
 
     @MockBean
     protected MyBatisUtil myBatisUtil;
