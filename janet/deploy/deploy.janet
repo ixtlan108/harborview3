@@ -124,12 +124,11 @@
   (print "Enter copy-spago-files..")
   (let [spago-cfg (cfg :spago)
         from-f (spago-cfg :js-file)
-        with-joy (dyn :x-joy)
         to-f (string/format (spago-cfg :js-target) spago-md5)
         from-map-f (spago-cfg :js-map-file)
         to-map-f (spago-cfg :js-map-target)]
-    (if (not with-joy) 
-     (clear-static-files (spago-cfg :js-static)))
+    (if (not (dyn :x-joy)) 
+      (clear-static-files (spago-cfg :js-static)))
     (shutil/copyfile from-f to-f)
     (shutil/copyfile from-map-f to-map-f)))
 
@@ -172,13 +171,12 @@
     (run (template-app pkg main stem with-joy))))
 
 (defn build-app [pkg]
-  (when (dyn :x-build) 
-    (printf "BUILD %s.." pkg)
-    (os/cd co/src-ps)
-    (if (dyn :x-quiet) 
-       (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
-       (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
-    (os/cd co/cud)))
+  (printf "BUILD %s.." pkg)
+  (os/cd co/src-ps)
+  (if (dyn :x-quiet) 
+     (os/execute [(dyn :x-spago-cmd) "build" "--quiet" "--package" pkg])
+     (os/execute [(dyn :x-spago-cmd) "build" "--package" pkg]))
+  (os/cd co/cud))
 
 (defn run-nvim-pre []
   (print "run-nvim-pre"))
@@ -196,26 +194,30 @@
 
 (defn run-rapanui []
   (nvim-pre)
-  (build-app "rapanui")
-  (run-template-app "rapanui" "RapanuiMain" "rapanui")
+  (when (dyn :x-build) 
+    (build-app "rapanui")
+    (run-template-app "rapanui" "RapanuiMain" "rapanui"))
   (nvim-post))
 
 (defn run-maunaloa []
   (nvim-pre)
-  (build-app "maunaloa")
-  (run-template-app "maunaloa" "Main" "maunaloa")
+  (when (dyn :x-build) 
+    (build-app "maunaloa")
+    (run-template-app "maunaloa" "Main" "maunaloa"))
   (nvim-post))
 
 (defn run-optionpurchase []
   (nvim-pre)
-  (build-app "optionpurchase")
-  (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase")
+  (when (dyn :x-build) 
+    (build-app "optionpurchase")
+    (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
   (nvim-post))
 
 (defn run-derivatives []
   (nvim-pre)
-  (build-app "derivatives")
-  (run-template-app "derivatives" "DerivativesMain" "derivatives")
+  (when (dyn :x-build) 
+    (build-app "derivatives")
+    (run-template-app "derivatives" "DerivativesMain" "derivatives"))
   (nvim-post))
 
 (def elm-cmd "/usr/local/bin/elm")

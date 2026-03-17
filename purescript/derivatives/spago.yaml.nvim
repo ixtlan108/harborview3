@@ -17,7 +17,6 @@ package:
     - effect
     - foreign 
     - halogen
-    - harborview
     # - aff
     # - affjax
     # - affjax-web
@@ -50,3 +49,6 @@ package:
     main: Test.Main
     dependencies:
       - spec
+workspace:
+  packageSet:
+    registry: 50.11.0
