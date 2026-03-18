@@ -18,9 +18,10 @@ type State =
     , sortOrderAsc :: Boolean
     , ivNotZero :: Boolean
     , calcRiscSelected :: Boolean
-    , modalPurchase :: DialogState
     , purchaseItem :: Maybe TableItem
     , volume :: Maybe Amount
+    , modalPurchase :: DialogState
+    , modalBottom :: ModalState
   }
 
 defaultState :: State
@@ -33,7 +34,8 @@ defaultState =
     , sortOrderAsc: false
     , ivNotZero: false
     , calcRiscSelected: false
-    , modalPurchase: DialogHidden
     , purchaseItem: Nothing 
     , volume: Nothing
+    , modalPurchase: DialogHidden
+    , modalBottom: ModalHidden
   }

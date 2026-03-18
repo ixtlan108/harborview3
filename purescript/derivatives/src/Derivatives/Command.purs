@@ -47,7 +47,7 @@ handleAppStatus s msg =
   in
     ( H.modify_
         \stx ->
-          stx { risc = Just (T.Risc 12.3) }
+          stx { modalBottom = myModal }
     ) *> pure unit
 
 handleTickerChange
