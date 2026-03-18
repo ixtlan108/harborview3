@@ -25,7 +25,7 @@ import Halogen as H
 import Halogen.HTML.Elements (p)
 import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
-import HarborView.Common (StockTicker(..),Amount(..))
+import HarborView.Common (StockTicker(..), Amount(..))
 import HarborView.Common as HC
 import HarborView.ModalDialog (DialogState(..))
 
@@ -203,14 +203,21 @@ handlePurchaseAction
   => PurchaseAction
   -> m Unit
 handlePurchaseAction = case _ of
-  XOk item ->
+  XOk _ ->
     (H.modify_ \stx -> stx { modalPurchase = DialogHidden }) *>
       H.get >>= \st -> 
-          case st.volume of 
-            Nothing ->
-              pure  unit
-            Just volume1 ->
-              pure  unit
+        let 
+          x = 
+            st.purchaseItem >>= \item1 -> 
+              st.volume >>= \(Amount vol1) -> 
+                Just { ticker: item1.ticker, volume: vol1 }
+        in
+        case x of 
+          Nothing ->
+            pure unit
+          Just x1 ->
+            H.liftEffect (logShow x1) *>
+            pure unit
   XCancel _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
   XOpen s _ ->

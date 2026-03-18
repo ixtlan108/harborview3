@@ -194,28 +194,28 @@
 
 (defn run-rapanui []
   (nvim-pre)
-  (when (dyn :x-build) 
+  (if (dyn :x-build) 
     (build-app "rapanui")
     (run-template-app "rapanui" "RapanuiMain" "rapanui"))
   (nvim-post))
 
 (defn run-maunaloa []
   (nvim-pre)
-  (when (dyn :x-build) 
+  (if (dyn :x-build) 
     (build-app "maunaloa")
     (run-template-app "maunaloa" "Main" "maunaloa"))
   (nvim-post))
 
 (defn run-optionpurchase []
   (nvim-pre)
-  (when (dyn :x-build) 
+  (if (dyn :x-build) 
     (build-app "optionpurchase")
     (run-template-app "optionpurchase" "OptionPurchaseMain" "optionpurchase"))
   (nvim-post))
 
 (defn run-derivatives []
   (nvim-pre)
-  (when (dyn :x-build) 
+  (if (dyn :x-build) 
     (build-app "derivatives")
     (run-template-app "derivatives" "DerivativesMain" "derivatives"))
   (nvim-post))
