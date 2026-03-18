@@ -216,8 +216,13 @@ handlePurchaseAction = case _ of
           Nothing ->
             pure unit
           Just x1 ->
-            H.liftEffect (logShow x1) *>
-            pure unit
+            --H.liftEffect (logShow x1) *>
+            Adapter.purchase x1.ticker x1.volume >>= \result ->
+              case result of
+                Left err ->
+                  handleAppStatus err "handlePurchaseAction XOk"
+                Right result1 ->
+                  pure unit
   XCancel _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogHidden }
   XOpen s _ ->
