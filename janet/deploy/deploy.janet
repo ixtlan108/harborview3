@@ -1,4 +1,3 @@
-(import jpm)
 (import jpm/shutil :as shutil)
 (import spork/argparse :as ap)
 (import ./css)
@@ -102,9 +101,9 @@
 
 (defn clear-static-files [path]
  (let (fx (os/dir path))
-  (each i fx 
-    (let (fi (string/slice (buffer/push-string @"" path "/" i)))
-      (os/rm fi)))))
+   (each i fx 
+     (let (fi (string/slice (buffer/push-string @"" path "/" i)))
+       (os/rm fi)))))
 
 (defn run-spago [cfg]
   (print "Enter run-spago..")
@@ -140,22 +139,21 @@
         to-f (string/format (css-cfg :css-target) css-md5)]
     (if (not with-joy) 
      (clear-static-files (css-cfg :css-static)))
-    (jpm/shutil/copyfile from-f to-f)))
+    (shutil/copyfile from-f to-f)))
 
-(defn render [cfg spago-md5 sass-md5]
-  (let [is-joy (dyn :x-joy)]
-    (when (not is-joy)
-      (print "Enter render..")
-      (let [tpl (cfg :tpl)
-            f (file/open tpl :r)
-            content (string/slice (file/read f :all))]
-        (file/close f)
-        (print "tpl file: " tpl)
-        (let [result (string/format content spago-md5 sass-md5)
-              result-file (file/open (cfg :tpl-target) :w)]
-          (file/write result-file result)
-          (file/close result-file)
-          (print result))))))
+(defn render [cfg spago-md5 css-md5]
+  (when (not (dyn :x-joy))
+    (print "Enter render..")
+    (let [tpl (cfg :tpl)
+          f (file/open tpl :r)
+          content (string/slice (file/read f :all))]
+      (file/close f)
+      (print "tpl file: " tpl)
+      (let [result (string/format content spago-md5 css-md5)
+            result-file (file/open (cfg :tpl-target) :w)]
+        (file/write result-file result)
+        (file/close result-file)
+        (print result)))))
 
 (defn run [cfg]
   (let [css-md5 (css/run-css cfg)
@@ -277,6 +275,24 @@
            "97" run-nvim-pre 
            "98" run-nvim-post})
 
+(defn proj-item [[index desc is-first]] 
+  (if is-first
+    (string/format "\n\n\t%d:\t%s" index desc)
+    (string/format "%d:\t%s" index desc)))
+
+
+(defn proj-help []
+  (let [projs [[1 "rapanui" true] 
+               [2 "maunaloa" false] 
+               [3 "optionpurchase" false] 
+               [4 "derivatives" false] 
+               [5 "options (elm)" false] 
+               [6 "critters (elm)" false]] 
+        projsx (map proj-item projs)]
+    (string/join projsx "\n\t")))
+
+# "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: derivatives, 5: options (elm), 6: critters (elm), 97: nvim on, 98: nvim off" :required true}
+
 (defn run [argx]
   (printf "%q" argx)
   (let [os-linux (= (argx "os") "linux")
@@ -297,7 +313,7 @@
 (defn main [&]
   (let
     [ argx (ap/argparse "Deploy"
-            "proj"  {:kind :option  :short "p" :help "1: rapanui, 2: maunaloa, 3: optionpurchase, 4: derivatives, 5: options (elm), 6: critters (elm), 97: nvim on, 98: nvim off" :required true}
+            "proj"  {:kind :option  :short "p" :help (proj-help) :required true}
             "os"    {:kind :option  :short "o" :help "Os: linux, macos. Default: linux" :default "linux"}
             "elm"   {:kind :flag    :short "e" :default false :help "Default: false"}
             "joy"   {:kind :flag    :short "j" :default false :help "Joy backend. Default: false"}

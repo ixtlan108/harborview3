@@ -95,7 +95,8 @@
 
 (def main-action "MainAction")
 
-(def fname "/home/rcs/opt/java/harborview3/purescript/derivatives/src/Derivatives/UI.purs")
+# (def fname "/home/rcs/opt/java/harborview3/purescript/derivatives/src/Derivatives/UI.purs")
+(def fname (c/localized "derivatives/src/Derivatives/UI.purs"))
 
 (defn mk-output-fn1 [&opt f]
   (if f 
@@ -116,16 +117,5 @@
   (sel2/run selects main-action out-2))
 
 (defn run [console]
-  (if console
-    (let [out-2 (mk-output-fn2)
-          out-1 (mk-output-fn1)]
-      (run1 out-1 out-2))
-    (let [f (file/open fname :w)
-          out-2 (mk-output-fn2 f)
-          out-1 (mk-output-fn1 f)]
-      (run1 out-1 out-2)
-      (file/close f))))
+  (c/run console run1 fname))
 
-
-(defn xrun []
-  (printf "%q" (sel2/with-no-select (first selects))))
