@@ -42,7 +42,7 @@
 
 (def label-class "ps-label ps-mr-1")
 
-(def selects  
+(comment selects  
   @[{ :name "pageSelect" 
       :title "Page"
       :evt "PageChange"
@@ -56,6 +56,12 @@
       :options tickers
       :lc label-class
       :disabled "false"}])
+
+(def calls-puts [{:v "calls" :t "Calls" :f true} {:v "puts" :t "Puts"}])
+
+(def selects
+  @[(sel2/params "pageSelect" "Risc" "PageChange" calls-puts :skip-no-sel true)
+    (sel2/params "tickerSelect" "Ticker" "TickerChange" tickers)])
 
 (def btn-class "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success")
 
@@ -71,7 +77,7 @@
 
 (def modal-label-class "ps-label ps-mb-1")
 
-(def inputs
+(comment inputs
   @[{ :name "inpRisc"
       :type :num
       :title "Risc"
@@ -88,6 +94,10 @@
       :disabled false 
       :class modal-inp-class  
       :p1 ["val" "Maybe Int"]}])
+
+(def inputs
+  @[(inp/params "inpRisc" "Risc" :t :num :e "RiscChange")
+    (inp/params "purchaseVolume" "Volume" :t :int :e "(PDA <<< XVolume)" :lc modal-label-class)])
 
 (def checkbox
   @[{ :name "ivCheck" :id "ivcheck" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-24 ps-mr-1"}
