@@ -6,7 +6,7 @@ import Effect.Class (liftEffect)
 import Effect.Aff (Aff)
 import Effect.Console (logShow)
 -- import HarborView.Maunaloa.Common (alert)
-import HarborView.Common (HarborViewError(..))
+import HarborView.HarborViewError (HarborViewError(..))
 
 -- data MaunaloaError =
 --     AffjaxError String
@@ -20,3 +20,6 @@ handleErrorAff (AffjaxError err) =
 handleErrorAff (JsonError err) =
     -- liftEffect $ alert $ "JsonError: " <> err
     liftEffect $ logShow $ "JsonError: " <> err
+handleErrorAff _ =
+    liftEffect $ logShow "JsonError: " 
+    

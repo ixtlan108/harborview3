@@ -47,12 +47,13 @@ render st =
     , HH.div [ HP.classes [ ClassName "derivatives" ] ]
         [ Table.createTable st.opx st.sortField st.sortOrderAsc ]
     , DLG.modalDialog st.modalPurchase
-        (Title $ "Purchase Option")
+        (Title $ "PURCHASE OPTION")
         (PDA <<< XOk)
         (PDA <<< XCancel)
         (modalContent st)
+    , DLG.modalDialogBottom st.modalBottom ModalBottomClose
     ]
-
+ 
 -- }}}
 
 modalContent :: forall w r. { purchaseItem :: Maybe TableItem, volume :: Maybe Amount | r } -> HTML w MainAction

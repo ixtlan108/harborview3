@@ -22,3 +22,4 @@ data MainAction
   | TableItemChecked Int Boolean
   | TableSort SortField MouseEvent
   | PDA PurchaseAction
+  | ModalBottomClose MouseEvent

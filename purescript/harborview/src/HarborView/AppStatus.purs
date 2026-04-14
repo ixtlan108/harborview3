@@ -50,8 +50,9 @@ modalStateFor st msg =
       in
       ModalWarn msg1
     AffjaxError s ->
-      ModalError msg
+      ModalError $ "(" <> s <> ") " <> msg
     HttpError statusCode  ->
-      ModalError msg
+      ModalError $ "(http staus code: " <> show statusCode <> ") " <> msg
     JsonError s ->
-      ModalError msg
+      ModalError $ "(" <> s <> ") " <> msg
+      

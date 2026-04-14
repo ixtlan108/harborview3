@@ -28,7 +28,7 @@ import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
 import HarborView.Common (StockTicker(..), Amount(..))
 import HarborView.Common as HC
-import HarborView.ModalDialog (DialogState(..))
+import HarborView.ModalDialog (DialogState(..),ModalState(..))
 
 --}}}
 
@@ -289,5 +289,7 @@ handleAction = case _ of
     handleTableSort sf
   PDA act ->
     handlePurchaseAction act
+  ModalBottomClose _ ->
+    H.modify_ \stx -> stx { modalBottom = ModalHidden }
 
 --}}}

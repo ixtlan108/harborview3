@@ -14,10 +14,10 @@ import HarborView.Maunaloa.Common
   , Take(..)
   , StockTicker(..)
   )
-import HarborView.UI as UI
-import HarborView.UI
-  ( SelectItems
-  )
+--import HarborView.UI as UI
+--import HarborView.UI
+--  ( SelectItems
+--  )
 import HarborView.Maunaloa.Core as Core
 import Web.UIEvent.MouseEvent (MouseEvent)
 --import Web.Event.Event as E

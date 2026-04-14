@@ -24,7 +24,8 @@ import Effect.Class (liftEffect)
 import Effect.Console (logShow)
 import Graphics.Canvas (CanvasElement, Context2D)
 import Graphics.Canvas as Canvas
-import HarborView.Common (UnixTime(..), HarborViewError, defaultEventHandling)
+import HarborView.HarborViewError  (HarborViewError)
+import HarborView.Common (UnixTime(..), defaultEventHandling)
 import HarborView.Maunaloa.Candlestick as Candlestick
 import HarborView.Maunaloa.Common (Pix(..), ChartMapping(..), HtmlId(..), OptionTicker(..), StockTicker(..), ChartType, JsonSpot, chartTypeAsInt, mainURL, alert)
 import HarborView.Maunaloa.HRuler (HRuler, timeStampToPix)

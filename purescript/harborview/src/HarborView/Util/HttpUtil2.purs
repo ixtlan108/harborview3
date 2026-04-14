@@ -20,11 +20,12 @@ import Affjax.RequestBody (RequestBody)
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Error (JsonDecodeError)
+import Data.Argonaut.Decode as Decode
 
 import HarborView.AppStatus (AppStatus(..))
 
 parseResult :: forall r r2.
-    Either Error { body :: Json, status :: StatusCode | r2 }
+    Either Error { body :: String, status :: StatusCode | r2 }
     -> (Json -> Either JsonDecodeError r) -> Either AppStatus r
 parseResult res f =
   case res of
@@ -38,7 +39,8 @@ parseResult res f =
           Left $ HttpError code
         else
           let
-            fresult = f response.body
+            fresult = 
+              Decode.parseJson response.body >>= f
           in
             case fresult of
               Left err ->
@@ -48,7 +50,7 @@ parseResult res f =
 
 get :: forall r. URL -> (Json -> Either JsonDecodeError r) -> Aff (Either AppStatus r)
 get url f =
-  Affjax.get ResponseFormat.json url >>= \res ->
+  Affjax.get ResponseFormat.string url >>= \res ->
     pure $ parseResult res f
 
 post
@@ -58,7 +60,7 @@ post
   -> (Json -> Either JsonDecodeError r)
   -> Aff (Either AppStatus r)
 post url requestBody f =
-  Affjax.post ResponseFormat.json url (Just requestBody) >>= \res ->
+  Affjax.post ResponseFormat.string url (Just requestBody) >>= \res ->
     pure $ parseResult res f
 
 
@@ -69,10 +71,10 @@ put
   -> (Json -> Either JsonDecodeError r)
   -> Aff (Either AppStatus r)
 put url requestBody f =
-  Affjax.put ResponseFormat.json url (Just requestBody) >>= \res ->
+  Affjax.put ResponseFormat.string url (Just requestBody) >>= \res ->
     pure $ parseResult res f
 
 delete :: forall r. URL -> (Json -> Either JsonDecodeError r) -> Aff (Either AppStatus r)
 delete url f =
-  Affjax.delete ResponseFormat.json url >>= \res ->
+  Affjax.delete ResponseFormat.string url >>= \res ->
     pure $ parseResult res f

@@ -91,14 +91,6 @@
 (joy/route :get "/nordnet/calls/:oid" stock-options)
 (joy/route :get "/nordnet/puts/:oid" stock-options)
 
-(comment risc-payload
-  [{ :ticker "YAR6L320"
-     :stockprice 470.0 
-     :status 1}
-   { :ticker "YAR6L300"
-     :stockprice 460.0 
-     :status 1}])
-
 (defn calculate-riscs [req]
   (printf "%q" req)
   (let [risc-payload (map calc-risc (req :body))
@@ -108,4 +100,5 @@
     (r/respond :json json-response)))
   
 (joy/route :post "/maunaloa/stockprice/calculate" calculate-riscs)
+
 

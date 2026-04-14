@@ -21,6 +21,6 @@ package:
     main: Test.Main
     dependencies:
       - spec
-workspace:
-  packageSet:
-    registry: 50.11.0
+# workspace:
+#   packageSet:
+#     registry: 50.11.0
