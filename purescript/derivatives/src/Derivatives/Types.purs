@@ -1,5 +1,4 @@
-module Derivatives.Types
-  where
+module Derivatives.Types where
 
 import Prelude
 
@@ -9,10 +8,9 @@ import HarborView.CommonJson as CJ
 
 --------------- Page ---------------
 
-data Page =
-  Calls
+data Page
+  = Calls
   | Puts
-
 
 derive instance Eq Page
 
@@ -31,11 +29,11 @@ newtype Risc = Risc Number
 --------------- Risc Request ---------------
 type RiscRequest =
   { ticker :: String
-    , risc :: Number
+  , risc :: Number
   }
 
 toJson :: RiscRequest -> Array (Tuple String Json)
 toJson risc =
   [ CJ.fromString "ticker" risc.ticker
-   , CJ.fromNumber "risc" risc.risc
+  , CJ.fromNumber "risc" risc.risc
   ]

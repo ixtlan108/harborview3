@@ -19,7 +19,7 @@
                    :bid 190 
                    :ask 195 
                    :expiry "2026-12-18"
-                   :ivBid 0.3 
+                   :ivBid -0.3 
                    :ivAsk 0.4}
                  {
                    :brEven 12
@@ -30,7 +30,7 @@
                    :ask 215 
                    :expiry "2026-12-18"
                    :ivBid 0.1 
-                   :ivAsk 0.2}
+                   :ivAsk -0.2}
                  {
                    :brEven 12
                    :days 293

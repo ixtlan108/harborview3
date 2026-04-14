@@ -21,6 +21,8 @@ import Derivatives.Types (Risc(..))
 --import Oahu.SortField (SortField(..))
 import Web.HTML.Common (AttrName(..))
 
+
+-- {{{tdAlign 
 tdAlign :: forall r i. Boolean -> IProp r i
 tdAlign isLeft =
   if isLeft then
@@ -28,6 +30,10 @@ tdAlign isLeft =
   else
     HP.attr (AttrName "align") "right"
 
+-- }}}
+
+
+-- {{{thSortAsc 
 thSortAsc :: forall r i. Boolean -> IProp r i
 thSortAsc asc =
   if asc then
@@ -35,10 +41,13 @@ thSortAsc asc =
   else
     HP.attr (AttrName "aria-sort") "descending"
 
+-- }}}
+
 noSort ∷ ∀ r i. Array (IProp (class ∷ String | r) i)
 noSort =
   [ HP.classes [ ClassName "no-sort" ] ]
 
+-- {{{sortedTh 
 sortedTh :: forall w. SortField -> SortField -> String -> Boolean -> HTML w MainAction
 sortedTh curSortField sortField title isAsc =
   if curSortField == sortField then
@@ -46,10 +55,13 @@ sortedTh curSortField sortField title isAsc =
   else
     HH.th [ HE.onClick (TableSort sortField) ] [ HH.text title ]
 
+-- }}}
+
 unSortedTh :: forall w. String -> HTML w MainAction
 unSortedTh title =
   HH.th noSort [ HH.text title ]
 
+--{{{ tableHead 
 tableHead :: forall w. SortField -> Boolean -> HTML w MainAction
 tableHead sf isAsc =
   let
@@ -75,9 +87,11 @@ tableHead sf isAsc =
           , unSortedTh "S.P. at Risc"
         ]
     ]
+  --}}}
 
 foreign import setRisc_ :: Fn2 TableItem Number (Effect Unit)
 
+-- {{{setRisc 
 setRisc :: TableItem -> Maybe Risc -> (Effect Unit)
 setRisc item risc =
   let
@@ -86,6 +100,8 @@ setRisc item risc =
               Just (Risc risc2) -> risc2
   in
   runFn2 setRisc_ item risc1
+
+-- }}}
 
 foreign import setSelected_ :: Fn2 TableItem Boolean (Effect Unit)
 
@@ -99,6 +115,7 @@ setCalcRiscResult :: TableItem -> Number -> Number -> Effect Unit
 setCalcRiscResult =
   runFn3 setCalcRiscResult_
 
+-- {{{tableItemCheck 
 tableItemCheck :: forall w. Int -> Boolean -> HTML w MainAction
 tableItemCheck lnr isChecked =
   HH.div [ HP.classes [ ClassName "form-check form-switch" ]]
@@ -112,6 +129,9 @@ purchase :: forall w. TableItem -> HTML w MainAction
 purchase item =
   HH.button [HE.onClick (PDA <<< XOpen item), HP.classes [ ClassName "ps-btn btn btn-outline-success"]] [HH.text "Purchase"]
 
+-- }}}
+
+-- {{{ createRow 
 createRow :: forall w. TableItem -> HTML w MainAction
 createRow item =
   HH.tr_
@@ -131,6 +151,9 @@ createRow item =
     , HH.td_ [ HH.text $ show item.spAtRisc ]
   ]
 
+-- }}}
+
+-- {{{createTable 
 createTable :: forall w.
   Array TableItem
   -> SortField
@@ -145,3 +168,5 @@ createTable items sf isAsc =
       [ tableHead sf isAsc
       , HH.tbody_ rows
       ]
+
+-- }}}

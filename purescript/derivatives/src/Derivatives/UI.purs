@@ -1,6 +1,8 @@
 module Derivatives.UI
   where
 
+
+-- {{{ Prelude
 import Prelude
 import Data.Maybe (Maybe(..))
 import DOM.HTML.Indexed.InputType (InputType(..))
@@ -10,21 +12,27 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML (HTML, ClassName(..))
 import Derivatives.Actions (MainAction(..),PurchaseAction(..))
 
+--}}}
 
+--{{{ ivCheck 
 ivCheck :: forall w. Boolean -> HTML w MainAction
 ivCheck isChecked = 
   HH.div [ HP.classes [ ClassName "form-check form-switch ps-mt-24 ps-mr-1" ]]
     [ HH.input [HP.type_ InputCheckbox, HP.id "ivcheck", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onChecked IvChecked ]
     , HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "ivcheck"] [ HH.text "Only iv > 0.0"]
     ]
+--}}}
 
+--{{{ calcRiscOnSelectedCheck 
 calcRiscOnSelectedCheck :: forall w. Boolean -> HTML w MainAction
 calcRiscOnSelectedCheck isChecked = 
   HH.div [ HP.classes [ ClassName "form-check form-switch ps-mt-24" ]]
     [ HH.input [HP.type_ InputCheckbox, HP.id "calcriscselected", HP.classes [ ClassName "form-check-input" ], HP.checked isChecked, HE.onChecked CalcRiscSelectedChecked ]
     , HH.label [ HP.classes [ClassName "form-check-label" ], HP.for "calcriscselected"] [ HH.text "Calc risc on selected"]
     ]
+--}}}
 
+--{{{ inpRisc 
 inpRisc :: forall w. Maybe Number -> HTML w MainAction
 inpRisc val =
   HH.span [ HP.classes [ ClassName "form-group" ]]
@@ -37,7 +45,9 @@ inpRisc val =
             HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control ps-input" ], HE.onValueChange RiscChange, HP.value (show val1)]
       ]
     ]
+--}}}
 
+-- {{{ purchaseVolume 
 purchaseVolume :: forall w. Maybe Int -> HTML w MainAction
 purchaseVolume val =
   HH.span [ HP.classes [ ClassName "form-group" ]]
@@ -50,11 +60,13 @@ purchaseVolume val =
             HH.input [HP.type_ InputNumber, HP.classes [ ClassName "form-control ps-input" ], HE.onValueChange (PDA <<< XVolume), HP.value (show val1)]
       ]
     ]
+--}}}
 
 calcRisc :: forall w. HTML w MainAction
 calcRisc =
   HH.button [HE.onClick CalcRisc, HP.classes [ ClassName "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success"]] [HH.text "Calc Risc"]
 
+-- {{{ pageSelect 
 pageSelect :: forall w. String -> HTML w MainAction
 pageSelect selected = 
   HH.span [ HP.classes [ ClassName "form-group" ]]
@@ -80,7 +92,9 @@ pageSelect selected =
           opts
       ]
     ]
+--}}}
 
+-- {{{ tickerSelect 
 tickerSelect :: forall w. String -> HTML w MainAction
 tickerSelect selected = 
   HH.span [ HP.classes [ ClassName "form-group" ]]
@@ -174,3 +188,4 @@ tickerSelect selected =
           opts
       ]
     ]
+--}}}

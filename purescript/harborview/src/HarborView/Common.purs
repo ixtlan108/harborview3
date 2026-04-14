@@ -28,6 +28,8 @@ instance Show StockTicker where show (StockTicker s) = show s
 newtype Amount =
   Amount Int
 
+derive instance Newtype Amount _
+
 --------------- Price ---------------
 
 newtype Price =

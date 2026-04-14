@@ -14,6 +14,7 @@ type State =
     , ticker :: Maybe StockTicker
     , risc :: Maybe Risc
     , opx :: Array TableItem
+    , opxShadow :: Array TableItem
     , sortField :: SortField
     , sortOrderAsc :: Boolean
     , ivNotZero :: Boolean
@@ -30,6 +31,7 @@ defaultState =
     , ticker: Nothing
     , risc: Nothing
     , opx: []
+    , opxShadow: []
     , sortField: SfNone
     , sortOrderAsc: false
     , ivNotZero: false

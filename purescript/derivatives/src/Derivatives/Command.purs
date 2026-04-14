@@ -1,5 +1,6 @@
 module Derivatives.Command where
 
+--{{{ Prelude
 import Prelude
 
 import Control.Monad.State.Class (class MonadState)
@@ -22,19 +23,16 @@ import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Console (logShow)
 import Halogen as H
-import Halogen.HTML.Elements (p)
+--import Halogen.HTML.Elements (p)
 import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
 import HarborView.Common (StockTicker(..), Amount(..))
 import HarborView.Common as HC
 import HarborView.ModalDialog (DialogState(..))
 
--- handleAppStatus
---   :: forall m.
---      MonadState State m
---   => AppStatus
---   -> m Unit
+--}}}
 
+--{{{ handleAppStatus
 handleAppStatus
   :: forall m
    . MonadState State m
@@ -49,7 +47,9 @@ handleAppStatus s msg =
         \stx ->
           stx { modalBottom = myModal }
     ) *> pure unit
+--}}}
 
+--{{{ handleTickerChange
 handleTickerChange
   :: forall m
    . MonadState State m
@@ -77,6 +77,9 @@ handleTickerChange ticker =
                   *>
                     pure unit
 
+--}}}
+
+--{{{ handleRiscChange
 handleRiscChange
   :: forall m
    . MonadState State m
@@ -94,7 +97,9 @@ handleRiscChange risc =
         *> (H.modify_ \stx -> stx { opx = origOpx, risc = risc })
         *>
           pure unit
+--}}}
 
+--{{{ handleTableSort
 handleTableSort
   :: forall m
    . MonadState State m
@@ -108,9 +113,9 @@ handleTableSort sf =
       sortedItems = TableSort.sortResponse sf so st.opx
     in
       H.modify_ \stx -> stx { opx = sortedItems, sortOrderAsc = so, sortField = sf }
+--}}}
 
--- (H.modify_ \stx -> stx { risc = risc }) *>
-
+--{{{ calcRiscSingle
 calcRiscSingle
   :: forall m
    . MonadState State m
@@ -119,7 +124,10 @@ calcRiscSingle
   -> m Unit
 calcRiscSingle item =
   pure unit
+  
+--}}}
 
+--{{{ handleTableItemChecked
 handleTableItemChecked
   :: forall m
    . MonadState State m
@@ -145,10 +153,15 @@ handleTableItemChecked lnr isChecked =
               ) *>
               (H.modify_ \stx -> stx { opx = items })
 
+--}}}
+
+--{{{ toRiscRequest 
 toRiscRequest :: TableItem -> RiscRequest
 toRiscRequest item =
   { ticker: item.ticker, risc: item.risc }
+--}}}
 
+--{{{ setRiscResults
 setRiscResult :: Array TableItem -> RiscResponse -> Effect Unit
 setRiscResult items response =
   let
@@ -159,7 +172,9 @@ setRiscResult items response =
         pure unit
       Just curOpx1 ->
         Table.setCalcRiscResult curOpx1 response.stockprice response.optionprice
+--}}}
 
+--{{{ setRiscResults
 setRiscResults
   :: forall m
    . MonadAff m
@@ -171,7 +186,9 @@ setRiscResults items responses =
     riscFn = setRiscResult items
   in
     H.liftEffect (Traversable.traverse_ riscFn responses)
+--}}}
 
+--{{{ handleCalcRisc
 handleCalcRisc
   :: forall m
    . MonadState State m
@@ -196,6 +213,9 @@ handleCalcRisc =
                 *>
                   (H.modify_ \stx -> stx { opx = origItems })
 
+--}}}
+
+--{{{ handlePurchaseAction
 handlePurchaseAction
   :: forall m
    . MonadState State m
@@ -228,8 +248,17 @@ handlePurchaseAction = case _ of
   XOpen s _ ->
     H.modify_ \stx -> stx { modalPurchase = DialogVisible, purchaseItem = Just s }
   XVolume s ->
+    --H.liftEffect (logShow s) *>
     H.modify_ \stx -> stx { volume = HC.imap Amount s }
 
+--}}}
+
+
+filterOpx :: Array TableItem -> Array TableItem 
+filterOpx table = 
+  Array.filter (\x -> x.ivBid > 0.0 && x.ivAsk > 0.0) table
+
+--{{{ handleAction
 handleAction
   :: forall cs o m
    . MonadAff m
@@ -247,7 +276,11 @@ handleAction = case _ of
   RiscChange s ->
     handleRiscChange $ HC.umap Risc s
   IvChecked b ->
-    H.modify_ \stx -> stx { ivNotZero = b }
+    H.get >>= \st -> 
+      if b == true then
+        H.modify_ \stx -> stx { ivNotZero = b, opx = filterOpx st.opx, opxShadow = st.opx }
+      else
+        H.modify_ \stx -> stx { ivNotZero = b, opx = st.opxShadow, opxShadow = [] }
   CalcRiscSelectedChecked b ->
     H.modify_ \stx -> stx { calcRiscSelected = b }
   TableItemChecked lnr b ->
@@ -256,3 +289,5 @@ handleAction = case _ of
     handleTableSort sf
   PDA act ->
     handlePurchaseAction act
+
+--}}}

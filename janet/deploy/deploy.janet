@@ -59,7 +59,6 @@
           sx1 (get sx 1)]
       (string/slice sx1 0 8))))
 
-
 (defn template-app [pkg main stem is-joy-backend]
   (let [spago
           { :pkg pkg
