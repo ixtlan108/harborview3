@@ -108,17 +108,6 @@
 # (def fname "/home/rcs/opt/java/harborview3/purescript/derivatives/src/Derivatives/UI.purs")
 (def fname (c/localized "derivatives/src/Derivatives/UI.purs"))
 
-(defn mk-output-fn1 [&opt f]
-  (if f 
-     (partial c/write-result f)
-     c/prn-result))
-
-(defn mk-output-fn2 [&opt f]
-  (if f
-    (let [wr-fn (partial c/write-result f)]
-      (fn [b] (map wr-fn b)))
-    (fn [b] (map c/prn-result b))))
-
 (defn run1 [out-1 out-2]
   (map out-1 prelude)
   (cx/run checkbox main-action out-2)

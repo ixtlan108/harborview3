@@ -42,21 +42,6 @@
 
 (def label-class "ps-label ps-mr-1")
 
-(comment selects  
-  @[{ :name "pageSelect" 
-      :title "Page"
-      :evt "PageChange"
-      :options [{:v "calls" :t "Calls" :f true} {:v "puts" :t "Puts"}]
-      :disabled "false"
-      :lc label-class
-      :skip-no-sel true} 
-    { :name "tickerSelect" 
-      :title "Ticker"
-      :evt "TickerChange"
-      :options tickers
-      :lc label-class
-      :disabled "false"}])
-
 (def calls-puts [{:v "calls" :t "Calls" :f true} {:v "puts" :t "Puts"}])
 
 (def selects
@@ -77,24 +62,6 @@
 
 (def modal-label-class "ps-label ps-mb-1")
 
-(comment inputs
-  @[{ :name "inpRisc"
-      :type :num
-      :title "Risc"
-      :evt "RiscChange" 
-      :lc label-class
-      :disabled false 
-      :class "form-control ps-input ps-mt-auto"
-      :p1 ["val" "Maybe Number"]}
-    { :name "purchaseVolume"
-      :type :int
-      :title "Volume"
-      :evt "(PDA <<< XVolume)" 
-      :lc modal-label-class 
-      :disabled false 
-      :class modal-inp-class  
-      :p1 ["val" "Maybe Int"]}])
-
 (def inputs
   @[(inp/params "inpRisc" "Risc" :t :num :e "RiscChange")
     (inp/params "purchaseVolume" "Volume" :t :int :e "(PDA <<< XVolume)" :lc modal-label-class)])
@@ -107,17 +74,6 @@
 
 # (def fname "/home/rcs/opt/java/harborview3/purescript/derivatives/src/Derivatives/UI.purs")
 (def fname (c/localized "maunaloa/src/Maunaloa/UI.purs"))
-
-(defn mk-output-fn1 [&opt f]
-  (if f 
-     (partial c/write-result f)
-     c/prn-result))
-
-(defn mk-output-fn2 [&opt f]
-  (if f
-    (let [wr-fn (partial c/write-result f)]
-      (fn [b] (map wr-fn b)))
-    (fn [b] (map c/prn-result b))))
 
 (defn run1 [out-1 out-2]
   (map out-1 prelude)

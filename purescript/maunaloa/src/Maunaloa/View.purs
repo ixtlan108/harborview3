@@ -30,18 +30,12 @@ import Halogen.HTML
   , ClassName(..)
   )
 import Halogen.HTML.Events as HE
+import Maunaloa.Command (handleAction)
 
 import Effect.Console (logShow)
 
 import Prelude
 
-type State =
-  { tickers :: SelectItems
-  , ct :: ChartType
-  , selectedTicker :: String
-  , takeAmt :: Take
-  , dropAmt :: Int
-  }
 
 mkTickers :: SelectItems
 mkTickers =
@@ -65,24 +59,11 @@ mkTickers =
   , { v: "3", t: "YAR - Yara" }
   ]
 
-data Action
-  = SelectChange String
-  | Initialize
-  | ResetChart MouseEvent
-  | AddLevelLine MouseEvent
-  | FetchRiscLines MouseEvent
-  | Previous MouseEvent
-  | Next MouseEvent
-  | Last MouseEvent
-  | DeleteNonPersistent MouseEvent
-  | DeleteAll MouseEvent
-  | FetchSpot MouseEvent
 
 component :: forall q i o m. MonadAff m => ChartType -> H.Component q i o m
 component c =
   H.mkComponent
-    { initialState: \_ -> { tickers: mkTickers
-                          , ct: c
+    { initialState: \_ -> { ct: c
                           , selectedTicker: "0" --UI.emptySelectItem
                           , takeAmt: Take 90
                           , dropAmt: 0
@@ -161,7 +142,7 @@ fetchSpot =
 render :: forall cs m. State -> H.ComponentHTML Action cs m
 render st =
   let
-    tickers = UI.mkSelect_ st.tickers SelectChange
+    tickers = []  -- UI.mkSelect_ st.tickers SelectChange
   in
   HH.div
   [ HP.classes [ mainClass ]]
@@ -201,70 +182,3 @@ navigate dropAmt =
       H.modify_ \stx -> stx { dropAmt = newDropAmt }
 
 
-handleAction :: forall cs o m. MonadAff m => Action -> H.HalogenM State Action cs o m Unit
-handleAction = case _ of
-  SelectChange s ->
-    H.get >>= \st ->
-      ( if s == "0" then
-          liftEffect (Core.paintEmpty st.ct)
-        else
-          liftEffect (Core.paint st.ct (StockTicker s) (Drop st.dropAmt) st.takeAmt)
-      ) *>
-    H.modify_ \stx -> stx { selectedTicker = s }
-  Initialize ->
-    H.gets _.ct >>= \ct1 ->
-      liftEffect (
-        (logShow $ Common.chartTypeAsInt ct1) *>
-        Core.initEvents ct1
-      )
-  ResetChart _ ->
-    H.get >>= \st ->
-      if st.selectedTicker  == "0" then
-        pure unit
-      else
-        let
-          ticker = StockTicker st.selectedTicker
-        in
-        liftEffect (
-          Core.resetCharts *>
-          Core.paint st.ct ticker (Drop 0) st.takeAmt
-        ) *>
-        H.modify_ \stx -> stx { dropAmt = 0 }
-  AddLevelLine _ ->
-    H.gets _.ct >>= \ct1 ->
-      liftEffect (Core.addLevelLine ct1)
-  FetchRiscLines _ ->
-    H.get >>= \st ->
-      H.liftAff $ Core.fetchLevelLines st.ct (StockTicker st.selectedTicker)
-  Previous _ ->
-    navigate 90
-  Next _ ->
-    navigate (-90)
-  Last _ ->
-    navigate 0
-  {-
-  DeleteLine _ ->
-    H.get >>= \st ->
-      if st.selectedTicker == "0" then
-        pure unit
-      else
-        pure unit
-  -}
-  DeleteNonPersistent _ ->
-    H.get >>= \st ->
-      if st.selectedTicker == "0" then
-        pure unit
-      else
-        liftEffect $ Core.deleteNonPersistentLevelLines st.ct
-  DeleteAll _ ->
-    H.get >>= \st ->
-      if st.selectedTicker == "0" then
-        pure unit
-      else
-        H.liftAff $ Core.deleteAllLevelLines st.ct (StockTicker st.selectedTicker)
-  FetchSpot _ ->
-    H.get >>= \st ->
-      if st.selectedTicker == "0" then
-        pure unit
-      else
-        H.liftAff $ Core.fetchSpot st.ct (StockTicker st.selectedTicker)
