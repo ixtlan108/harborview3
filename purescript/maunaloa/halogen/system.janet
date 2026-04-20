@@ -1,23 +1,33 @@
-(import /html/button :as btn)
-(import /html/wrapper :as wr)
-(import /html/input :as inp)
+#(import /html/button :as btn)
+#(import /html/wrapper :as wr)
+#(import /html/input :as inp)
+#(import /html/checkbox :as cx)
 (import /html/common :as c)
 (import /html/select2 :as sel2)
-(import /html/checkbox :as cx)
+
 
 
 (def prelude 
-  @[[1 "module Derivatives.UI"]
+  @[[1 "module HarborView.Maunaloa.View"]
     [2 "where"]
     [1 ""]
     [1 "import Prelude"]
     [1 "import Data.Maybe (Maybe(..))"]
-    [1 "import DOM.HTML.Indexed.InputType (InputType(..))"]
+    [1 "import Control.Monad.State.Class (class MonadState)"]
+    [1 "import Effect.Aff.Class (class MonadAff)"]
+    [1 "import Effect.Class (class MonadEffect, liftEffect)"]
+    [1 "import Effect.Console (logShow)"]
+    [1 "import Web.UIEvent.MouseEvent (MouseEvent)"]
+    [1 "import Halogen as H"]
     [1 "import Halogen.HTML as HH"]
     [1 "import Halogen.HTML.Events as HE"]
     [1 "import Halogen.HTML.Properties as HP"]
     [1 "import Halogen.HTML (HTML, ClassName(..))"]
-    [1 "import Derivatives.Actions (MainAction(..),PurchaseAction(..))"]
+    [1 "import HarborView.Maunaloa.Core as Core"]
+    [1 "import HarborView.Maunaloa.Common (ChartType, Drop(..), Take(..), StockTicker(..))"]
+    [1 "import Maunaloa.Command (handleAction)"]
+    [1 "import Maunaloa.Actions (Action(..))"]
+    [1 "import Maunaloa.State (State)"]
     [1 ""]])
 
 (def tickers 
@@ -40,17 +50,16 @@
      { :t "TOM" :v "17"}
      { :t  "YAR" :v "3"}])
 
-(def label-class "ps-label ps-mr-1")
+(comment label-class "ps-label ps-mr-1")
 
-(def calls-puts [{:v "calls" :t "Calls" :f true} {:v "puts" :t "Puts"}])
+(comment calls-puts [{:v "calls" :t "Calls" :f true} {:v "puts" :t "Puts"}])
 
 (def selects
-  @[(sel2/params "pageSelect" "Risc" "PageChange" calls-puts :skip-no-sel true)
-    (sel2/params "tickerSelect" "Ticker" "TickerChange" tickers)])
+  @[(sel2/params "tickerSelect" "Ticker" "SelectChange" tickers)])
 
-(def btn-class "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success")
+(comment btn-class "ps-mr-1 ps-mt-24 ps-btn btn btn-outline-success")
 
-(def buttons 
+(comment buttons 
   @[{ :evt "CalcRisc"
        :title "Calc Risc"
        :disabled "false"
@@ -58,28 +67,28 @@
        :name "calcRisc"}])
 
 
-(def modal-inp-class "form-control")
+(comment modal-inp-class "form-control")
 
-(def modal-label-class "ps-label ps-mb-1")
+(comment modal-label-class "ps-label ps-mb-1")
 
-(def inputs
+(comment inputs
   @[(inp/params "inpRisc" "Risc" :t :num :e "RiscChange")
     (inp/params "purchaseVolume" "Volume" :t :int :e "(PDA <<< XVolume)" :lc modal-label-class)])
 
-(def checkbox
+(comment checkbox
   @[{ :name "ivCheck" :id "ivcheck" :evt "IvChecked" :title "Only iv > 0.0" :cl-div "form-check form-switch ps-mt-24 ps-mr-1"}
     { :name "calcRiscOnSelectedCheck" :id "calcriscselected" :evt "CalcRiscSelectedChecked" :title "Calc risc on selected" :cl-div "form-check form-switch ps-mt-24"}])
 
-(def main-action "MainAction")
+(def main-action "Action")
 
 # (def fname "/home/rcs/opt/java/harborview3/purescript/derivatives/src/Derivatives/UI.purs")
 (def fname (c/localized "maunaloa/src/Maunaloa/UI.purs"))
 
 (defn run1 [out-1 out-2]
   (map out-1 prelude)
-  (cx/run checkbox main-action out-2)
-  (inp/run inputs main-action out-2)
-  (btn/run buttons main-action out-2)
+  #(cx/run checkbox main-action out-2)
+  #(inp/run inputs main-action out-2)
+  #(btn/run buttons main-action out-2)
   (sel2/run selects main-action out-2))
 
 (defn run [console]

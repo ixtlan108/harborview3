@@ -12,15 +12,15 @@
     <div class="bd-example" role="tabpanel" style="margin-bottom: 1rem">
         <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-bottom: 1rem">
             <li class="nav-item">
-                <a class="nav-link active" id="chart1-tab" data-toggle="tab" data-height="true" href="#chart1"
+                <a class="nav-link active" id="chart1-tab" data-bs-toggle="tab" data-height="true" href="#chart1"
                     role="tab" aria-controls="chart1" aria-expanded="true">Days</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="chart2-tab" data-toggle="tab" data-height="true" href="#chart2" role="tab"
+                <a class="nav-link" id="chart2-tab" data-bs-toggle="tab" data-height="true" href="#chart2" role="tab"
                     aria-controls="chart2" aria-expanded="false">Weeks</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="chart3-tab" data-toggle="tab" data-height="true" href="#chart3" role="tab"
+                <a class="nav-link" id="chart3-tab" data-bs-toggle="tab" data-height="true" href="#chart3" role="tab"
                     aria-controls="chart3" aria-expanded="false">Month</a>
             </li>
         </ul>
@@ -41,7 +41,7 @@
         </div>
     </div>
     <div th:replace="~{head.html :: scripts}"></div>
-    <script type="text/javascript" src="/js/maunaloa/ps-charts-%s.js"></script>
+    <script type="text/javascript" src="/js/maunaloa/maunaloa-%s.js"></script>
     <link rel="stylesheet" href="/css/maunaloa/maunaloa-%s.css">
     <script type="module" src="/js/maunaloa/charts.js"></script>
     <script type="module" src="/js/maunaloa/svg/draggable.js"></script>

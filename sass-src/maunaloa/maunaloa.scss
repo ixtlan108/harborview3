@@ -1,3 +1,11 @@
+import components/checkbox
+import components/modal_dialog
+import globals/logo
+
+local-import grid_main
+local-import grid_scrapbook
+local-import menubar
+
 body {
   color: #014156;
   background-color: #FFFAF0;
@@ -29,11 +37,3 @@ a.href-td {
   color: #fff;
 }
 
-@import "../components/checkbox";
-@import "../components/modal_dialog";
-
-@import "../globals/logo";
-
-@import "grid_main";
-@import "grid_scrapbook";
-@import "menubar";

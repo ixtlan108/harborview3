@@ -1,42 +1,36 @@
 module HarborView.Maunaloa.View where
 
-
--- import Data.Tuple ( Tuple(..) )
+--import Data.Tuple ( Tuple(..) )
 --import Effect.Class (class MonadEffect, liftEffect)
 import Control.Monad.State.Class (class MonadState)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Console (logShow)
 import Data.Maybe (Maybe(..))
-import HarborView.Maunaloa.Common as Common
-import HarborView.Maunaloa.Common
-  ( ChartType
-  , Drop(..)
-  , Take(..)
-  , StockTicker(..)
-  )
+--import HarborView.Maunaloa.Common as Common
 --import HarborView.UI as UI
 --import HarborView.UI
 --  ( SelectItems
 --  )
-import HarborView.Maunaloa.Core as Core
 import Web.UIEvent.MouseEvent (MouseEvent)
 --import Web.Event.Event as E
 --import DOM.HTML.Indexed.InputType (InputType(..))
 import Halogen as H
 import Halogen.HTML.Properties as HP
 import Halogen.HTML as HH
-import Halogen.HTML
-  ( HTML
-  , ClassName(..)
-  )
+import Halogen.HTML (HTML, ClassName(..))
 import Halogen.HTML.Events as HE
-import Maunaloa.Command (handleAction)
 
-import Effect.Console (logShow)
+import HarborView.Maunaloa.Core as Core
+import HarborView.Maunaloa.Common (ChartType, Drop(..), Take(..), StockTicker(..))
+import Maunaloa.Command (handleAction)
+import Maunaloa.Actions (Action(..))
+import Maunaloa.State (State)
+import Maunaloa.UI as UI
 
 import Prelude
 
-
+{-
 mkTickers :: SelectItems
 mkTickers =
   [ { v: "18", t: "AKSO - Aker Solutions" }
@@ -58,21 +52,22 @@ mkTickers =
   , { v: "17", t: "TOM - Tomra" }
   , { v: "3", t: "YAR - Yara" }
   ]
-
+-}
 
 component :: forall q i o m. MonadAff m => ChartType -> H.Component q i o m
 component c =
   H.mkComponent
-    { initialState: \_ -> { ct: c
-                          , selectedTicker: "0" --UI.emptySelectItem
-                          , takeAmt: Take 90
-                          , dropAmt: 0
-                          }
+    { initialState: \_ ->
+        { ct: c
+        , selectedTicker: "-" --UI.emptySelectItem
+        , takeAmt: Take 90
+        , dropAmt: 0
+        }
     , render
     , eval: H.mkEval H.defaultEval
-      { handleAction = handleAction
-      , initialize = Just Initialize
-      }
+        { handleAction = handleAction
+        , initialize = Just Initialize
+        }
     }
 
 mainClass :: ClassName
@@ -91,13 +86,12 @@ icon { iconClass, title } evt =
   let
     cn = "fa-solid " <> iconClass <> " fa-fw"
   in
-  HH.span
-    [ HP.classes [ ClassName "scrap-span" ]]
-    [ HH.i
-        [ HE.onClick evt,  HP.classes [ ClassName cn ], HP.title title ]
-        []
-    ]
-
+    HH.span
+      [ HP.classes [ ClassName "scrap-span" ] ]
+      [ HH.i
+          [ HE.onClick evt, HP.classes [ ClassName cn ], HP.title title ]
+          []
+      ]
 
 resetChart :: Icon
 resetChart =
@@ -142,28 +136,27 @@ fetchSpot =
 render :: forall cs m. State -> H.ComponentHTML Action cs m
 render st =
   let
-    tickers = []  -- UI.mkSelect_ st.tickers SelectChange
+    tickers = UI.tickerSelect st.selectedTicker -- UI.mkSelect_ st.tickers SelectChange
   in
-  HH.div
-  [ HP.classes [ mainClass ]]
-  [
     HH.div
-    [ HP.classes [ menuBarClass ]]
-    [ tickers
-    ]
-    , HH.div
-    [ HP.classes [ menuBarClass ]]
-    [ icon resetChart ResetChart
-    , icon arrowLeft Previous
-    , icon arrowRight Next
-    , icon arrowLast Last
-    , icon levelLine AddLevelLine
-    , icon persistentLevelLine FetchRiscLines
-    , icon deleteNonPersistentLevelLines DeleteNonPersistent
-    , icon deleteAllLevelLines DeleteAll
-    , icon fetchSpot FetchSpot
-    ]
-  ]
+      [ HP.classes [ mainClass ] ]
+      [ HH.div
+          [ HP.classes [ menuBarClass ] ]
+          [ -- tickers
+          ]
+      , HH.div
+          [ HP.classes [ menuBarClass ] ]
+          [ icon resetChart ResetChart
+          , icon arrowLeft Previous
+          , icon arrowRight Next
+          , icon arrowLast Last
+          , icon levelLine AddLevelLine
+          , icon persistentLevelLine FetchRiscLines
+          , icon deleteNonPersistentLevelLines DeleteNonPersistent
+          , icon deleteAllLevelLines DeleteAll
+          , icon fetchSpot FetchSpot
+          ]
+      ]
 
 navigate :: forall m. MonadState State m => MonadEffect m => Int -> m Unit
 navigate dropAmt =
@@ -178,7 +171,6 @@ navigate dropAmt =
           else
             st.dropAmt + dropAmt
       in
-      liftEffect (Core.paint st.ct (StockTicker st.selectedTicker) (Drop newDropAmt) st.takeAmt) *>
-      H.modify_ \stx -> stx { dropAmt = newDropAmt }
-
+        liftEffect (Core.paint st.ct (StockTicker st.selectedTicker) (Drop newDropAmt) st.takeAmt) *>
+          H.modify_ \stx -> stx { dropAmt = newDropAmt }
 

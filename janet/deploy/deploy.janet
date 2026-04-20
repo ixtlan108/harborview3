@@ -78,27 +78,28 @@
                 (string/slice (buffer/push-string @"" co/src-java "/static/js/" stem "/" stem "-%s.js")))}
         css 
           { :src co/src-css
-            :pkg stem
-            :scss-file (string/slice (buffer/push-string @"" stem ".scss"))
-            :css-file (string/slice (buffer/push-string @"" stem ".css"))
-            :css-file-2 (string/slice (buffer/push-string @"" co/src-ps "/" pkg "/dist/" stem ".css"))
+            :pkg pkg
+            :stem stem
+            :scss-file (string/format "%s.scss" stem)
+            :css-file (string/format "%s.css" stem)
+            :css-file-2 (string/format "%s/%s/dist/%s.css" co/src-ps pkg stem)
             :css-map-file (string/slice (buffer/push-string @"" co/src-ps "/" pkg "/dist/" stem ".css.map"))
             :css-static 
               (string/slice (buffer/push-string @"" co/src-java "/static/css/" stem))
             :css-map-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"" co/src-harborview "/public/" stem ".css.map"))
+                (string/format "%s/public/%s.css.map" co/src-harborview stem) 
                 (string/slice (buffer/push-string  @"" co/src-java "/static/css/" stem "/" stem ".css.map")))
             :css-target
               (if is-joy-backend
-                (string/slice (buffer/push-string @"" co/src-harborview "/public/" stem ".css"))
+                (string/format "%s/public/%s.css" co/src-harborview stem)
                 (string/slice (buffer/push-string @"" co/src-java "/static/css/" stem "/" stem "-%s.css")))}]
     { :spago spago
       :css css
       :tpl (string/slice (buffer/push-string @"" co/src-ps "/" pkg "/tpl/index.html.tpl"))
       :tpl-target (string/slice (buffer/push-string @"" co/src-java "/templates/" stem "/index.html"))}))
 
-(defn clear-static-files [path]
+(comment clear-static-files [path]
  (let (fx (os/dir path))
    (each i fx 
      (let (fi (string/slice (buffer/push-string @"" path "/" i)))
@@ -125,10 +126,9 @@
         to-f (string/format (spago-cfg :js-target) spago-md5)
         from-map-f (spago-cfg :js-map-file)
         to-map-f (spago-cfg :js-map-target)]
-    (if (not (dyn :x-joy)) 
-      (clear-static-files (spago-cfg :js-static)))
-    (shutil/copyfile from-f to-f)
-    (shutil/copyfile from-map-f to-map-f)))
+    (if (dyn :x-joy) 
+      (shutil/copyfile from-map-f to-map-f))
+    (shutil/copyfile from-f to-f)))
 
 (defn copy-css-files [cfg css-md5]
   (print "Enter copy-css-files..")
@@ -136,8 +136,6 @@
         from-f (css-cfg :css-file-2)
         with-joy (dyn :x-joy)
         to-f (string/format (css-cfg :css-target) css-md5)]
-    (if (not with-joy) 
-     (clear-static-files (css-cfg :css-static)))
     (shutil/copyfile from-f to-f)))
 
 (defn render [cfg spago-md5 css-md5]
