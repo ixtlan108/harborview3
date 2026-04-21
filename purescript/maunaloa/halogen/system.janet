@@ -8,26 +8,15 @@
 
 
 (def prelude 
-  @[[1 "module HarborView.Maunaloa.View"]
+  @[[1 "module Maunaloa.UI"]
     [2 "where"]
     [1 ""]
     [1 "import Prelude"]
-    [1 "import Data.Maybe (Maybe(..))"]
-    [1 "import Control.Monad.State.Class (class MonadState)"]
-    [1 "import Effect.Aff.Class (class MonadAff)"]
-    [1 "import Effect.Class (class MonadEffect, liftEffect)"]
-    [1 "import Effect.Console (logShow)"]
-    [1 "import Web.UIEvent.MouseEvent (MouseEvent)"]
-    [1 "import Halogen as H"]
     [1 "import Halogen.HTML as HH"]
     [1 "import Halogen.HTML.Events as HE"]
     [1 "import Halogen.HTML.Properties as HP"]
     [1 "import Halogen.HTML (HTML, ClassName(..))"]
-    [1 "import HarborView.Maunaloa.Core as Core"]
-    [1 "import HarborView.Maunaloa.Common (ChartType, Drop(..), Take(..), StockTicker(..))"]
-    [1 "import Maunaloa.Command (handleAction)"]
     [1 "import Maunaloa.Actions (Action(..))"]
-    [1 "import Maunaloa.State (State)"]
     [1 ""]])
 
 (def tickers 

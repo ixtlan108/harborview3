@@ -30,30 +30,6 @@ import Maunaloa.UI as UI
 
 import Prelude
 
-{-
-mkTickers :: SelectItems
-mkTickers =
-  [ { v: "18", t: "AKSO - Aker Solutions" }
-  , { v: "27", t: "BAKKA - Bakkafrost" }
-  , { v: "26", t: "BWLPG - BW LPG" }
-  , { v: "19", t: "DNB - DNB" }
-  , { v: "20", t: "DNO - DNO International" }
-  , { v: "2", t: "EQNR - Equinor" }
-  , { v: "21", t: "GJF - Gjensidige Forsikr" }
-  , { v: "28", t: "GOGL - Golden Ocean Group" }
-  , { v: "29", t: "NAS - Norw. Air Shuttle" }
-  , { v: "1", t: "NHY - Norsk hydro" }
-  , { v: "9", t: "ORK - Orkla" }
-  , { v: "12", t: "PGS - Petroleum Geo-Serv" }
-  , { v: "14", t: "STB - Storebrand" }
-  , { v: "23", t: "SUBC - Subsea 7" }
-  , { v: "6", t: "TEL - Telenor" }
-  , { v: "16", t: "TGS - TGS-NOPEC" }
-  , { v: "17", t: "TOM - Tomra" }
-  , { v: "3", t: "YAR - Yara" }
-  ]
--}
-
 component :: forall q i o m. MonadAff m => ChartType -> H.Component q i o m
 component c =
   H.mkComponent
@@ -136,15 +112,11 @@ fetchSpot =
 render :: forall cs m. State -> H.ComponentHTML Action cs m
 render st =
   let
-    tickers = UI.tickerSelect st.selectedTicker -- UI.mkSelect_ st.tickers SelectChange
+    tickers = UI.tickerSelect st.selectedTicker 
   in
     HH.div
       [ HP.classes [ mainClass ] ]
       [ HH.div
-          [ HP.classes [ menuBarClass ] ]
-          [ -- tickers
-          ]
-      , HH.div
           [ HP.classes [ menuBarClass ] ]
           [ icon resetChart ResetChart
           , icon arrowLeft Previous
@@ -155,22 +127,8 @@ render st =
           , icon deleteNonPersistentLevelLines DeleteNonPersistent
           , icon deleteAllLevelLines DeleteAll
           , icon fetchSpot FetchSpot
+          , tickers
           ]
       ]
 
-navigate :: forall m. MonadState State m => MonadEffect m => Int -> m Unit
-navigate dropAmt =
-  H.get >>= \st ->
-    if st.selectedTicker == "0" then
-      pure unit
-    else
-      let
-        newDropAmt =
-          if dropAmt == 0 then
-            0
-          else
-            st.dropAmt + dropAmt
-      in
-        liftEffect (Core.paint st.ct (StockTicker st.selectedTicker) (Drop newDropAmt) st.takeAmt) *>
-          H.modify_ \stx -> stx { dropAmt = newDropAmt }
 

@@ -2,29 +2,18 @@ module Maunaloa.UI
   where
 
 import Prelude
-import Data.Maybe (Maybe(..))
-import Control.Monad.State.Class (class MonadState)
-import Effect.Aff.Class (class MonadAff)
-import Effect.Class (class MonadEffect, liftEffect)
-import Effect.Console (logShow)
-import Web.UIEvent.MouseEvent (MouseEvent)
-import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML (HTML, ClassName(..))
-import HarborView.Maunaloa.Core as Core
-import HarborView.Maunaloa.Common (ChartType, Drop(..), Take(..), StockTicker(..))
-import Maunaloa.Command (handleAction)
 import Maunaloa.Actions (Action(..))
-import Maunaloa.State (State)
 
 
 tickerSelect :: forall w. String -> HTML w Action
 tickerSelect selected = 
   HH.span [ HP.classes [ ClassName "form-group" ]]
     [ HH.label [ HP.classes [ ClassName "ps-label ps-mr-1" ]]
-      [ HH.text "Ticker", 
+      [ HH.text "", 
         let
           opts = 
             [

@@ -51,6 +51,11 @@
     [ [:link {:href "/derivatives.css" :rel "stylesheet"}]
       [:script {:src "/derivatives.js" :defer ""}]]])
 
+(defn maunaloa-home [request]
+  [:div {:id "maunaloa"}
+    [ [:link {:href "/derivatives.css" :rel "stylesheet"}]
+      [:script {:src "/derivatives.js" :defer ""}]]])
+
 # Middleware
 (def app (-> (joy/handler)
              (joy/layout app-layout)

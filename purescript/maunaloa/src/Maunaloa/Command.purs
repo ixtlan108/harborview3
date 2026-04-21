@@ -4,28 +4,52 @@ module Maunaloa.Command
 import Prelude
 
 import Effect.Aff.Class (class MonadAff)
+import Effect.Class (class MonadEffect, liftEffect)
+import Control.Monad.State.Class (class MonadState)
 import Halogen as H
+import HarborView.Maunaloa.Core as Core
+import HarborView.Maunaloa.Common (StockTicker(..),Drop(..))
 import Maunaloa.Actions (Action(..))
 import Maunaloa.State (State)
 
 handleAction :: forall cs o m. MonadAff m => Action -> H.HalogenM State Action cs o m Unit
 handleAction = case _ of
   SelectChange s ->
-    pure unit
+    H.get >>= \st ->
+      ( if s == "-" then
+          liftEffect (Core.paintEmpty st.ct)
+        else
+          liftEffect (Core.paint st.ct (StockTicker s) (Drop st.dropAmt) st.takeAmt)
+      ) *>
+    H.modify_ \stx -> stx { selectedTicker = s }
   Initialize ->
-    pure unit
+    H.gets _.ct >>= \ct1 ->
+      liftEffect (Core.initEvents ct1)
   ResetChart _ ->
-    pure unit
+    H.get >>= \st ->
+      if st.selectedTicker  == "0" then
+        pure unit
+      else
+        let
+          ticker = StockTicker st.selectedTicker
+        in
+        liftEffect (
+          Core.resetCharts *>
+          Core.paint st.ct ticker (Drop 0) st.takeAmt
+        ) *>
+        H.modify_ \stx -> stx { dropAmt = 0 }
   AddLevelLine _ ->
-    pure unit
+    H.gets _.ct >>= \ct1 ->
+      liftEffect (Core.addLevelLine ct1)
   FetchRiscLines _ ->
-    pure unit
+    H.get >>= \st ->
+      H.liftAff $ Core.fetchLevelLines st.ct (StockTicker st.selectedTicker)
   Previous _ ->
-    pure unit
+    navigate 90
   Next _ ->
-    pure unit
+    navigate (-90)
   Last _ ->
-    pure unit
+    navigate 0
   DeleteNonPersistent _ ->
     pure unit
   DeleteAll _ ->
@@ -33,6 +57,21 @@ handleAction = case _ of
   FetchSpot _ ->
     pure unit
 
+navigate :: forall m. MonadState State m => MonadEffect m => Int -> m Unit
+navigate dropAmt =
+  H.get >>= \st ->
+    if st.selectedTicker == "0" then
+      pure unit
+    else
+      let
+        newDropAmt =
+          if dropAmt == 0 then
+            0
+          else
+            st.dropAmt + dropAmt
+      in
+        liftEffect (Core.paint st.ct (StockTicker st.selectedTicker) (Drop newDropAmt) st.takeAmt) *>
+          H.modify_ \stx -> stx { dropAmt = newDropAmt }
 {-
 handleAction :: forall cs o m. MonadAff m => Action -> H.HalogenM State Action cs o m Unit
 handleAction = case _ of
