@@ -1,7 +1,7 @@
 
 import globals/logo
-import colorscheme/tokyo
 import components/modal_dialog_bottom
+local-import colorscheme 
 
 body {
   background-color: var(--bg-color);
@@ -65,6 +65,6 @@ body {
   /*
   background-color: #727687;
   */
-  background-color: $bg-color-disabled;
-  color: $color-disabled;
+  background-color: var(--bg-color-disabled);
+  color: var(--color-disabled);
 }

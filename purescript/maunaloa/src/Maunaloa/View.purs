@@ -112,7 +112,7 @@ fetchSpot =
 render :: forall cs m. State -> H.ComponentHTML Action cs m
 render st =
   let
-    tickers = UI.tickerSelect st.selectedTicker 
+    tickers = UI.tickerSelect st.selectedTicker
   in
     HH.div
       [ HP.classes [ mainClass ] ]
@@ -130,5 +130,4 @@ render st =
           , tickers
           ]
       ]
-
 

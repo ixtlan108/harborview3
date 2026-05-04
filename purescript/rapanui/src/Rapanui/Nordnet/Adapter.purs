@@ -13,27 +13,28 @@ import Data.Argonaut.Core as AC
 import Data.Either (Either)
 import Data.Tuple (Tuple(..))
 import Effect.Aff (Aff)
-import HarborView.Common (HarborViewError)
+--import HarborView.Common (HarborViewError)
+import HarborView.AppStatus (AppStatus)
 import HarborView.CommonJson as CJ
-import HarborView.Util.HttpUtil as HU
+import HarborView.Util.HttpUtil2 as HU
 import Rapanui.Common (OptionTicker(..), Cid(..), Bid(..))
 import Rapanui.Nordnet.CoreJson (CritterResponse, DefaultResponse, StockOptionPayload)
 import Rapanui.Nordnet.CoreJson as CoreJson
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
 
-fetchCritters :: Aff (Either HarborViewError CritterResponse)
+fetchCritters :: Aff (Either AppStatus CritterResponse)
 fetchCritters =
   HU.get
     "/critter/purchase/11"
     CoreJson.critterResponseDecoder
 
-fetchStockOption :: OptionTicker -> Aff (Either HarborViewError StockOptionPayload)
+fetchStockOption :: OptionTicker -> Aff (Either AppStatus StockOptionPayload)
 fetchStockOption (OptionTicker ticker) =
   HU.get
     ("/rapanui/stockoption/" <> ticker)
     CoreJson.stockOptionDecoder
 
-toggleAccActive :: Int -> Boolean -> Aff (Either HarborViewError DefaultResponse)
+toggleAccActive :: Int -> Boolean -> Aff (Either AppStatus DefaultResponse)
 toggleAccActive oid isChecked =
   HU.get
     ("/rapanui/toggleAccrule/" <> show oid <> "/" <> show isChecked)
@@ -55,7 +56,7 @@ mapOptionSale (SaleError error) =
 mapOptionSale _ =
   []
 
-registerSales :: Array OptionSale -> Aff (Either HarborViewError DefaultResponse)
+registerSales :: Array OptionSale -> Aff (Either AppStatus DefaultResponse)
 registerSales items =
   let
     jb =

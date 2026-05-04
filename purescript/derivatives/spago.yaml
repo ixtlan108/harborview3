@@ -17,7 +17,7 @@ package:
     - effect
     - foreign 
     - halogen
-    # - harborview
+    - harborview
     # - aff
     # - affjax
     # - affjax-web

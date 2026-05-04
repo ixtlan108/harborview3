@@ -16,7 +16,7 @@ import Effect.Console (logShow)
 import Halogen (SubscriptionId)
 import Halogen as H
 import Halogen.Subscription (Emitter)
-import HarborView.Common (handleError)
+--import HarborView.Common (handleError)
 import HarborView.HalogenCommon (timer)
 import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
@@ -106,7 +106,8 @@ handleFetchCritters =
         H.liftAff Nordnet.fetchCritters >>= \result ->
           case result of
             Left err ->
-              liftEffect $ handleError err
+              pure unit
+              --liftEffect $ handleError err
             Right result1 ->
               mapJsonResult result1
       _ ->
@@ -158,7 +159,8 @@ handleAction = case _ of
     H.liftAff (Nordnet.toggleAccActive accOid checked) >>= \result ->
       case result of
         Left err ->
-          liftEffect $ handleError err
+          pure unit
+          --liftEffect $ handleError err
         Right result1 ->
           (liftEffect $ logShow $ result1)
   Timer subs _ ->

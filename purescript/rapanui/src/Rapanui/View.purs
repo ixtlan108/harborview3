@@ -16,7 +16,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
 --import HarborView.ModalDialog as DLG
-import HarborView.UI.Checkbox as CB
+--import HarborView.UI.Checkbox as CB
 import Rapanui.Command (handleAction)
 import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc)
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
@@ -87,15 +87,15 @@ accPart acc =
       let
         Oid oid = curAcc.oid
         -- Rtyp rtyp = curAcc.rtyp
-        cbActive =
-          CB.mkCheckboxSimple (CB.defaultSimpleChecboxParam $ IsActive oid)
+        -- cbActive =
+        --   CB.mkCheckboxSimple (CB.defaultSimpleChecboxParam $ IsActive oid)
       in
         [ HH.td [] [ HH.text (Common.fromInt oid) ]
         , HH.td [] [ HH.text (show curAcc.rtyp) ]
         , HH.td [] [ HH.text $ rtypDesc curAcc.rtyp ]
         --, HH.td [] [ HH.text (rtypDesc curAcc.rtyp) ]
         , HH.td [] [ HH.text (Common.numToString curAcc.value) ]
-        , HH.td [] [ cbActive ]
+        --, HH.td [] [ cbActive ]
         --, HH.td [] [ H.a [ A.href "#", A.class "newdnyrule href-td", E.onClick (DenyRuleMsgFor (NewDenyRule <| Oid curAcc.oid)) ] [ HH.text "New Deny" ] ]
         ]
 
@@ -188,7 +188,7 @@ render st =
       , RU.stopTimer
       ]
   in
-  HH.div [ HP.classes [ ClassName "containerx" ] ]
+  HH.div [ HP.class_ $  ClassName "containerx" ]
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]

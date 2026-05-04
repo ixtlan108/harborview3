@@ -49,11 +49,11 @@ type InputWrapperParams =
   , spanClazz :: Array ClassName
   }
 
-mkInputWrapper :: forall w i. InputWrapperParams -> HTML w i-> HTML w i
+mkInputWrapper :: forall w i. InputWrapperParams -> HTML w i -> HTML w i
 mkInputWrapper p inp =
   let
     Title t = p.title
   in
-  HH.span [ HP.classes p.spanClazz ]
-    [ HH.label [ HP.classes p.lblClazz ] [ HH.text t, inp ]
-    ]
+    HH.span [ HP.classes p.spanClazz ]
+      [ HH.label [ HP.classes p.lblClazz ] [ HH.text t, inp ]
+      ]
