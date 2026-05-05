@@ -1,6 +1,7 @@
 (import joy)
 (import joy/responder :as r)
 (import json :as j)
+(import /api/common :as c)
 
 (defn acc-rule (oid)
   {:oid 72
@@ -18,16 +19,15 @@
 
 (defn ticker-payload ()
   (let (ticker "NHY9E30")
-    {:ticker ticker 
-     :oid 47
-     :price 5.8
-     :critters [(critter ticker)]}))
+    [{:ticker ticker 
+        :oid 47
+        :price 5.8
+        :critters [(critter ticker)]}]))
   
 
 (defn purchase [req]
   (printf "%q" req)
-  (let (response {:appstatus 0 :msg nil :payload [(ticker-payload)]})
-    (r/respond :json (j/encode response))))
+  (c/payload-response (ticker-payload)))
 
 (joy/route :get "/critter/purchase/:purchasetype" purchase)
 
@@ -53,8 +53,7 @@
 (defn stock-option [req]
   (printf "%q" req)
   (inc-counter)
-  (let (response {:appstatus 0 :msg nil :payload (get-stock-opt)})
-    (r/respond :json (j/encode response))))
+  (c/payload-response (get-stock-opt)))
 
 (joy/route :get "/rapanui/stockoption/:ticker" stock-option)
 
