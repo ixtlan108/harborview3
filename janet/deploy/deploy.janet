@@ -133,11 +133,6 @@
       (when (not (co/file-exists? to-f))
         (shutil/copyfile from-f to-f)))))
 
-#      (shutil/copyfile from-map-f to-map-f))
-#    (when (not (co/file-exists? to-f))
-#      (print "Doing copy of js file...")
-#      (shutil/copyfile from-f to-f))))
-
 (defn copy-css-files [cfg css-md5]
   (print "Enter copy-css-files..")
   (let [css-cfg (cfg :css)
@@ -148,10 +143,6 @@
       (shutil/copyfile from-f to-f)
       (when (not (co/file-exists? to-f))
         (shutil/copyfile from-f to-f)))))
-
-#    (when (not (co/file-exists? to-f))
-#      (print "Doing copy of css file...")
-#      (shutil/copyfile from-f to-f))))
 
 (defn render [cfg spago-md5 css-md5]
   (when (not (dyn :x-joy))

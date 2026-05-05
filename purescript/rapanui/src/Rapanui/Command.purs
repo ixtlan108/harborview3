@@ -7,7 +7,7 @@ import Prelude
 import Control.Monad.State.Class (class MonadState)
 import Data.Array as A
 import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..),fromMaybe)
 import Data.Number (fromString)
 import Effect.Aff (Milliseconds(..))
 import Effect.Aff.Class (class MonadAff)
@@ -19,6 +19,8 @@ import Halogen.Subscription (Emitter)
 --import HarborView.Common (handleError)
 import HarborView.HalogenCommon (timer)
 import HarborView.ModalDialog (ModalState(..))
+import HarborView.AppStatus (AppStatus)
+import HarborView.AppStatus as AppStat
 import Rapanui.Common (MainAction(..))
 import Rapanui.Critter.Core as Core
 import Rapanui.Nordnet.Adapter as Nordnet
@@ -28,6 +30,34 @@ import Rapanui.State (State)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale)
 import Rapanui.StockMarket.OptionSaleItem as OSI
 
+handleAppStatus
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => AppStatus
+  -> String
+  -> m Unit
+handleAppStatus appStatus msg =
+  let
+    myModal = AppStat.modalStateFor appStatus msg
+  in
+    H.modify_
+      \stx ->
+        stx { modalStateBottom = myModal }
+
+handleAppStatus2
+  :: forall r m.
+     MonadState State m
+  => MonadAff m
+  => { status :: Int, msg :: Maybe String | r}
+  -> m Unit
+handleAppStatus2 response =
+  let
+    myModal = AppStat.modalStateFor (AppStat.fromInt response.status) (fromMaybe "" response.msg)
+  in
+  H.modify_
+    \stx ->
+      stx { modalStateBottom = myModal }
 
 mapJsonResult
   :: forall m
@@ -106,10 +136,12 @@ handleFetchCritters =
         H.liftAff Nordnet.fetchCritters >>= \result ->
           case result of
             Left err ->
-              pure unit
-              --liftEffect $ handleError err
+              handleAppStatus err "Nordnet.fetchCritters"
             Right result1 ->
-              mapJsonResult result1
+              if result1.status > 0 then
+                handleAppStatus2 result1
+              else
+                mapJsonResult result1
       _ ->
         pure unit
 
@@ -145,6 +177,7 @@ handleTick =
           stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>
       handleTickResult result
 
+
 handleAction
   :: forall cs o m
    . MonadAff m
@@ -159,10 +192,12 @@ handleAction = case _ of
     H.liftAff (Nordnet.toggleAccActive accOid checked) >>= \result ->
       case result of
         Left err ->
-          pure unit
-          --liftEffect $ handleError err
+          handleAppStatus err "Nordnet.toggleAccActive"
         Right result1 ->
-          (liftEffect $ logShow $ result1)
+          if result1.status > 0 then
+            handleAppStatus2 result1
+          else
+            (liftEffect $ logShow $ result1)
   Timer subs _ ->
     handleTimer subs
   Tick ->

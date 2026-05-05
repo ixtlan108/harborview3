@@ -15,6 +15,7 @@ import Halogen.HTML (ClassName(..), HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
+import HarborView.ModalDialog as DLG
 --import HarborView.ModalDialog as DLG
 --import HarborView.UI.Checkbox as CB
 import Rapanui.Command (handleAction)
@@ -192,7 +193,7 @@ render st =
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
-      -- , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
+      , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 
 {-

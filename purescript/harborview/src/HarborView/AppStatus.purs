@@ -14,6 +14,20 @@ data AppStatus
   | HttpError Int
   | JsonError String
 
+fromInt :: Int -> AppStatus
+fromInt status =
+  case status of
+    11 -> GeneralError 1
+    12 -> GeneralError 2
+    21 -> SqlError 1
+    22 -> SqlError 2
+    23 -> SqlError 3
+    24 -> SqlError 4
+    25 -> SqlError 5
+    31 -> ApplicationWarning 1
+    32 -> ApplicationWarning 2
+    _ -> Ok
+
 instance Show AppStatus where
   show Ok = "Ok"
   show (GeneralError i) = "GeneralError " <> show i
@@ -55,4 +69,3 @@ modalStateFor st msg =
       ModalError $ "(http staus code: " <> show statusCode <> ") " <> msg
     JsonError s ->
       ModalError $ "(" <> s <> ") " <> msg
-      

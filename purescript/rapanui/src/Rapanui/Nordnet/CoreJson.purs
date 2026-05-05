@@ -24,7 +24,7 @@ import Data.Maybe (Maybe)
 --import Prelude
 
 type PayloadResponse a =
-  { appstatus :: Int
+  { status :: Int
   , msg :: Maybe String
   , payload :: a
   }
@@ -58,8 +58,8 @@ critterResponseDecoder :: Json -> Either JsonDecodeError CritterResponse
 critterResponseDecoder = Decode.decodeJson
 
 type DefaultResponse =
-  { appstatus :: Int
-  , msg :: String
+  { status :: Int
+  , msg :: Maybe String
   }
 
 defaultResponseDecoder :: Json -> Either JsonDecodeError DefaultResponse

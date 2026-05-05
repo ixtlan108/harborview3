@@ -5,8 +5,10 @@
 (def SEARCH-NOT-FOUND 32)
 
 (defn get-param-str [req param-name]
-  (let [p (req :params)]
-    (p param-name)))
+  ((req :params) param-name))
+
+#  (let [p (req :params)]
+#    (p param-name)))
 
 (defn get-qs-int [req param-name]
   (let [q (req :query-string)
