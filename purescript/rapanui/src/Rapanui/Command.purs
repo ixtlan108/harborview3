@@ -147,7 +147,8 @@ handleFetchCritters =
 
 handleTickResult
   :: forall m
-   . MonadAff m
+   . MonadState State m
+  => MonadAff m
   => Array OptionSale
   -> m Unit
 handleTickResult items =
@@ -160,8 +161,15 @@ handleTickResult items =
     if A.null vs then
       pure unit
     else
-      H.liftAff (Nordnet.registerSales items) *>
-        pure unit
+      H.liftAff (Nordnet.registerSales items) >>= \result ->
+        case result of
+          Left err ->
+            handleAppStatus err "Nordnet.registerSales"
+          Right result1 ->
+            if result1.status > 0 then
+              handleAppStatus2 result1
+            else
+              pure unit
 
 handleTick
   :: forall m

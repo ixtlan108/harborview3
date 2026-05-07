@@ -300,7 +300,7 @@
   (printf "%q" argx)
   (let [os-linux (= (argx "os") "linux")
         md5-cmd (if os-linux md5-linux md5-macos)
-        spago-cmd (if os-linux "/usr/local/bin/spago" "/opt/homebrew/bin/spago")]
+        spago-cmd (if os-linux "/usr/local/bin/spago" "/usr/local/bin/spago")]
     (with-dyns [:x-css (argx "css")
                 :x-spago (argx "spago")
                 :x-quiet (argx "quiet")

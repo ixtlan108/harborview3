@@ -96,7 +96,7 @@
   (let (response {:appstatus 0 :msg nil})
     (r/respond :json (j/encode response))))
 
-(joy/route :put "/rapanui/optionsales" option-sales)
+(joy/route :put "/rapanui/optionsalesx" option-sales)
 
 # {"appStatusCode": 1,
 #  "error": null,
