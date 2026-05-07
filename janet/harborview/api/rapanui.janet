@@ -44,7 +44,7 @@
         acc-oid 112
         acc (mk-acc pid cid acc-oid 1.0)
         critter (mk-critter cid 10 [acc])
-        ticker (mk-ticker "NHY9E40" pid 12.0 [critter])]))
+        ticker (mk-ticker "NHY9E40" pid 8.0 [critter])]))
 
 (defn purchase [req]
   (printf "%q" req)
@@ -74,13 +74,13 @@
       6 (option 92.0 4.0)
       (option 200.0 20.0))
     (case stock-opt-counter # ticker == NHY9E40
-      1 (option 100.0 10.0)
-      2 (option 102.0 10.5)
-      3 (option 104.0 12.5)
-      4 (option 103.0 11.5)
-      5 (option 99.0 8.0)
+      1 (option 100.0 8.0)
+      2 (option 102.0 8.5)
+      3 (option 104.0 9.5)
+      4 (option 97.0 6.5)
+      5 (option 102.0 8.0)
       6 (option 92.0 4.0)
-      (option 200.0 20.0))))
+      (option 100.0 8.0))))
 
 (defn stock-option [req]
   (printf "%q" req)
