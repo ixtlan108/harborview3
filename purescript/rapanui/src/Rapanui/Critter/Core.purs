@@ -35,7 +35,7 @@ applyPurchase purchase =
     Nordnet.fetchStockOption purchase.ticker >>= \response ->
       case response of
         Left err ->
-          pure [SaleError "errToString err"]
+          pure [SaleError "errToString err" ]
         Right result1 ->
           let
             currentStock = Transform.mapStockOptionResponse result1

@@ -14,6 +14,10 @@ testSale1 :: OptionSale
 testSale1  =
   Sale { critterId: Cid 1, price: Bid 10.0 }
 
+errorSale1 :: OptionSale
+errorSale1 =
+  SaleError "Error 1"
+
 testOptionSaleSuite :: TestSuite
 testOptionSaleSuite =
   suite "OptionSaleItemTest" do
@@ -26,6 +30,6 @@ testOptionSaleSuite =
       let actual = validOptionSales curAx
       Assert.equal actual [ testSale1 ]
     test "Result Sale + SaleError" do
-      let curAx = [ NoSale, SaleError "Error 1", NotActive, testSale1, NoSale ]
+      let curAx = [ NoSale, errorSale1, NotActive, testSale1, NoSale ]
       let actual = validOptionSales curAx
-      Assert.equal actual [ testSale1, SaleError "Error 1" ]
+      Assert.equal actual [ testSale1, errorSale1 ]

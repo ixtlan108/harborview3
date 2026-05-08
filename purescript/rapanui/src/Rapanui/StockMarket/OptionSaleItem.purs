@@ -16,6 +16,11 @@ type SalePayload =
   , price :: Bid
   }
 
+-- type ErrorSalePayload =
+--   { critterId :: Cid
+--   , error :: String
+--   }
+
 data OptionSale
   = NotActive
   | NoSale
@@ -39,29 +44,29 @@ validOptionSales ax = go ax [] where
     let
       hx = Ar.head items
     in
-      case hx of
-        Nothing ->
-          result
-        Just hx1 ->
-          let
-            tx = Ar.tail items
-          in
-          case hx1 of
-            Sale _ ->
-              case tx of
-                Nothing ->
-                  hx1 : result
-                Just tx1 ->
-                  go tx1 (hx1 : result)
-            SaleError _ ->
-              case tx of
-                Nothing ->
-                  hx1 : result
-                Just tx1 ->
-                  go tx1 (hx1 : result)
-            _ ->
-              case tx of
-                Nothing ->
-                  result
-                Just tx1 ->
-                  go tx1 result
+    case hx of
+      Nothing ->
+        result
+      Just hx1 ->
+        let
+          tx = Ar.tail items
+        in
+        case hx1 of
+          Sale _ ->
+            case tx of
+              Nothing ->
+                hx1 : result
+              Just tx1 ->
+                go tx1 (hx1 : result)
+          SaleError _  ->
+            case tx of
+              Nothing ->
+                hx1 : result
+              Just tx1 ->
+                go tx1 (hx1 : result)
+          _ ->
+            case tx of
+              Nothing ->
+                result
+              Just tx1 ->
+                go tx1 result

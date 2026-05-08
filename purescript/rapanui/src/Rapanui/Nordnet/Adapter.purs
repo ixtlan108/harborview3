@@ -54,7 +54,11 @@ mapOptionSale (SaleError error) =
   , CJ.fromBool "isSale" false
   ]
 mapOptionSale _ =
-  []
+  [ Tuple "cid" AC.jsonNull
+  , Tuple "bid" AC.jsonNull
+  , Tuple "error" AC.jsonNull
+  , CJ.fromBool "isSale" false
+  ]
 
 registerSales :: Array OptionSale -> Aff (Either AppStatus DefaultResponse)
 registerSales items =

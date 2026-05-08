@@ -131,19 +131,28 @@ handleFetchCritters
   => m Unit
 handleFetchCritters =
   H.get >>= \st ->
-    case st.stockOptions of
-      [] ->
-        H.liftAff Nordnet.fetchCritters >>= \result ->
-          case result of
-            Left err ->
-              handleAppStatus err "Nordnet.fetchCritters"
-            Right result1 ->
-              if result1.status > 0 then
-                handleAppStatus2 result1
-              else
-                mapJsonResult result1
-      _ ->
-        pure unit
+    H.liftAff Nordnet.fetchCritters >>= \result ->
+      case result of
+        Left err ->
+          handleAppStatus err "Nordnet.fetchCritters"
+        Right result1 ->
+          if result1.status > 0 then
+            handleAppStatus2 result1
+          else
+            mapJsonResult result1
+    -- case st.stockOptions of
+    --   [] ->
+    --     H.liftAff Nordnet.fetchCritters >>= \result ->
+    --       case result of
+    --         Left err ->
+    --           handleAppStatus err "Nordnet.fetchCritters"
+    --         Right result1 ->
+    --           if result1.status > 0 then
+    --             handleAppStatus2 result1
+    --           else
+    --             mapJsonResult result1
+    --   _ ->
+    --     pure unit
 
 handleTickResult
   :: forall m
@@ -169,7 +178,7 @@ handleTickResult items =
             if result1.status > 0 then
               handleAppStatus2 result1
             else
-              pure unit
+              handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
 
 handleTick
   :: forall m

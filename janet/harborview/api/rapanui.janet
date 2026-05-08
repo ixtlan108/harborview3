@@ -83,8 +83,8 @@
       (option 100.0 8.0))))
 
 (defn stock-option [req]
-  (printf "%q" req)
-  (printf "%q" (c/get-param-str req :ticker))
+  #(printf "%q" req)
+  #(printf "%q" (c/get-param-str req :ticker))
   (inc-counter)
   (let [ticker (c/get-param-str req :ticker)]
     (c/payload-response (get-stock-opt ticker))))
@@ -92,11 +92,12 @@
 (joy/route :get "/rapanui/stockoption/:ticker" stock-option)
 
 (defn option-sales [req]
-  (printf "%q" req)
-  (let (response {:appstatus 0 :msg nil})
-    (r/respond :json (j/encode response))))
+  (printf "req body %q" (req :body))
+  #(printf "cid %q" (c/get-body-item req :cid))
+  #(printf "bid %q" (c/get-body-item req :bid))
+  (c/default-response "Option sale registered ok"))
 
-(joy/route :put "/rapanui/optionsalesx" option-sales)
+(joy/route :put "/rapanui/optionsales" option-sales)
 
 # {"appStatusCode": 1,
 #  "error": null,

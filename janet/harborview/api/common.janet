@@ -10,6 +10,10 @@
 #  (let [p (req :params)]
 #    (p param-name)))
 
+(defn get-body-item [req item-name]
+  (let [b (req :body)]
+    (b item-name)))
+
 (defn get-qs-int [req param-name]
   (let [q (req :query-string)
         val (q param-name)]
