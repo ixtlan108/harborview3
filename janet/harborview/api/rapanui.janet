@@ -86,6 +86,7 @@
   #(printf "%q" req)
   #(printf "%q" (c/get-param-str req :ticker))
   (inc-counter)
+  (printf "COUNTER: %d" stock-opt-counter)
   (let [ticker (c/get-param-str req :ticker)]
     (c/payload-response (get-stock-opt ticker))))
 

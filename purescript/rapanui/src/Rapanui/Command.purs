@@ -178,6 +178,7 @@ handleTickResult items =
             if result1.status > 0 then
               handleAppStatus2 result1
             else
+              (liftEffect $ logShow $ "REGISTER SALES: " <> show result) *>
               handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
 
 handleTick
