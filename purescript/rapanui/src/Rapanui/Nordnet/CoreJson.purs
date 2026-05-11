@@ -66,7 +66,8 @@ defaultResponseDecoder :: Json -> Either JsonDecodeError DefaultResponse
 defaultResponseDecoder = Decode.decodeJson
 
 type JsonStockOptionItem =
-  { bid :: Number
+  { ticker :: String
+  , bid :: Number
   , ask :: Number
   }
 

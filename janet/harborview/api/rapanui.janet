@@ -54,14 +54,14 @@
 
 (var stock-opt-counter 0)
 
-(defn option [spot bid]
-  (let [ask (* 1.25 bid)]
-    { :spot spot :option {:bid bid :ask ask} :optionStatus 0 :msg nil}))
-
 (defn inc-counter []
   (if (> stock-opt-counter 5)
     (set stock-opt-counter 1) 
     (++ stock-opt-counter)))
+
+(defn option [spot bid]
+  (let [ask (* 1.25 bid)]
+    { :spot spot :option {:bid bid :ask ask} :optionStatus 0 :msg nil}))
 
 (defn get-stock-opt [ticker]
   (if (= ticker "NHY9E30")

@@ -51,6 +51,8 @@ newtype Oid = Oid Int
 
 derive instance Generic Oid _
 
+derive instance Eq Oid
+
 instance Show Oid where
   show = genericShow
 

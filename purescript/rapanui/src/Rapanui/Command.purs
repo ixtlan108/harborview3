@@ -170,7 +170,7 @@ handleTickResult items =
     if A.null vs then
       pure unit
     else
-      H.liftAff (Nordnet.registerSales items) >>= \result ->
+      H.liftAff (Nordnet.registerSales vs) >>= \result ->
         case result of
           Left err ->
             handleAppStatus err "Nordnet.registerSales"
@@ -180,6 +180,14 @@ handleTickResult items =
             else
               (liftEffect $ logShow $ "REGISTER SALES: " <> show result) *>
               handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
+
+handleTickErrors
+  :: forall m
+   . MonadAff m
+  => Array OptionSale
+  -> m Unit
+handleTickErrors sales =
+  pure unit
 
 handleTick
   :: forall m
@@ -193,6 +201,7 @@ handleTick =
       (H.modify_
         \stx ->
           stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>
+      handleTickErrors result *>
       handleTickResult result
 
 

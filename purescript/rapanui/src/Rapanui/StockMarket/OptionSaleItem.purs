@@ -1,6 +1,6 @@
 module Rapanui.StockMarket.OptionSaleItem where
 
-import Rapanui.Common (Bid, Cid)
+import Rapanui.Common (Bid, Cid, Oid)
 
 import Data.Maybe (Maybe(..))
 -- import Data.Show (class Show)
@@ -16,16 +16,16 @@ type SalePayload =
   , price :: Bid
   }
 
--- type ErrorSalePayload =
---   { critterId :: Cid
---   , error :: String
---   }
+type ErrorSalePayload =
+  { oid :: Oid
+  , error :: String
+  }
 
 data OptionSale
   = NotActive
   | NoSale
   | Sale SalePayload
-  | SaleError String
+  | SaleError ErrorSalePayload
 
 derive instance Eq OptionSale
 

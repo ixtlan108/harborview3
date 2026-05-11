@@ -7,7 +7,7 @@ import Prelude
 import Test.Unit (suite, test, TestSuite)
 import Test.Unit.Assert as Assert
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..), validOptionSales)
-import Rapanui.Common (Bid(..), Cid(..))
+import Rapanui.Common (Bid(..), Cid(..), Oid(..))
 
 
 testSale1 :: OptionSale
@@ -16,7 +16,8 @@ testSale1  =
 
 errorSale1 :: OptionSale
 errorSale1 =
-  SaleError "Error 1"
+  SaleError { oid: Oid 1, error: "Error 1" }
+
 
 testOptionSaleSuite :: TestSuite
 testOptionSaleSuite =

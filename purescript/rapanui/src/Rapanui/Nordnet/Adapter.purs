@@ -17,7 +17,7 @@ import Effect.Aff (Aff)
 import HarborView.AppStatus (AppStatus)
 import HarborView.CommonJson as CJ
 import HarborView.Util.HttpUtil2 as HU
-import Rapanui.Common (OptionTicker(..), Cid(..), Bid(..))
+import Rapanui.Common (OptionTicker(..), Cid(..), Bid(..), Oid(..))
 import Rapanui.Nordnet.CoreJson (CritterResponse, DefaultResponse, StockOptionPayload)
 import Rapanui.Nordnet.CoreJson as CoreJson
 import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
@@ -46,10 +46,12 @@ mapOptionSale (Sale { critterId: (Cid cid), price: (Bid bid)}) =
   , CJ.fromNumber "bid" bid
   , Tuple "error" AC.jsonNull
   , CJ.fromBool "isSale" true
+  , Tuple "oid" AC.jsonNull
   ]
-mapOptionSale (SaleError error) =
+mapOptionSale (SaleError { error, oid: (Oid oid) }) =
   [ Tuple "cid" AC.jsonNull
   , Tuple "bid" AC.jsonNull
+  , CJ.fromInt "oid" oid
   , CJ.fromString "error" error
   , CJ.fromBool "isSale" false
   ]
@@ -57,6 +59,7 @@ mapOptionSale _ =
   [ Tuple "cid" AC.jsonNull
   , Tuple "bid" AC.jsonNull
   , Tuple "error" AC.jsonNull
+  , Tuple "oid" AC.jsonNull
   , CJ.fromBool "isSale" false
   ]
 
