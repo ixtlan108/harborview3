@@ -183,7 +183,8 @@ handleTickResult items =
 
 handleTickErrors
   :: forall m
-   . MonadAff m
+   . MonadState State m
+  => MonadAff m
   => Array OptionSale
   -> m Unit
 handleTickErrors sales =
@@ -197,7 +198,7 @@ handleTick
 handleTick =
   H.get >>= \st ->
     H.liftAff (Core.applyPurchases st.stockOptions) >>= \result ->
-      (liftEffect $ logShow $ result) *>
+      --(liftEffect $ logShow $ result) *>
       (H.modify_
         \stx ->
           stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>
@@ -224,7 +225,7 @@ handleAction = case _ of
           if result1.status > 0 then
             handleAppStatus2 result1
           else
-            (liftEffect $ logShow $ result1)
+            pure unit
   Timer subs _ ->
     handleTimer subs
   Tick ->
@@ -237,10 +238,3 @@ handleAction = case _ of
         \stx -> stx { interval = fromString s, emitter = Nothing }
   ModalDialogBottomClose _ ->
     H.modify_ \stx -> stx { modalStateBottom = ModalHidden }
-
-{-
-    (liftEffect $ logShow accOid)
-      *> (liftEffect $ logShow checked)
-      *>
-        pure unit
--}
