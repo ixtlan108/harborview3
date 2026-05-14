@@ -7,7 +7,7 @@ import Prelude
 import Control.Monad.State.Class (class MonadState)
 import Data.Array as A
 import Data.Either (Either(..))
-import Data.Maybe (Maybe(..),fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Number (fromString)
 import Effect.Aff (Milliseconds(..))
 import Effect.Aff.Class (class MonadAff)
@@ -16,16 +16,16 @@ import Effect.Console (logShow)
 import Halogen (SubscriptionId)
 import Halogen as H
 import Halogen.Subscription (Emitter)
---import HarborView.Common (handleError)
-import HarborView.HalogenCommon (timer)
-import HarborView.ModalDialog (ModalState(..))
 import HarborView.AppStatus (AppStatus)
 import HarborView.AppStatus as AppStat
+import HarborView.HalogenCommon (timer)
+import HarborView.ModalDialog (ModalState(..))
 import Rapanui.Common (MainAction(..))
 import Rapanui.Critter.Core as Core
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
 import Rapanui.Nordnet.Transform as Transform
+--import Rapanui.Log (Log)
 import Rapanui.State (State)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale)
 import Rapanui.StockMarket.OptionSaleItem as OSI
@@ -154,6 +154,7 @@ handleFetchCritters =
     --   _ ->
     --     pure unit
 
+
 handleTickResult
   :: forall m
    . MonadState State m
@@ -178,8 +179,8 @@ handleTickResult items =
             if result1.status > 0 then
               handleAppStatus2 result1
             else
-              (liftEffect $ logShow $ "REGISTER SALES: " <> show result) *>
-              handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
+              (liftEffect $ logShow $ "REGISTER SALES: " <> show result)
+              --handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
 
 handleTickErrors
   :: forall m
@@ -188,7 +189,7 @@ handleTickErrors
   => Array OptionSale
   -> m Unit
 handleTickErrors sales =
-  pure unit
+  liftEffect $ logShow "handleTickErrors"
 
 handleTick
   :: forall m
@@ -198,7 +199,7 @@ handleTick
 handleTick =
   H.get >>= \st ->
     H.liftAff (Core.applyPurchases st.stockOptions) >>= \result ->
-      --(liftEffect $ logShow $ result) *>
+      (liftEffect $ logShow $ result) *>
       (H.modify_
         \stx ->
           stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>

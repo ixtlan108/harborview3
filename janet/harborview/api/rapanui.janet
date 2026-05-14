@@ -56,7 +56,7 @@
 
 (defn inc-counter []
   (if (> stock-opt-counter 5)
-    (set stock-opt-counter 1) 
+    (set stock-opt-counter 0) 
     (++ stock-opt-counter)))
 
 (defn option [spot bid]

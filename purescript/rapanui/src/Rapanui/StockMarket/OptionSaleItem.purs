@@ -1,6 +1,6 @@
 module Rapanui.StockMarket.OptionSaleItem where
 
-import Rapanui.Common (Bid, Cid, Oid)
+import Rapanui.Common (Bid(..), Cid(..), Oid(..), Log)
 
 import Data.Maybe (Maybe(..))
 -- import Data.Show (class Show)
@@ -10,6 +10,7 @@ import Data.Array as Ar
 import Data.Array ((:))
 
 import Prelude
+
 
 type SalePayload =
   { critterId :: Cid
@@ -70,3 +71,21 @@ validOptionSales ax = go ax [] where
                 result
               Just tx1 ->
                 go tx1 result
+
+
+mapOptionSaleToLog :: OptionSale -> Log
+mapOptionSaleToLog (Sale { critterId: (Cid cid), price: (Bid bid) }) =
+  { oid: "-"
+    , cid: show cid
+    , log: "Price: " <> show bid
+  }
+mapOptionSaleToLog (SaleError { oid: (Oid oid), error }) =
+  { oid: show oid
+    , cid: "-"
+    , log: error
+  }
+mapOptionSaleToLog _ =
+  { oid: "-"
+    , cid: "-"
+    , log: "-"
+  }

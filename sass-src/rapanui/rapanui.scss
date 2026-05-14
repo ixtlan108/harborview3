@@ -19,14 +19,15 @@ body {
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 10fr 1fr;
-  grid-template-rows: 20px 40px 80px auto;
+  grid-template-rows: 20px 40px 80px auto logs;
   gap: 5px 5px;
   grid-auto-flow: row;
   grid-template-areas:
     ". . ."
     ". buttons ."
     ". tick-interval ."
-    ". critters .";
+    ". critters ."
+    ". logs .";
 }
 
 .buttons { 
@@ -43,6 +44,10 @@ body {
 
 .critters { 
   grid-area: critters; 
+}
+
+.logs { 
+  grid-area: logs; 
 }
 
 .ps-mr-1 {

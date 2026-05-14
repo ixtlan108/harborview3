@@ -17,6 +17,7 @@ module Rapanui.Common
   , Rtyp(..)
   , StatusCode(..)
   , Status(..)
+  , Log
   , rtypDesc
   ) where
 
@@ -157,6 +158,12 @@ newtype Msg = Msg String
 newtype PosixTimeInt = PosixTimeInt Int
 
 newtype Iso8601 = Iso8601 String
+
+type Log =
+  { oid :: String
+  , cid :: String
+  , log :: String
+  }
 
 --newtype MarketOpen = MarketOpen TimeOfDay deriving (Show)
 

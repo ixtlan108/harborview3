@@ -22,6 +22,7 @@ type State =
   , emitter :: Maybe (Emitter MainAction)
   , modalStateBottom :: ModalState
   , optionSales :: Array OptionSale
+  --, logs :: Array Log
   }
 
 defaultState :: State
@@ -33,6 +34,7 @@ defaultState =
   , emitter: Nothing
   , modalStateBottom: ModalHidden
   , optionSales: []
+  --, logs: []
   }
 
 --instance Show State where

@@ -1,4 +1,4 @@
-module Rapanui.Table
+module Rapanui.LogTable
   where
 
 --import Data.Maybe (fromMaybe,Maybe)
@@ -7,10 +7,12 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML as HH
 import Halogen.HTML (ClassName(..), HTML)
 import Web.HTML.Common (AttrName(..))
+import Rapanui.Common (Log)
+
+import Prelude
 
 --import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
 --import Rapanui.Common (MainAction)
-import Rapanui.Log (Log)
 
 tdAlign :: forall r i. Boolean -> IProp r i
 tdAlign isLeft =
@@ -30,5 +32,20 @@ tableHead =
     ]
 
 createRow :: forall w i. Log -> HTML w i
-createRow _ =
-  HH.div_ []
+createRow log =
+  HH.tr_
+    [ HH.td [ tdAlign false ] [ HH.text log.oid ]
+    , HH.td [ tdAlign false ] [ HH.text log.cid ]
+    , HH.td [ tdAlign true ] [ HH.text log.log ]
+    ]
+
+createTable :: forall w i. Array Log -> HTML w i
+createTable logs =
+  let
+    rows = map createRow logs
+  in
+    HH.table
+      [ HP.classes [ ClassName "sortable ps-mt-1" ] ]
+      [ tableHead
+      , HH.tbody_ rows
+      ]
