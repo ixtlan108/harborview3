@@ -7,16 +7,18 @@ table {
 table thead th {
   position: sticky;
   /* make the table heads sticky */
-  top: 119px;
-  z-index: 1000;
+  top: 0;
   /* table head will be placed from the top of the table and sticks to it */
-  background: var(--table-th-nosort-background-color);
 }
 
 th,
 td {
   padding: 8px 16px;
   border: 1px solid var(--table-td-border-color);
+}
+
+th {
+  background: var(--table-th-background-color);
 }
 
 .sortable thead th:not(.no-sort) {

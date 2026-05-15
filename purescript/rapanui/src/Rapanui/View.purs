@@ -19,13 +19,15 @@ import HarborView.ModalDialog as DLG
 --import HarborView.ModalDialog as DLG
 --import HarborView.UI.Checkbox as CB
 import Rapanui.Command (handleAction)
-import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc, Log)
+import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc)
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
 import Rapanui.State (State, defaultState)
 import Rapanui.UI as RU
 import Rapanui.LogTable as LogTable
 import Rapanui.StockMarket.OptionSaleItem (OptionSale)
 import Rapanui.StockMarket.OptionSaleItem as OSI
+
+--foreign import curTime :: String
 
 --noSort ∷ ∀ r i. Array (IProp (class ∷ String | r) i)
 --noSort =
@@ -37,7 +39,7 @@ tableHeader =
   HH.thead []
     [ HH.tr
         []
-        [ HH.th [] [ HH.text "Oid" ]
+        [ HH.th [] [ HH.text "Cid" ]
         , HH.th [] [ HH.text "Ask" ]
         , HH.th [] [ HH.text "Status" ]
         , HH.th [] [ HH.text "-" ]
@@ -177,12 +179,12 @@ component =
     , eval: H.mkEval H.defaultEval { handleAction = handleAction }
     }
 
-createLogTable :: forall w. Array OptionSale -> HTML w MainAction
-createLogTable sales =
+createLogTable :: forall w. Array OptionSale -> Int -> HTML w MainAction
+createLogTable sales tickCounter =
   let
     logs = map OSI.mapOptionSaleToLog sales
   in
-  LogTable.createTable logs
+  LogTable.createTable logs tickCounter
 
 
 render :: ∀ s m. MonadAff m => State -> H.ComponentHTML MainAction s m
@@ -204,7 +206,7 @@ render st =
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
-      , HH.div [ HP.classes [ ClassName "logs" ]] [ createLogTable st.optionSales ]
+      , HH.div [ HP.classes [ ClassName "logs" ]] [ createLogTable st.optionSales st.tickCounter ]
       , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 
