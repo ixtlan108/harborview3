@@ -178,12 +178,6 @@ component =
     , eval: H.mkEval H.defaultEval { handleAction = handleAction }
     }
 
-createLogTable :: forall w. Array Log -> Int -> HTML w MainAction
-createLogTable logs tickCounter =
-  --   logs = map OSI.mapOptionSaleToLog sales
-  LogTable.createTable logs tickCounter
-
-
 render :: ∀ s m. MonadAff m => State -> H.ComponentHTML MainAction s m
 render st =
   let
@@ -197,13 +191,14 @@ render st =
       [ RU.fetchPurchases
       , RU.startTimer
       , RU.stopTimer
+      , RU.clearLogs
       ]
   in
   HH.div [ HP.class_ $  ClassName "containerx" ]
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
-      , HH.div [ HP.classes [ ClassName "logs" ]] [ createLogTable st.logs st.tickCounter ]
+      , HH.div [ HP.classes [ ClassName "logs" ]] [ LogTable.createTable st.logs ]
       , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 

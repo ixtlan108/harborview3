@@ -73,19 +73,25 @@ validOptionSales ax = go ax [] where
                 go tx1 result
 
 
-mapOptionSaleToLog :: OptionSale -> Log
-mapOptionSaleToLog (Sale { critterId: (Cid cid), price: (Bid bid) }) =
-  { oid: "-"
+mapOptionSaleToLog :: Int -> String -> OptionSale -> Log
+mapOptionSaleToLog tick tm (Sale { critterId: (Cid cid), price: (Bid bid) }) =
+  { tick: tick
+    , tm: tm
+    , oid: "-"
     , cid: show cid
     , log: "Price: " <> show bid
   }
-mapOptionSaleToLog (SaleError { oid: (Oid oid), error }) =
-  { oid: show oid
+mapOptionSaleToLog tick tm (SaleError { oid: (Oid oid), error }) =
+  { tick: tick
+    , tm: tm
+    , oid: show oid
     , cid: "-"
     , log: error
   }
-mapOptionSaleToLog _ =
-  { oid: "-"
+mapOptionSaleToLog _ _ _ =
+  { tick: 0
+    , tm: "-"
+    , oid: "-"
     , cid: "-"
     , log: "-"
   }

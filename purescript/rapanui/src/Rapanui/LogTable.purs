@@ -11,7 +11,7 @@ import Rapanui.Common (Log)
 
 import Prelude
 
-foreign import curTime :: Int -> String
+-- foreign import curTime :: Int -> String
 --import Rapanui.StockMarket.OptionSaleItem (OptionSale(..))
 --import Rapanui.Common (MainAction)
 
@@ -34,20 +34,20 @@ tableHead =
         ]
     ]
 
-createRow :: forall w i. Int -> Log -> HTML w i
-createRow tickCounter log =
+createRow :: forall w i. Log -> HTML w i
+createRow log =
   HH.tr_
-    [ HH.td [ tdAlignLeft false ] [ HH.text $ show tickCounter ]
-    , HH.td [ tdAlignLeft true ] [ HH.text $ curTime 1 ]
+    [ HH.td [ tdAlignLeft false ] [ HH.text $ show log.tick ]
+    , HH.td [ tdAlignLeft true ] [ HH.text log.tm ]
     , HH.td [ tdAlignLeft false ] [ HH.text log.oid]
     , HH.td [ tdAlignLeft false ] [ HH.text log.cid ]
     , HH.td [ tdAlignLeft true ] [ HH.text log.log ]
     ]
 
-createTable :: forall w i. Array Log -> Int -> HTML w i
-createTable logs tickCounter =
+createTable :: forall w i. Array Log -> HTML w i
+createTable logs =
   let
-    rows = map (createRow tickCounter) logs
+    rows = map createRow logs
   in
     HH.table
       [ HP.classes [ ClassName "sortable ps-mt-1" ] ]

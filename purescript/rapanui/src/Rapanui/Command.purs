@@ -30,6 +30,8 @@ import Rapanui.StockMarket.OptionSaleItem as OSI
 import Rapanui.State (State)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale)
 
+foreign import curTime :: Int -> String
+
 handleAppStatus
   :: forall m
    . MonadState State m
@@ -161,11 +163,12 @@ updateLogs
   => Array OptionSale
   -> m Unit
 updateLogs sales =
-  let
-    newLogs = map OSI.mapOptionSaleToLog sales
-  in
   H.get >>= \st ->
-   H.modify_ \stx -> stx { logs = newLogs <> st.logs }
+    let
+      tm = curTime 1
+      newLogs = map (OSI.mapOptionSaleToLog st.tickCounter tm) sales
+    in
+    H.modify_ \stx -> stx { logs = newLogs <> st.logs }
 
 handleTickResult
   :: forall m
@@ -235,11 +238,11 @@ handleAction = case _ of
     handleTimer subs
   Tick ->
     handleTick
-  Noop _ ->
-    pure unit
   IntervalChange s ->
     unsubscribeTimer *>
       H.modify_
         \stx -> stx { interval = fromString s, emitter = Nothing }
   ModalDialogBottomClose _ ->
     H.modify_ \stx -> stx { modalStateBottom = ModalHidden }
+  ClearLogs _ ->
+    H.modify_ \stx -> stx { logs = [] }

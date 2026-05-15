@@ -35,9 +35,9 @@ data MainAction
   | Timer Boolean MouseEvent
   | IsActive Int Boolean
   | Tick
-  | Noop String
   | IntervalChange String
   | ModalDialogBottomClose MouseEvent
+  | ClearLogs MouseEvent
 
 newtype OptionTicker = OptionTicker String
 
@@ -160,7 +160,9 @@ newtype PosixTimeInt = PosixTimeInt Int
 newtype Iso8601 = Iso8601 String
 
 type Log =
-  { oid :: String
+  { tick :: Int
+  , tm :: String
+  , oid :: String
   , cid :: String
   , log :: String
   }
