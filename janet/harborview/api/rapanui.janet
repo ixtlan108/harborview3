@@ -50,7 +50,6 @@
   (printf "%q" req)
   (c/payload-response [pl-1 pl-2]))
 
-(joy/route :get "/critter/purchase/:purchasetype" purchase)
 
 (var stock-opt-counter 0)
 
@@ -90,7 +89,6 @@
   (let [ticker (c/get-param-str req :ticker)]
     (c/payload-response (get-stock-opt ticker))))
 
-(joy/route :get "/rapanui/stockoption/:ticker" stock-option)
 
 (defn option-sales [req]
   (printf "req body %q" (req :body))
@@ -98,6 +96,8 @@
   #(printf "bid %q" (c/get-body-item req :bid))
   (c/default-response "Option sale registered ok"))
 
+(joy/route :get "/rapanui/stockoption/:ticker" stock-option)
+(joy/route :get "/critter/purchase/:purchasetype" purchase)
 (joy/route :put "/rapanui/optionsales" option-sales)
 
 # {"appStatusCode": 1,

@@ -35,3 +35,8 @@
 (defn default-response (msg)
   (let [resp {:status APP-STATUS-OK :msg msg}]
     (r/respond :json (j/encode resp))))
+
+(defn post-response (status msg)
+  (let [resp {:status status :msg msg}]
+    (r/respond :json (j/encode resp))))
+

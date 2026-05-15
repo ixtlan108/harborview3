@@ -41,7 +41,7 @@ createResponse :: Number -> Number -> Int -> StockOptionPayload
 createResponse bid ask status =
   { status : 0
     , payload: { spot: 120.0
-                 , option: { ticker: "NHY9E30", bid: bid, ask: ask }
+                 , option: {  bid: bid, ask: ask }
                  , optionStatus: status
                  , msg: Nothing
                  }
