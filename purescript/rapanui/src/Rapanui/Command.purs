@@ -25,10 +25,10 @@ import Rapanui.Critter.Core as Core
 import Rapanui.Nordnet.Adapter as Nordnet
 import Rapanui.Nordnet.CoreJson (CritterResponse)
 import Rapanui.Nordnet.Transform as Transform
+import Rapanui.StockMarket.OptionSaleItem as OSI
 --import Rapanui.Log (Log)
 import Rapanui.State (State)
 import Rapanui.StockMarket.OptionSaleItem (OptionSale)
-import Rapanui.StockMarket.OptionSaleItem as OSI
 
 handleAppStatus
   :: forall m
@@ -154,6 +154,18 @@ handleFetchCritters =
     --   _ ->
     --     pure unit
 
+updateLogs
+  :: forall m
+   . MonadState State m
+  => MonadAff m
+  => Array OptionSale
+  -> m Unit
+updateLogs sales =
+  let
+    newLogs = map OSI.mapOptionSaleToLog sales
+  in
+  H.get >>= \st ->
+   H.modify_ \stx -> stx { logs = newLogs <> st.logs }
 
 handleTickResult
   :: forall m
@@ -171,6 +183,7 @@ handleTickResult items =
     if A.null vs then
       pure unit
     else
+      updateLogs vs *>
       H.liftAff (Nordnet.registerSales vs) >>= \result ->
         case result of
           Left err ->
@@ -182,14 +195,6 @@ handleTickResult items =
               (liftEffect $ logShow $ "REGISTER SALES: " <> show result)
               --handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
 
-handleTickErrors
-  :: forall m
-   . MonadState State m
-  => MonadAff m
-  => Array OptionSale
-  -> m Unit
-handleTickErrors sales =
-  liftEffect $ logShow "handleTickErrors"
 
 handleTick
   :: forall m
@@ -203,7 +208,6 @@ handleTick =
       (H.modify_
         \stx ->
           stx { tickCounter = stx.tickCounter + 1, optionSales = result }) *>
-      handleTickErrors result *>
       handleTickResult result
 
 

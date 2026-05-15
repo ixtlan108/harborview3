@@ -19,13 +19,12 @@ import HarborView.ModalDialog as DLG
 --import HarborView.ModalDialog as DLG
 --import HarborView.UI.Checkbox as CB
 import Rapanui.Command (handleAction)
-import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc)
+import Rapanui.Common (MainAction(..), Oid(..), Ask(..), OptionTicker(..), rtypDesc, Log)
 import Rapanui.Critter.Rules (StockOptionPurchase, Critter, AcceptRule)
 import Rapanui.State (State, defaultState)
 import Rapanui.UI as RU
 import Rapanui.LogTable as LogTable
-import Rapanui.StockMarket.OptionSaleItem (OptionSale)
-import Rapanui.StockMarket.OptionSaleItem as OSI
+--import Rapanui.StockMarket.OptionSaleItem (OptionSale)
 
 --foreign import curTime :: String
 
@@ -179,11 +178,9 @@ component =
     , eval: H.mkEval H.defaultEval { handleAction = handleAction }
     }
 
-createLogTable :: forall w. Array OptionSale -> Int -> HTML w MainAction
-createLogTable sales tickCounter =
-  let
-    logs = map OSI.mapOptionSaleToLog sales
-  in
+createLogTable :: forall w. Array Log -> Int -> HTML w MainAction
+createLogTable logs tickCounter =
+  --   logs = map OSI.mapOptionSaleToLog sales
   LogTable.createTable logs tickCounter
 
 
@@ -206,7 +203,7 @@ render st =
     [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
-      , HH.div [ HP.classes [ ClassName "logs" ]] [ createLogTable st.optionSales st.tickCounter ]
+      , HH.div [ HP.classes [ ClassName "logs" ]] [ createLogTable st.logs st.tickCounter ]
       , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
     ]
 
