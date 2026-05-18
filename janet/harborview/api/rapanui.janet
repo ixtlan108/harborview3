@@ -89,12 +89,15 @@
   (let [ticker (c/get-param-str req :ticker)]
     (c/payload-response (get-stock-opt ticker))))
 
+(defn sale? [v] (v :isSale)) 
 
 (defn option-sales [req]
-  (printf "req body %q" (req :body))
-  #(printf "cid %q" (c/get-body-item req :cid))
-  #(printf "bid %q" (c/get-body-item req :bid))
-  (c/default-response "Option sale registered ok"))
+  (let [body (req :body)
+        sales (filter sale? body)]
+    (printf "req body %q" body)
+    (if (= (length body) (length sales))
+      (c/default-response "Option sale registered ok")
+      (c/post-response 32 "Some option sales were error"))))
 
 (joy/route :get "/rapanui/stockoption/:ticker" stock-option)
 (joy/route :get "/critter/purchase/:purchasetype" purchase)

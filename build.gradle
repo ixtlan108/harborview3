@@ -7,7 +7,6 @@ plugins {
 
 group = 'hamilton108'
 version = '0.9.2'
-sourceCompatibility = '21'
 
 repositories {
 	mavenCentral()
@@ -62,15 +61,6 @@ tasks.register('integrationTest', Test) {
     systemProperty('spring.profiles.active', 'integration')
 }
 
-configurations {
-    integrationImplementation.extendsFrom(testImplementation)
-    integrationRuntimeOnly.extendsFrom(testRuntimeOnly)
-}
-
-tasks.named('integrationTest') {
-    useJUnitPlatform()
-}
-
 sourceSets {
     integration  {
         java {
@@ -80,6 +70,16 @@ sourceSets {
         }
     }
 }
+
+configurations {
+    integrationImplementation.extendsFrom(testImplementation)
+    integrationRuntimeOnly.extendsFrom(testRuntimeOnly)
+}
+
+tasks.named('integrationTest') {
+    useJUnitPlatform()
+}
+
 
 idea {
     module {

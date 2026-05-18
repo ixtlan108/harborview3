@@ -47,7 +47,6 @@ public class MaunaloaCore {
 
     private Logger logger = LoggerFactory.getLogger(MaunaloaCore.class);
     private final StockMarketService stockMarketAdapter;
-    private final OptionCalculator optionCalculator;
     private final ChartFactory chartFactory = new ChartFactory();
     private final ChartWeekFactory chartWeekFactory = new ChartWeekFactory();
     private final ChartMonthFactory chartMonthFactory = new ChartMonthFactory();
@@ -55,25 +54,14 @@ public class MaunaloaCore {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build();
 
-    Cache<Integer, List<RLine>> rlineCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build();
-
     private List<SelectItem> stockTickers;
 
-    private final NordnetRepository nordnetRepository;
     private final Core core;
 
-    public MaunaloaCore(@Qualifier("adapter.demo") NordnetRepository nordnetRepository,
-    //public MaunaloaCore(NordnetRepository nordnetRepository,
-                        StockMarketService stockMarketAdapter,
-                        Core core,
-                        @Qualifier("blackScholes") OptionCalculator optionCalculator) {
-        this.nordnetRepository = nordnetRepository;
+    public MaunaloaCore(StockMarketService stockMarketAdapter,
+                        Core core) {
         this.stockMarketAdapter = stockMarketAdapter;
         this.core = core;
-        this.optionCalculator = optionCalculator;
-        System.out.println("MaunaloaCore: " + nordnetRepository);
     }
 
     //@Cacheable(value="stockTickers")
@@ -118,124 +106,12 @@ public class MaunaloaCore {
     }
 
 
-    //----------------------------- Risc Lines --------------------------------
-    void saveRiscResult(int oid,
-                        String ticker,
-                        double bid,
-                        double ask,
-                        double riscValue,
-                        double riscStockPrice,
-                        double riscOptionPrice,
-                        double breakEven) {
-        var line = new RLine(oid, ticker, bid, ask, riscValue, riscStockPrice, riscOptionPrice, breakEven);
-
-        var lines = rlineCache.getIfPresent(oid);
-        if (lines == null)  {
-            logger.info(String.format("Empty rline cache for oid: %d", oid));
-            var newLines = new ArrayList<RLine>();
-            newLines.add(line);
-            rlineCache.put(oid, newLines);
-        }
-        else {
-            logger.info(String.format("Found rline cache for oid: %d", oid));
-            lines.add(line);
-        }
-    }
-
-    RiscResponse calcRiscStockPrice(RiscRequest request) {
-
-        //*
-        var info = StockOptionUtil.stockOptionInfoFromTicker(request.getTicker());
-
-        var oid = info.getStockTicker().oid(); //info.first();
-
-        var optionType = info.getStockOptionType(); //info.third();
-
-        var hit = nordnetRepository.findOption(request.getTicker());
-
-        if (hit == null) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.COULD_NOT_FIND_OPTION_ERROR);
-        }
-
-        var option = hit.second();
-
-        var riscAdjustedPrice = option.getAsk() - request.getRiscValue();
-
-        if (riscAdjustedPrice < 0) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.RISC_ADJUSTED_PRICE_LESS_THAN_ZERO);
-        }
-
-        if (option.getIvBid() < 0) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.IV_LESS_THAN_ZERO);
-        }
-
-        double curStockPrice = 0.0;
-        double curBreakEven = 0.0;
-        var stockPrice = hit.first();
-        try {
-            curStockPrice = optionCalculator.stockPriceFor2(optionType,
-                    riscAdjustedPrice,
-                    option.getX(),
-                    option.getDays(),
-                    option.getIvBid(),
-                    stockPrice.cls());
-        } catch (BinarySearchException ex) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.CALCULATE_OPTION_PRICE_ERROR);
-        }
-
-        try {
-            curBreakEven = optionCalculator.stockPriceFor2(optionType,
-                    option.getAsk(),
-                    option.getX(),
-                    option.getDays(),
-                    option.getIvBid(),
-                    stockPrice.cls());
-        } catch (BinarySearchException ex) {
-            return new RiscResponse(request.getTicker(), -1.0, RiscResponseStatus.BREAK_EVEN_ERROR);
-        }
-
-        var result = new RiscResponse(request.getTicker(), curStockPrice, RiscResponseStatus.OK);
-
-        saveRiscResult(oid,
-                request.getTicker().value(),
-                option.getBid(),
-                option.getAsk(),
-                request.getRiscValue(),
-                curStockPrice,
-                riscAdjustedPrice,
-                curBreakEven);
-
-        return result;
-
-        //*/
-    }
-
-    public Either<ApplicationError,List<RiscResponse>> calcRiscStockPrices(List<RiscRequest> request) {
-        return core.handleSearch(() -> {
-            var result = new ArrayList<RiscResponse>();
-            for (var risc : request) {
-                result.add(calcRiscStockPrice(risc));
-            }
-            return result;
-        });
-    }
 
     public Either<ApplicationError, StockPrice> getSpot(StockTicker stockTicker) {
         return core.handleSearch(() -> stockMarketAdapter.getSpot(stockTicker));
     }
 
-    public List<RLine> getRiscLines(StockTicker ticker) {
-        var lines = rlineCache.getIfPresent(ticker.oid());
-        return Objects.requireNonNullElse(lines, Collections.emptyList());
-    }
-    public StatusDTO deleteAllRiscLines(StockTicker ticker) {
-        rlineCache.invalidate(ticker.oid());
-        return new StatusDTO(true, String.format("Deleted risc lines for %s ok", ticker.ticker()), StatusCode.OK.getStatus());
-    }
 
-    public void invalidateRiscLineCache() {
-        rlineCache.invalidateAll();
-    }
     public void invalidateStockPriceCache() {
         stockPriceCache.invalidateAll();
     }

@@ -55,9 +55,5 @@ public class StockPriceAPI {
         return ApiUtil.map(maunaloaCore.months(new StockTicker(oid)));
     }
 
-    @PutMapping(value = "/calculate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PayloadResponse<List<RiscResponse>>> calcRiscStockPrices(@RequestBody List<RiscRequest> riscs) {
-        return ApiUtil.map(maunaloaCore.calcRiscStockPrices(riscs));
-    }
 
 }

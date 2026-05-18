@@ -192,11 +192,7 @@ handleTickResult items =
           Left err ->
             handleAppStatus err "Nordnet.registerSales"
           Right result1 ->
-            if result1.status > 0 then
-              handleAppStatus2 result1
-            else
-              (liftEffect $ logShow $ "REGISTER SALES: " <> show result)
-              --handleAppStatus2 { status: 0, msg: Just "registerSales OK" }
+            handleAppStatus2 result1
 
 
 handleTick
