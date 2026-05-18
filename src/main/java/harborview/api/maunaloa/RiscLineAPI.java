@@ -3,7 +3,7 @@ package harborview.api.maunaloa;
 import harborview.nordnet.api.RLine;
 import harborview.domain.stockmarket.StockTicker;
 import harborview.dto.StatusDTO;
-import harborview.rapanui.api.RapanuiCore;
+import harborview.rapanui.RapanuiCore;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,7 +15,6 @@ import java.util.List;
 @RequestMapping("/maunaloa/risclines")
 public class RiscLineAPI {
 
-    //private final MaunaloaCore maunaloaCore;
     private final RapanuiCore rapanuiCore;
 
     public RiscLineAPI(RapanuiCore rapanuiCore) {
