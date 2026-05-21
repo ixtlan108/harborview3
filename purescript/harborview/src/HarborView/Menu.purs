@@ -1,4 +1,4 @@
-module Harborview.Menu
+module HarborView.Menu
   where
 
 import Prelude
@@ -8,8 +8,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 
 data ActivePage
-  = Home
-  | Critters
+  = Critters
   | Rapanui
   | Charts
   | Derivatives
@@ -20,7 +19,30 @@ derive instance Eq ActivePage
 
 mkMenu :: forall w action. ActivePage -> HTML w action
 mkMenu ap =
-  HH.div_ []
+  let
+    critter = if ap == Critters then
+      HH.a [ HP.href "/critter/overlook", HP.classes [ ClassName "menu--active" ]]
+    else
+      HH.a [ HP.href "/critter/overlook" ]
+    rapanui = if ap == Rapanui then
+      HH.a [ HP.href "/rapanui", HP.classes [ ClassName "menu--active" ]]
+    else
+      HH.a [ HP.href "/rapanui" ]
+  in
+  HH.div [ HP.classes [ ClassName "menu--header menu--header-x" ]]
+    [ HH.ul [ HP.classes [ ClassName "menu--ul"]]
+      [ HH.li [ HP.classes [ ClassName "menu--li" ]]
+          [ critter
+            [ HH.text "Critter"]
+          ]
+        , HH.li [ HP.classes [ ClassName "menu--li" ]]
+            [ rapanui
+              [ HH.text "Rapanui"]
+            ]
+        , HH.li [ HP.classes [ ClassName "menu--li menu--version" ]]
+          [ HH.text "Ver. 0.9.76 2026-04-23" ]
+        ]
+    ]
 
 -- mkMenu :: forall w action. ActivePage -> HTML w action
 -- mkMenu ap =
@@ -67,8 +89,6 @@ mkMenu ap =
 --   HH.div [ HP.classes [ ClassName "menu--header menu--header-x" ]]
 --     [ HH.ul [ HP.classes [ ClassName "menu--ul"]]
 --       [
---         -- HH.li [ HP.classes [ ClassName "menu--li menu--badge" ]]
---         --   [ HH.text "PUSHWAGNER" ]
 --       HH.li [ HP.classes [ ClassName "menu--li" ]]
 --         [ home
 --           [ HH.text "Registration"]

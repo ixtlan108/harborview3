@@ -1,0 +1,45 @@
+/* common/menu.css */
+.menu--ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.menu--li {
+  float: left;
+}
+
+.menu--li a {
+  display: block;
+  color: wheat;
+  text-align: center;
+  padding: 10px 10px;
+  text-decoration: none;
+}
+
+.menu--li a:hover:not(.active) {
+  background-color: var(--menu-bg-color-hover);
+}
+.menu--active {
+  background-color: var(--menu-bg-color);
+}
+.menu--badge, .menu--version {
+  text-align: center;
+  font-style: italic;
+  padding: 10px 30px;
+}
+.menu--badge {
+  color: wheat;
+}  
+.menu--version {
+  color: tan;
+}
+.menu--header {
+  grid-row: 1;
+  background-color: var(--navbar-bg-color);
+  color: var(--bg-color);
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}

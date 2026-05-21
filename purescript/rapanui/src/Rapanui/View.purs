@@ -16,6 +16,8 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import HarborView.Common as Common
 import HarborView.ModalDialog as DLG
+import HarborView.ModalDialog as DLG
+import HarborView.Menu (mkMenu, ActivePage(..))
 --import HarborView.ModalDialog as DLG
 --import HarborView.UI.Checkbox as CB
 import Rapanui.Command (handleAction)
@@ -195,7 +197,8 @@ render st =
       ]
   in
   HH.div [ HP.class_ $  ClassName "containerx" ]
-    [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
+    [ mkMenu Rapanui
+      , HH.div [ HP.classes [ ClassName "buttons" ]] buttons
       , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
       , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
       , HH.div [ HP.classes [ ClassName "logs" ]] [ LogTable.createTable st.logs ]
