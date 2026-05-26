@@ -1,0 +1,20 @@
+details {
+  border: 1px solid;
+  padding: 7px;
+  border-radius: 3px;
+  margin-bottom: 1rem;
+}
+
+summary {
+  font-style: italic;
+  font-size: 1rem;
+  color: black;
+}
+
+details[open] > summary {
+  margin-bottom: 0.5rem;
+}
+
+summary:hover {
+  background-color: silver;
+}
