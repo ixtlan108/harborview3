@@ -196,13 +196,15 @@ render st =
       , RU.clearLogs
       ]
   in
-  HH.div [ HP.class_ $  ClassName "containerx" ]
+  HH.div [ HP.class_ $  ClassName "rapanui--grid-main" ]
     [ mkMenu Rapanui
-      , HH.div [ HP.classes [ ClassName "buttons" ]] buttons
-      , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
-      , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
-      , HH.div [ HP.classes [ ClassName "logs" ]] [ LogTable.createTable st.logs ]
-      , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
+      , HH.div [ HP.class_ $  ClassName "containerx" ]
+        [ HH.div [ HP.classes [ ClassName "buttons" ]] buttons
+        , HH.div [ HP.classes [ ClassName "tick-interval" ]] [ interval, tick ]
+        , HH.div [ HP.classes [ ClassName "critters" ]] [ createTable st ]
+        , HH.div [ HP.classes [ ClassName "logs" ]] [ LogTable.createTable st.logs ]
+        , DLG.modalDialogBottom st.modalStateBottom ModalDialogBottomClose
+        ]
     ]
 
 {-

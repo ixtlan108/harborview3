@@ -26,10 +26,10 @@ tableHead :: forall w i. HTML w i
 tableHead =
   HH.thead_
     [ HH.tr_
-        [ HH.th_ [ HH.text "Tick" ]
-        , HH.th_ [ HH.text "Time" ]
-        , HH.th_ [ HH.text "Oid" ]
+        [ HH.th_ [ HH.text "Oid" ]
         , HH.th_ [ HH.text "Cid" ]
+        , HH.th_ [ HH.text "Tick" ]
+        , HH.th_ [ HH.text "Time" ]
         , HH.th_ [ HH.text "Log" ]
         ]
     ]
@@ -37,10 +37,10 @@ tableHead =
 createRow :: forall w i. Log -> HTML w i
 createRow log =
   HH.tr_
-    [ HH.td [ tdAlignLeft false ] [ HH.text $ show log.tick ]
-    , HH.td [ tdAlignLeft true ] [ HH.text log.tm ]
-    , HH.td [ tdAlignLeft false ] [ HH.text log.oid]
+    [ HH.td [ tdAlignLeft false ] [ HH.text log.oid]
     , HH.td [ tdAlignLeft false ] [ HH.text log.cid ]
+    , HH.td [ tdAlignLeft false ] [ HH.text $ show log.tick ]
+    , HH.td [ tdAlignLeft true ] [ HH.text log.tm ]
     , HH.td [ tdAlignLeft true ] [ HH.text log.log ]
     ]
 
